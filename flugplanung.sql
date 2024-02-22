@@ -1,0 +1,151 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Erstellungszeit: 22. Feb 2024 um 21:08
+-- Server-Version: 10.4.32-MariaDB
+-- PHP-Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Datenbank: `flugplanung`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `dienste`
+--
+
+CREATE TABLE `dienste` (
+  `flugtag` date DEFAULT NULL,
+  `pilot_id` int(11) DEFAULT NULL,
+  `windenfahrer` tinyint(1) NOT NULL,
+  `startleiter` tinyint(1) NOT NULL,
+  `id` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `dienste_wuensche`
+--
+
+CREATE TABLE `dienste_wuensche` (
+  `pilot_id` int(11) NOT NULL DEFAULT 0,
+  `datum` date NOT NULL,
+  `wunsch` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `mitglieder`
+--
+
+CREATE TABLE `mitglieder` (
+  `pilot_id` int(11) NOT NULL,
+  `firstname` varchar(32) NOT NULL,
+  `lastname` varchar(32) NOT NULL,
+  `verein` text NOT NULL,
+  `windenfahrer` tinyint(1) NOT NULL,
+  `dienste_admin` tinyint(1) DEFAULT 0,
+  `password` varchar(64) DEFAULT NULL,
+  `email` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Daten für Tabelle `mitglieder`
+--
+
+INSERT INTO `mitglieder` (`pilot_id`, `firstname`, `lastname`, `verein`, `windenfahrer`, `dienste_admin`, `password`, `email`) VALUES
+(31, 'Max', 'Mustermann', 'Alpspitzflieger e.V.', 1, 0, '$2y$10$Q57JsLL2O9AhBiPMZG40O.gQHFAJb2qiFr4965iSKwupiowpX3lyi', 'max@mustermann.de');
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `moegliche_flugtage`
+--
+
+CREATE TABLE `moegliche_flugtage` (
+  `datum` date NOT NULL,
+  `aufbau` time NOT NULL DEFAULT '10:00:00',
+  `betrieb_ngl` tinyint(1) DEFAULT 0,
+  `betrieb_hrp` tinyint(1) NOT NULL DEFAULT 0,
+  `betrieb_amd` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tagesplanung`
+--
+
+CREATE TABLE `tagesplanung` (
+  `pilot_id` int(11) NOT NULL,
+  `Kommentar` varchar(128) NOT NULL,
+  `NGL` int(11) NOT NULL,
+  `HRP` int(11) NOT NULL,
+  `AMD` int(11) NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `flugtag` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Indizes der exportierten Tabellen
+--
+
+--
+-- Indizes für die Tabelle `dienste`
+--
+ALTER TABLE `dienste`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indizes für die Tabelle `dienste_wuensche`
+--
+ALTER TABLE `dienste_wuensche`
+  ADD PRIMARY KEY (`pilot_id`,`datum`);
+
+--
+-- Indizes für die Tabelle `mitglieder`
+--
+ALTER TABLE `mitglieder`
+  ADD PRIMARY KEY (`pilot_id`);
+
+--
+-- Indizes für die Tabelle `moegliche_flugtage`
+--
+ALTER TABLE `moegliche_flugtage`
+  ADD PRIMARY KEY (`datum`);
+
+--
+-- Indizes für die Tabelle `tagesplanung`
+--
+ALTER TABLE `tagesplanung`
+  ADD PRIMARY KEY (`flugtag`,`pilot_id`) USING BTREE;
+
+--
+-- AUTO_INCREMENT für exportierte Tabellen
+--
+
+--
+-- AUTO_INCREMENT für Tabelle `mitglieder`
+--
+ALTER TABLE `mitglieder`
+  MODIFY `pilot_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
