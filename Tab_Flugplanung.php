@@ -139,7 +139,7 @@
 			<div class="toast-body">
 				Eine Chatbox ist in Arbeit. Für Ad-Hoc Nachrichten für den Flugtag nutzt bitte unsere Signal
 				Chatgruppe.<br>Hier ist der <a
-					href="https://signal.group/#CjQKIPOFrmZF5OhUKKQsdfUHo3rsmZj7TMP4_rqT4uobeWY7EhBJBc69P8JDokMV7Fgo-96M">Link</a>
+					href="https://signal.group/#">Link</a>
 				zur Gruppe. Alternativ kannst Du den QR-Code scannen:<br><br>
 				<img src="img/qr_code_signal_chat.png" width="150px" alt="chat symbol">
 			</div>
