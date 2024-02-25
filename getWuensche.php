@@ -1,7 +1,8 @@
 <?php
-require 'check_login.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-require 'db_connect.php';
+\JustinMueller\Flugplanung\Helper::checkLogin();
+\JustinMueller\Flugplanung\Database::connect();
 
 $pilot_id = $_GET['pilot_id'];
 $startDate = $_GET['startDate'];
@@ -16,7 +17,7 @@ $sql = "SELECT
 		          WHERE 
 		mf.datum BETWEEN '$startDate' AND '$endDate'";
 
-$result = $conn->query($sql);
+$result = \JustinMueller\Flugplanung\Database::query($sql);
 
 $values = array();
 if ($result->num_rows > 0) {
@@ -28,4 +29,4 @@ if ($result->num_rows > 0) {
 
 echo json_encode($values);
 
-$conn->close();
+\JustinMueller\Flugplanung\Database::close();

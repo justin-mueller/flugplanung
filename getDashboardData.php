@@ -1,7 +1,8 @@
 <?php
-require 'check_login.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-require 'db_connect.php';
+\JustinMueller\Flugplanung\Helper::checkLogin();
+\JustinMueller\Flugplanung\Database::connect();
 
 $allPilots = array(['error']);
 
@@ -33,7 +34,7 @@ GROUP BY
     mf.datum;
 ";
 
-$result = $conn->query($sql);
+$result = \JustinMueller\Flugplanung\Database::query($sql);
 
 $data = array();
 
@@ -77,4 +78,4 @@ if ($result->num_rows > 0) {
 
 echo json_encode($data);
 
-$conn->close();
+\JustinMueller\Flugplanung\Database::close();

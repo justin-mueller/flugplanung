@@ -1,7 +1,8 @@
 <?php
-require 'check_login.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-require 'db_connect.php';
+\JustinMueller\Flugplanung\Helper::checkLogin();
+\JustinMueller\Flugplanung\Database::connect();
 require 'clubs.php';
 
 $flugtag = $_GET['flugtag'];
@@ -44,7 +45,7 @@ $sql = "
 
 
 
-$result = $conn->query($sql);
+$result = \JustinMueller\Flugplanung\Database::query($sql);
 
 $data = array();
 if ($result->num_rows > 0) {
@@ -67,5 +68,4 @@ if (empty($data)) {
   }
 }
 
-$conn->close();
-?>
+\JustinMueller\Flugplanung\Database::close();

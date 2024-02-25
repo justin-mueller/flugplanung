@@ -1,16 +1,13 @@
 <?php
-require 'check_login.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-require 'db_connect.php';
-require 'insertSqlStatement.php';
+\JustinMueller\Flugplanung\Helper::checkLogin();
+\JustinMueller\Flugplanung\Database::connect();
 
-$table = "chatbox";
 $pilot_id = $_POST['pilot_id'];
 $text = $_POST['text'];
 
-$sql = "INSERT INTO $table  (Pilot_ID, text) VALUES ('$pilot_id', '$text')";
+$sql = "INSERT INTO chatbox  (Pilot_ID, text) VALUES ('$pilot_id', '$text')";
 
-
-insertSqlStatement($conn, $sql);
-
-$conn->close();
+\JustinMueller\Flugplanung\Database::insertSqlStatement($sql);
+\JustinMueller\Flugplanung\Database::close();

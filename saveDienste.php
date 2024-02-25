@@ -1,8 +1,8 @@
 <?php
-require 'check_login.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-require 'db_connect.php';
-require 'insertSqlStatement.php';
+\JustinMueller\Flugplanung\Helper::checkLogin();
+\JustinMueller\Flugplanung\Database::connect();
 
 $flugtag = $_POST['flugtag'];
 $pilot_id = $_POST['pilot_id'];
@@ -12,6 +12,6 @@ $startleiter = $_POST['startleiter'];
 $sql = "INSERT INTO dienste (id, flugtag, pilot_id, windenfahrer, startleiter) 
 			  VALUES (CONCAT('$flugtag', '_' ,'$pilot_id') , '$flugtag', '$pilot_id', '$windenfahrer', '$startleiter')";
 
-insertSqlStatement($conn, $sql);
+\JustinMueller\Flugplanung\Database::insertSqlStatement($sql);
 
-$conn->close();
+\JustinMueller\Flugplanung\Database::close();

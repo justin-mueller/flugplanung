@@ -1,7 +1,8 @@
 <?php
-require 'check_login.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-require 'db_connect.php';
+\JustinMueller\Flugplanung\Helper::checkLogin();
+\JustinMueller\Flugplanung\Database::connect();
 
 $startDate = date('Y-m-d', strtotime('-1 week'));
 
@@ -10,7 +11,7 @@ $sql = "SELECT *
         LEFT JOIN mitglieder m ON m.pilot_id = cb.pilot_id
         WHERE cb.datetime >= '$startDate'";
 
-$result = $conn->query($sql);
+$result = \JustinMueller\Flugplanung\Database::query($sql);
 
 $values = [];
 if ($result->num_rows > 0) {
@@ -28,4 +29,4 @@ if ($result->num_rows > 0) {
     echo json_encode(['error' => 'Keine Einträge in der Chatbox!']);
 }
 
-$conn->close();
+\JustinMueller\Flugplanung\Database::close();

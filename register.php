@@ -1,7 +1,9 @@
 <?php
-require 'db_connect.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    \JustinMueller\Flugplanung\Database::connect();
+
     $email = $_POST['email_register'];
     $password = $_POST['password_register'];
     $vorname = ucwords(strtolower($_POST['vorname_register']));
@@ -16,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check if the email already exists
     $checkEmailQuery = "SELECT * FROM mitglieder WHERE email = '$email'";
-    $checkResult = $conn->query($checkEmailQuery);
+    $checkResult = \JustinMueller\Flugplanung\Database::query($checkEmailQuery);
 
     if ($checkResult->num_rows > 0) {
         // Email already exists, send error response
@@ -29,14 +31,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insertQuery = "INSERT INTO mitglieder
           (email, password, firstname, lastname, verein, fluggeraet, windenfahrer, avatar) VALUES
           ('$email', '$hashedPassword','$vorname', '$nachname','$verein', '$fluggeraetCombined', '$windenfahrer', '$avatar')";
-        if ($conn->query($insertQuery) === TRUE) {
-            // Successful insertion
-            echo json_encode(['success' => true]);
-        } else {
-            // Error in insertion
-            echo json_encode(['success' => false, 'error' => $conn->error]);
-        }
+        echo json_encode(\JustinMueller\Flugplanung\Database::insertSqlStatement($insertQuery));
     }
 
-    $conn->close();
+    \JustinMueller\Flugplanung\Database::close();
 }

@@ -5,20 +5,21 @@ use Twig\Loader\FilesystemLoader;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-include 'check_login.php';
-require 'db_connect.php';
+\JustinMueller\Flugplanung\Helper::checkLogin();
 
 $error = '';
 
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    \JustinMueller\Flugplanung\Database::connect();
+
     $email = $_POST['email'];
     $password = $_POST['password'];
 
     // Retrieve the hashed password from the database
     $sql = "SELECT * FROM mitglieder WHERE email = '$email'";
-    $result = $conn->query($sql);
-    $conn->close();
+    $result = \JustinMueller\Flugplanung\Database::query($sql);
+    \JustinMueller\Flugplanung\Database::close();
 
     if ($result->num_rows == 1) {
         $mitgliederData = $result->fetch_assoc();

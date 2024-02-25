@@ -1,15 +1,14 @@
 <?php
-require 'check_login.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-require 'db_connect.php';
-require 'insertSqlStatement.php';
+\JustinMueller\Flugplanung\Helper::checkLogin();
+\JustinMueller\Flugplanung\Database::connect();
 
-$table = "moegliche_flugtage";
 $datum = $_POST['datum'];
 
-$sql = "INSERT INTO $table (datum) VALUES ('$datum')";
+$sql = "INSERT INTO moegliche_flugtage (datum) VALUES ('$datum')";
+$result = \JustinMueller\Flugplanung\Database::insertSqlStatement($sql);
 
-insertSqlStatement($conn, $sql);
+\JustinMueller\Flugplanung\Database::close();
 
-$conn->close();
-
+echo json_encode($result);

@@ -1,12 +1,13 @@
 <?php
-require 'check_login.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-require 'db_connect.php';
+\JustinMueller\Flugplanung\Helper::checkLogin();
+\JustinMueller\Flugplanung\Database::connect();
 
 $flugtag = $_GET['flugtag'];
 
 $query = "SELECT * FROM moegliche_flugtage WHERE datum = '$flugtag'";
-$result = $conn->query($query);
+$result = \JustinMueller\Flugplanung\Database::query($query);
 
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
@@ -33,4 +34,4 @@ if ($result->num_rows > 0) {
     echo json_encode(array('error' => 'No entries found in the "mitglieder" table'));
 }
 
-$conn->close();
+\JustinMueller\Flugplanung\Database::close();
