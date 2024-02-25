@@ -15,4 +15,4 @@ if (ini_get('session.use_cookies')) {
 // Destroy the session data
 session_destroy();
 
-header('Location: login_page.php');
+header('Location: login.php');
