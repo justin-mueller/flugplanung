@@ -19,6 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve the hashed password from the database
     $sql = "SELECT * FROM mitglieder WHERE email = '$email'";
     $result = $conn->query($sql);
+    $conn->close();
 
     if ($result->num_rows == 1) {
         $mitgliederData = $result->fetch_assoc();
@@ -41,5 +42,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = "E-Mail oder Passwort falsch!";
     }
 }
-
-$conn->close();
