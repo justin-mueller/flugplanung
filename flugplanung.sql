@@ -57,7 +57,7 @@ CREATE TABLE `mitglieder` (
   `pilot_id` int(11) NOT NULL,
   `firstname` varchar(32) NOT NULL,
   `lastname` varchar(32) NOT NULL,
-  `verein` text NOT NULL,
+  `verein` int(11) NOT NULL DEFAULT 0,
   `windenfahrer` tinyint(1) NOT NULL,
   `dienste_admin` tinyint(1) DEFAULT 0,
   `password` varchar(64) DEFAULT NULL,

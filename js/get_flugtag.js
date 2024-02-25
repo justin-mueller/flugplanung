@@ -1,7 +1,7 @@
-function getRowCount(data, rowKey, targetValue, hdgf_only) {
+function getRowCount(data, rowKey, targetValue, clubFilter = 0) {
 	var count = 0;
 	$.each(data, function (index, row) {
-		if (row[rowKey] === targetValue && (!hdgf_only || (hdgf_only && row.Verein == 'HDGF'))) {
+		if (row[rowKey] === targetValue && (clubFilter === 0 || row.Verein === clubFilter)) {
 			count++;
 		}
 	});
@@ -53,25 +53,25 @@ function getFlugtag() {
 				startleiter_official = data.some(value => value.startleiter_official == 1) ? (data.filter(o => o.startleiter_official == 1))[0].Pilot_ID : null;
 
 				var pilot_count_all_prio_1 = [
-					getRowCount(data, 'NGL', '0', false),
-					getRowCount(data, 'HRP', '0', false),
-					getRowCount(data, 'AMD', '0', false)
+					getRowCount(data, 'NGL', '0'),
+					getRowCount(data, 'HRP', '0'),
+					getRowCount(data, 'AMD', '0')
 				];
 				var pilot_count_all_prio_2 = [
-					getRowCount(data, 'NGL', '1', false),
-					getRowCount(data, 'HRP', '1', false),
-					getRowCount(data, 'AMD', '1', false)
+					getRowCount(data, 'NGL', '1'),
+					getRowCount(data, 'HRP', '1'),
+					getRowCount(data, 'AMD', '1')
 				];
 
 				var pilot_count_hdgf_prio_1 = [
-					getRowCount(data, 'NGL', '0', true),
-					getRowCount(data, 'HRP', '0', true),
-					getRowCount(data, 'AMD', '0', true)
+					getRowCount(data, 'NGL', '0', 198),
+					getRowCount(data, 'HRP', '0', 198),
+					getRowCount(data, 'AMD', '0', 198)
 				];
 				var pilot_count_hdgf_prio_2 = [
-					getRowCount(data, 'NGL', '1', true),
-					getRowCount(data, 'HRP', '1', true),
-					getRowCount(data, 'AMD', '1', true)
+					getRowCount(data, 'NGL', '1', 198),
+					getRowCount(data, 'HRP', '1', 198),
+					getRowCount(data, 'AMD', '1', 198)
 				];
 
 				total_pilot_count_all[0] = pilot_count_all_prio_1[0] + pilot_count_all_prio_2[0];
