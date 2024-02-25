@@ -43,8 +43,8 @@ function getDashboardData() {
                 entry.windenfahrerOptionen = Array.from(windenfahrerWithPlus);
             });
 
-            allOptions = data;
-            populateDashboardTable(data);
+            dashboardData = data;
+            populateDashboardTable();
             populatePilotTable();
         },
         error: function (xhr, status, error) {
@@ -57,47 +57,48 @@ function extractNumericId(name) {
     const matches = name.match(/\d+/);
     return matches ? matches[0] : null;
 }
-function populateDashboardTable(data) {
+function populateDashboardTable() {
     const tableBody = document.getElementById('table-body-dashboard');
 
     while (tableBody.firstChild) {
         tableBody.removeChild(tableBody.firstChild);
     }
 
-    data.forEach(entry => {
+    dashboardData.forEach(entry => {
+        if (entry.date) {
+            const date = entry.date.valueOf();
+            const row = document.createElement('tr');
 
-        const date = entry.date.valueOf();
-        const row = document.createElement('tr');
+            // Date column
+            const dateCell = document.createElement('td');
+            dateCell.textContent = getFormattedGermanDate(date);
+            row.appendChild(dateCell);
 
-        // Date column
-        const dateCell = document.createElement('td');
-        dateCell.textContent = getFormattedGermanDate(date);
-        row.appendChild(dateCell);
+            // Startleiter Optionen column
+            const startleiterOptionenCell = document.createElement('td');
+            startleiterOptionenCell.setAttribute('id', 'Optionen_startleiter_' + date);
+            row.appendChild(startleiterOptionenCell);
 
-        // Startleiter Optionen column
-        const startleiterOptionenCell = document.createElement('td');
-        startleiterOptionenCell.setAttribute('id', 'Optionen_startleiter_' + date);
-        row.appendChild(startleiterOptionenCell);
+            // Windenfahrer Optionen column
+            const windenfahrerOptionenCell = document.createElement('td');
+            windenfahrerOptionenCell.setAttribute('id', 'Optionen_windenfahrer_' + date);
+            row.appendChild(windenfahrerOptionenCell);
 
-        // Windenfahrer Optionen column
-        const windenfahrerOptionenCell = document.createElement('td');
-        windenfahrerOptionenCell.setAttribute('id', 'Optionen_windenfahrer_' + date);
-        row.appendChild(windenfahrerOptionenCell);
+            // Startleiter column
+            const startleiterCell = document.createElement('td');
+            startleiterCell.setAttribute('id', 'startleiter_' + date);
+            row.appendChild(startleiterCell);
 
-        // Startleiter column
-        const startleiterCell = document.createElement('td');
-        startleiterCell.setAttribute('id', 'startleiter_' + date);
-        row.appendChild(startleiterCell);
+            // Windenfahrer column
+            const windenfahrerCell = document.createElement('td');
+            windenfahrerCell.setAttribute('id', 'windenfahrer_' + date);
+            row.appendChild(windenfahrerCell);
 
-        // Windenfahrer column
-        const windenfahrerCell = document.createElement('td');
-        windenfahrerCell.setAttribute('id', 'windenfahrer_' + date);
-        row.appendChild(windenfahrerCell);
+            populatePilotOptions(startleiterOptionenCell, startleiterCell, entry.startleiterOptionen, date, 'startleiter', entry.startleiter);
+            populatePilotOptions(windenfahrerOptionenCell, windenfahrerCell, entry.windenfahrerOptionen, date, 'windenfahrer', entry.windenfahrer);
 
-        populatePilotOptions(startleiterOptionenCell, startleiterCell, entry.startleiterOptionen, date, 'startleiter', entry.startleiter);
-        populatePilotOptions(windenfahrerOptionenCell, windenfahrerCell, entry.windenfahrerOptionen, date, 'windenfahrer', entry.windenfahrer);
-
-        tableBody.appendChild(row);
+            tableBody.appendChild(row);
+        }
     });
 }
 
@@ -179,23 +180,24 @@ function populatePilotTable() {
 
     // Add Counts
     enteredDienste.forEach(entry => {
-
         const dienst_short = entry.dienst == 'windenfahrer' ? ' (WF)' : ' (SL)'
         const pilotName = entry.name + dienst_short;
         pilotCount[pilotName] = (pilotCount[pilotName] || 0) + 1;
     });
 
     // Add 0 Values
-    allOptions[0].startleiterOptionen.forEach(entry => {
-        const field = entry.name.replace("+", "").replace("-", "") + ' (SL)'
-        pilotCount[field] = (pilotCount[field] || 0);
-    });
-
-    allOptions[0].windenfahrerOptionen.forEach(entry => {
-        const field = entry.name.replace("+", "").replace("-", "") + ' (WF)'
-        pilotCount[field] = (pilotCount[field] || 0);
-    });
-
+    if (dashboardData.startleiterOptionen) {
+        dashboardData.startleiterOptionen.forEach(entry => {
+            const field = entry.name.replace("+", "").replace("-", "") + ' (SL)'
+            pilotCount[field] = (pilotCount[field] || 0);
+        });
+    }
+    if (dashboardData.windenfahrerOptionen) {
+        dashboardData.windenfahrerOptionen.forEach(entry => {
+            const field = entry.name.replace("+", "").replace("-", "") + ' (WF)'
+            pilotCount[field] = (pilotCount[field] || 0);
+        });
+    }
 
     const headerRow = table.createTHead().insertRow();
     const headerCellName = headerRow.insertCell(0);
