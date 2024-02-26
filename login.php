@@ -1,5 +1,4 @@
 <?php
-session_save_path(realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/../tmp'));
 session_start();
 
 // Check if the user is already logged in, if yes, redirect to the main page
