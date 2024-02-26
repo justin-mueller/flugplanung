@@ -1,12 +1,15 @@
 <?php
+
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
+
 require_once __DIR__ . '/vendor/autoload.php';
 
-\JustinMueller\Flugplanung\Helper::checkLogin();
-\JustinMueller\Flugplanung\Database::connect();
+Helper::checkLogin();
+Database::connect();
 
-$datum = $_POST['datum'];
+$sql = 'DELETE FROM moegliche_flugtage WHERE datum = :datum';
+$result = Database::insertSqlStatement($sql, ['datum' => $_POST['datum']]);
 
-$sql = "DELETE FROM moegliche_flugtage WHERE datum = '$datum'";
-\JustinMueller\Flugplanung\Database::insertSqlStatement($sql);
-
-\JustinMueller\Flugplanung\Database::close();
+header('Content-Type: application/json');
+echo json_encode($result, JSON_THROW_ON_ERROR);

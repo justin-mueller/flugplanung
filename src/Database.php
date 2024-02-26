@@ -4,7 +4,7 @@ namespace JustinMueller\Flugplanung;
 
 class Database
 {
-    static protected $conn;
+    static protected \PDO $conn;
 
     public static function connect(): void
     {
@@ -22,32 +22,29 @@ class Database
             $port = 3306;
         }
 
-        self::$conn = new \mysqli($servername, $username, $password, $dbname, $port);
-        self::$conn->set_charset("utf8");
-
-        if (self::$conn->connect_error) {
-            die("Connection failed: " . self::$conn->connect_error);
-        }
+        self::$conn = new \PDO(
+            sprintf('mysql:host=%s;port=%s;dbname=%s', $servername, $port, $dbname),
+            $username,
+            $password
+        );
     }
 
-    public static function close(): void
+    public static function query(string $sql, array $parameters): bool|array
     {
-        self::$conn->close();
+        $statement = self::$conn->prepare($sql);
+        $statement->execute($parameters);
+        return $statement->fetchAll(\PDO::FETCH_ASSOC) ?: [];
     }
 
-    public static function query(string $sql)
+    public static function insertSqlStatement(string $sql, array $parameters): array
     {
-        return self::$conn->query($sql);
-    }
+        $statement = self::$conn->prepare($sql);
+        $success = $statement->execute($parameters);
 
-    public static function insertSqlStatement(string $sql): array
-    {
-        if (self::$conn->query($sql) === TRUE) {
-            // Successful insertion
+        if ($success === TRUE) {
             return ['success' => true];
-        } else {
-            // Error in insertion
-            return ['success' => false, 'error' => self::$conn->error];
         }
+
+        return ['success' => false, 'error' => implode(' -- ', $statement->errorInfo())];
     }
 }

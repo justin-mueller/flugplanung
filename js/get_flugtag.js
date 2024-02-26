@@ -241,14 +241,12 @@ function getFlugtag() {
 }
 
 function replaceValueWithImage(value) {
-	if (value === '0') {
+	if (value === 0) {
 		return '<img src="img/stern_fav.svg" class="table-image">';
-	} else if (value === '1') {
+	} else if (value === 1) {
 		return '<img src="img/stern.svg" class="table-image">';
-	} else if (value === '2') {
+	} else if (value === 2) {
 		return '<img src="img/kreuz.svg" class="table-image">';
 	}
 	return value;
 }
-
-

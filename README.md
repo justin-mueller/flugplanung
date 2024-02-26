@@ -6,7 +6,7 @@ Flugplanung für Gleitschirm-Vereine mit Windenschleppbetrieb
 
 ### Technische Voraussetzungen
 
-- PHP 8
+- PHP 8 mit PDO
 - MySQL / MariaDB
 - Composer
 
