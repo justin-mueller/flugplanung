@@ -226,16 +226,14 @@ function populatePilotTable() {
 //Error Handling ist hier etwas schlecht
 function saveDienste() {
 
-    const year = new Date(enteredDienste[0].date).getFullYear();
-
     $.ajax({
-        url: `deleteDienste.php?year=${year}`,
+        url: `deleteDienste.php?year=${saisonJahr}`,
         method: 'GET',
         dataType: 'json',
     })
         .done(deleteData => {
             if (deleteData.success) {
-                console.log('Deleted old entries for the year:', year);
+                console.log('Deleted old entries for the year:', saisonJahr);
 
                 const ajaxPromises = [];
 
