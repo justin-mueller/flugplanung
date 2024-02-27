@@ -1,5 +1,4 @@
 <?php
-session_save_path(realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/../tmp'));
 session_start();
 
 // Check if the user is not logged in, redirect to login page
@@ -14,9 +13,6 @@ $mitgliederData = isset($_SESSION['mitgliederData']) ? $_SESSION['mitgliederData
 // Convert the PHP array to a JSON string for JavaScript
 $mitgliederJson = json_encode($mitgliederData);
 ?>
-
-<script>var User_Information = <?php echo $mitgliederJson; ?>;</script>
-
 <!DOCTYPE html>
 <html lang="de">
 
@@ -29,6 +25,8 @@ $mitgliederJson = json_encode($mitgliederData);
 	<link rel="stylesheet" href="css/bootstrap-datepicker.min.css">
 	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
+
+	<script>var User_Information = <?php echo $mitgliederJson; ?>;</script>
 
 	<script type="text/javascript" src="js_modules/jquery.js"></script>
 	<script type="text/javascript" src="js_modules/bootstrap.js"></script>

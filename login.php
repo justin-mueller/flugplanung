@@ -1,5 +1,4 @@
 <?php
-session_save_path(realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/../tmp'));
 session_start();
 
 // Check if the user is already logged in, if yes, redirect to the main page
@@ -19,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve the hashed password from the database
     $sql = "SELECT * FROM mitglieder WHERE email = '$email'";
     $result = $conn->query($sql);
+    $conn->close();
 
     if ($result->num_rows == 1) {
         $mitgliederData = $result->fetch_assoc();
@@ -41,5 +41,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = "E-Mail oder Passwort falsch!";
     }
 }
-
-$conn->close();
