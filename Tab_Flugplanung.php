@@ -121,18 +121,21 @@ require 'check_login.php';
 		<div id="minpilotwarning" class="alert alert-warning d-flex align-items-center mt-3" role="alert">
 			<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:">
 				<use xlink:href="img/warning.svg#warning-fill" />
-				<div>
-					Aktuell wird die Mindestanzahl von 3 HDGF Piloten in keinem Fluggebiet erreicht!
-				</div>
+			</svg>
+			<div>
+				Aktuell wird die Mindestanzahl von 3 HDGF Piloten in keinem Fluggebiet erreicht!
+			</div>
 		</div>
 
 		<div id="minpilotreached" class="alert alert-primary d-flex align-items-center mt-3 d-none" role="alert">
 			<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">
+				<use xlink:href="img/warning.svg#warning-fill" />
+			</svg>
 		</div>
 
 		<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="display: block">
 			<div class="toast-header">
-				<img src="img/chat.svg" width="50px" alt="chat symbol">
+				<img src="img/chat.svg" width="50px" alt="chat symbol"/>
 				<strong class="me-auto">Chatbox</strong>
 				<small>...noch etwas Geduld!</small>
 

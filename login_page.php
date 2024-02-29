@@ -17,7 +17,7 @@
 	<script type="text/javascript" src="js_modules/bootstrap.js"></script>
 	<script type="text/javascript" src="js/register.js"></script>
 	<script type="text/javascript" src="js/toasts.js"></script>
-	
+
 	<div id="toastContainer"></div>
 	<div id="unicorn"></div>
 
@@ -36,7 +36,7 @@
 							<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
 								<div class="form-outline mb-4">
-									<input type="email" name="email" id="typeEmailX-2"
+									<input type="email" name="email" id="typeEmailX-2" value="<?php echo htmlspecialchars($email ?? ''); ?>"
 										class="form-control form-control-lg" required />
 									<label class="form-label" for="typeEmailX-2">E-mail</label>
 								</div>

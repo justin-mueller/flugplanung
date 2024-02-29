@@ -13,14 +13,16 @@ if ($_SERVER['SERVER_NAME'] === 'localhost' || $_SERVER['SERVER_ADDR'] === '127.
     $username = "root";
     $password = "";
     $dbname = "flugplanung";
+    $port = 3306;
 } else {
     $servername = "localhost";
     $username = "-";
     $password = "-";
     $dbname = "-";
+    $port = 3306;
 }
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname, $port);
 $conn->set_charset("utf8");
 
 if ($conn->connect_error) {

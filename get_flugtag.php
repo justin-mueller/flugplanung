@@ -2,8 +2,9 @@
 require 'check_login.php';
 
 require 'db_connect.php';
+require 'clubs.php';
 
-$flugtag = $_GET['flugtag']; 
+$flugtag = $_GET['flugtag'];
 
 $sql = "
         SELECT
@@ -48,6 +49,7 @@ $result = $conn->query($sql);
 $data = array();
 if ($result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
+     $row['Verein'] = $clubs[$row['Verein']];
      $data[] = $row;
   }
 }
@@ -59,7 +61,7 @@ if (empty($data)) {
   if ($jsonEncodedData === false) {
     echo "JSON encoding failed: " . json_last_error_msg();
   } else {
-	 header('Content-Type: application/json');
+    header('Content-Type: application/json');
     echo $jsonEncodedData;
   }
 }
