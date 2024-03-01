@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows == 1) {
         $mitgliederData = $result->fetch_assoc();
         $hashedPasswordFromDB = $mitgliederData['password'];
-
+        unset($mitgliederData['password']);
         // Validate credentials using password_verify
         if (password_verify($password, $hashedPasswordFromDB)) {
             // Authentication successful, store username and additional data in session

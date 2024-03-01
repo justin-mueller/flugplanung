@@ -8,6 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nachname = ucwords(strtolower($_POST['nachname_register']));
     $verein = $_POST['verein_register'];
     $windenfahrer = $_POST['windenfahrer_register'];
+    $avatar = $_POST['avatar_register'];
 
     // Check if the email already exists
     $checkEmailQuery = "SELECT * FROM mitglieder WHERE email = '$email'";
@@ -22,8 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Insert new user into the database
         $insertQuery = "INSERT INTO mitglieder
-          (email, password, firstname, lastname, verein, windenfahrer) VALUES
-          ('$email', '$hashedPassword','$vorname', '$nachname','$verein', '$windenfahrer')";
+          (email, password, firstname, lastname, verein, windenfahrer, avatar) VALUES
+          ('$email', '$hashedPassword','$vorname', '$nachname','$verein', '$windenfahrer', '$avatar')";
         if ($conn->query($insertQuery) === TRUE) {
             // Successful insertion
             echo json_encode(['success' => true]);

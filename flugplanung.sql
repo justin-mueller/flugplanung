@@ -24,6 +24,17 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `chatbox`
+--
+
+CREATE TABLE `chatbox` (
+  `pilot_id` int(11) DEFAULT NULL,
+  `text` varchar(128) DEFAULT NULL,
+  `datetime` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+--
 -- Tabellenstruktur für Tabelle `dienste`
 --
 
@@ -61,8 +72,10 @@ CREATE TABLE `mitglieder` (
   `windenfahrer` tinyint(1) NOT NULL,
   `dienste_admin` tinyint(1) DEFAULT 0,
   `password` varchar(64) DEFAULT NULL,
-  `email` varchar(64) NOT NULL
+  `email` varchar(64) NOT NULL,
+  `avatar` smallint(6) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- --------------------------------------------------------
 
@@ -97,6 +110,12 @@ CREATE TABLE `tagesplanung` (
 --
 -- Indizes der exportierten Tabellen
 --
+
+--
+-- Indizes für die Tabelle `chatbox`
+--
+ALTER TABLE `chatbox`
+  ADD PRIMARY KEY (`datetime`);
 
 --
 -- Indizes für die Tabelle `dienste`

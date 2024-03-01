@@ -98,6 +98,13 @@ $(document).ready(function () {
 
 
 
+	loadChatbox(true);
+
+    var avatarDiv = document.getElementById("avatar-header");
+    var imageUrl = "img/a" + User_Information.avatar + ".png"; 
+
+    avatarDiv.innerHTML = "<img src='" + imageUrl + "' alt='Avatar Preview'>";
 
 
+	setInterval(() => loadChatbox(false), 15000);
 });

@@ -119,7 +119,7 @@ require 'check_login.php';
 		</div>
 
 		<div id="minpilotwarning" class="alert alert-warning d-flex align-items-center mt-3" role="alert">
-			<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:">
+			<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning">
 				<use xlink:href="img/warning.svg#warning-fill" />
 			</svg>
 			<div>
@@ -133,24 +133,10 @@ require 'check_login.php';
 			</svg>
 		</div>
 
-		<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="display: block">
-			<div class="toast-header">
-				<img src="img/chat.svg" width="50px" alt="chat symbol"/>
-				<strong class="me-auto">Chatbox</strong>
-				<small>...noch etwas Geduld!</small>
-
-			</div>
 
 
-			<div class="toast-body">
-				Eine Chatbox ist in Arbeit. Für Ad-Hoc Nachrichten für den Flugtag nutzt bitte unsere Signal
-				Chatgruppe.<br>Hier ist der <a
-					href="https://signal.group/#">Link</a>
-				zur Gruppe. Alternativ kannst Du den QR-Code scannen:<br><br>
-				<img src="img/qr_code_signal_chat.png" width="150px" alt="chat symbol">
-			</div>
-		</div>
-
+		<!--- Chatbox --->
+		<?php require 'chatboxPage.php'; ?>
 
 		<div class="row mt-3 mb-3">
 			<div class="accordion" id="accordionExample">

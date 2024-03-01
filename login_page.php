@@ -19,7 +19,6 @@
 	<script type="text/javascript" src="js/toasts.js"></script>
 
 	<div id="toastContainer"></div>
-	<div id="unicorn"></div>
 
 	<section class="login">
 
@@ -102,6 +101,37 @@
 									<label class="form-check-label" for="windenfahrer_register">Ich habe einen
 										Windenfahrerschein!</label>
 								</div>
+
+								<div class="form-outline mb-4">
+
+									<div class="custom-select">
+									<div class="avatar" id="avatar-preview"></div>	
+										<select id="avatar-register" name="avatar_register" class="form-control form-control-lg" onchange="updatePreview()">
+											<option value="1">Avatar 1</option>
+											<option value="2">Avatar 2</option>
+											<option value="3">Avatar 3</option>
+											<option value="4">Avatar 4</option>
+											<option value="5">Avatar 5</option>
+											<option value="6">Avatar 6</option>
+											<option value="7">Avatar 7</option>
+											<option value="8">Avatar 8</option>
+											<option value="9">Avatar 9</option>
+											<option value="10">Avatar 10</option>
+											<option value="11">Avatar 11</option>
+											<option value="12">Avatar 12</option>
+											<option value="13">Avatar 13</option>
+											<option value="14">Avatar 14</option>
+											<option value="15">Avatar 15</option>
+											<option value="16">Avatar 16</option>
+											<option value="17">Avatar 17</option>
+											<option value="18">Avatar 18</option>
+											<option value="19">Avatar 19</option>
+										</select>
+									</div>
+										<label class="form-label" for="avatar-register">Avatar</label>
+									</div>
+
+						
 
 								<button class="btn btn-primary btn-lg btn-block mb-4 ui-button" type="submit">Registrieren</button>
 								<div id='register-error' class="alert alert-danger  d-none" role="alert"></div>
