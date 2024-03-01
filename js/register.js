@@ -23,8 +23,6 @@ $(document).ready(function () {
 				if (response.success) {
 					$('.login').addClass('flash-login');
 					showToast('Juhu!', 'Das hat geklappt', 'Du bist jetzt registriert und kannst Dich direkt anmelden!', 'success');
-					// Fliegendes Einhorn deaktiviert
-					//$('#unicorn').addClass('move-image');
 				} else {
 					$('#register-error').removeClass('d-none');
 					$('#register-error').html(response.error);
@@ -35,6 +33,9 @@ $(document).ready(function () {
 			}
 		});
 	});
+
+	updatePreview();
+
 });
 
 function openRegisterForm() {
@@ -44,3 +45,13 @@ function openRegisterForm() {
 function forgotPassword() {
 	alert('Funktion ist noch in Arbeit. Bitte bei Justin melden!');
 }
+
+function updatePreview() {
+    var selectBox = document.getElementById("avatar-register");
+    var selectedValue = selectBox.options[selectBox.selectedIndex].value;
+    var previewDiv = document.getElementById("avatar-preview");
+
+    var imageUrl = "img/a" + selectedValue + ".png"; 
+
+    previewDiv.innerHTML = "<img src='" + imageUrl + "' alt='Avatar Preview'>";
+  }

@@ -51,7 +51,7 @@ function loadFlugtage(init) {
 			}
 		},
 		error: function (error) {
-			console.error('Error loading Flugtage:', error);
+			console.error('Flugtage konnten nicht geladen werdn!', error);
 		}
 	});
 }
