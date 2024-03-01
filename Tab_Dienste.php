@@ -1,5 +1,8 @@
-<?php require 'saison.php'; ?>
+<?php
+require 'check_login.php';
 
+require 'saison.php'; 
+?>
 <div class="row">
 	<div class="col-md-4">
 		<div class="accordion position-sticky" id="accordionExample" style="top: 0;">

@@ -1,4 +1,5 @@
 <?php
+require 'check_login.php';
 
 require 'db_connect.php';
 
@@ -34,9 +35,9 @@ GROUP BY
 
 $result = $conn->query($sql);
 
-if ($result->num_rows > 0) {
-    $data = array();
+$data = array();
 
+if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $startleiterOptions = $row['startleiterOptionen'] !== null ? explode(',', $row['startleiterOptionen']) : $allPilots;
         $windenfahrerOptions = $row['windenfahrerOptionen'] !== null ? explode(',', $row['windenfahrerOptionen']) : $allPilots;
@@ -72,10 +73,8 @@ if ($result->num_rows > 0) {
         );
         $data[] = $entry;
     }
-
-    echo json_encode($data);
-} else {
-    echo json_encode(array());
 }
+
+echo json_encode($data);
 
 $conn->close();

@@ -1,4 +1,6 @@
 <?php
+require 'check_login.php';
+
 require 'db_connect.php';
 
 $year = $_GET['year'];

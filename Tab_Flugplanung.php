@@ -1,3 +1,6 @@
+<?php
+require 'check_login.php';
+?>
 <div class="row mt-3">
 	<div class="col-12 mb-3">
 		<form>
@@ -125,28 +128,15 @@
 		</div>
 
 		<div id="minpilotreached" class="alert alert-primary d-flex align-items-center mt-3 d-none" role="alert">
-			<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"></svg>
+			<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">
+				<use xlink:href="img/warning.svg#warning-fill" />
+			</svg>
 		</div>
 
 
 
 		<!--- Chatbox --->
 		<?php require 'chatboxPage.php'; ?>
-
-		<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="display: block">
-			<div class="toast-header">
-				<img src="img/chat.svg" width="50px" alt="chat symbol">
-				<strong class="me-auto">Chatbox</strong>
-				<small>...noch etwas Geduld!</small>
-
-			</div>
-
-
-			<div class="toast-body">
-				Hier ist eine vorläufige Chatbox!
-			</div>
-		</div>
-
 
 		<div class="row mt-3 mb-3">
 			<div class="accordion" id="accordionExample">

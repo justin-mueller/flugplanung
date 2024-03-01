@@ -56,7 +56,7 @@ CREATE TABLE `dienste_wuensche` (
   `pilot_id` int(11) NOT NULL DEFAULT 0,
   `datum` date NOT NULL,
   `wunsch` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -68,20 +68,14 @@ CREATE TABLE `mitglieder` (
   `pilot_id` int(11) NOT NULL,
   `firstname` varchar(32) NOT NULL,
   `lastname` varchar(32) NOT NULL,
-  `verein` text NOT NULL,
+  `verein` int(11) NOT NULL DEFAULT 0,
   `windenfahrer` tinyint(1) NOT NULL,
   `dienste_admin` tinyint(1) DEFAULT 0,
   `password` varchar(64) DEFAULT NULL,
   `email` varchar(64) NOT NULL,
   `avatar` smallint(6) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Daten für Tabelle `mitglieder`
---
-
-INSERT INTO `mitglieder` (`pilot_id`, `firstname`, `lastname`, `verein`, `windenfahrer`, `dienste_admin`, `password`, `email`) VALUES
-(31, 'Max', 'Mustermann', 'Alpspitzflieger e.V.', 1, 0, '$2y$10$Q57JsLL2O9AhBiPMZG40O.gQHFAJb2qiFr4965iSKwupiowpX3lyi', 'max@mustermann.de');
 
 -- --------------------------------------------------------
 
@@ -95,7 +89,7 @@ CREATE TABLE `moegliche_flugtage` (
   `betrieb_ngl` tinyint(1) DEFAULT 0,
   `betrieb_hrp` tinyint(1) NOT NULL DEFAULT 0,
   `betrieb_amd` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -161,7 +155,7 @@ ALTER TABLE `tagesplanung`
 -- AUTO_INCREMENT für Tabelle `mitglieder`
 --
 ALTER TABLE `mitglieder`
-  MODIFY `pilot_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `pilot_id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

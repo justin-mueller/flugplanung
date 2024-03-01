@@ -1,13 +1,6 @@
 <?php
 
-session_save_path(realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/../tmp'));
-session_start();
-
-// Check if the user is not logged in, redirect to login page
-if (!isset($_SESSION['email'])) {
-	header("Location: login_page.php");
-	exit;
-}
+require 'check_login.php';
 
 // Access additional user data stored in the session, if available
 $mitgliederData = isset($_SESSION['mitgliederData']) ? $_SESSION['mitgliederData'] : [];
@@ -15,9 +8,6 @@ $mitgliederData = isset($_SESSION['mitgliederData']) ? $_SESSION['mitgliederData
 // Convert the PHP array to a JSON string for JavaScript
 $mitgliederJson = json_encode($mitgliederData);
 ?>
-
-<script>var User_Information = <?php echo $mitgliederJson; ?>;</script>
-
 <!DOCTYPE html>
 <html lang="de">
 
@@ -31,7 +21,7 @@ $mitgliederJson = json_encode($mitgliederData);
 	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<link rel="stylesheet" type="text/css" href="css/chatbox.css">
-	
+  
 	<script type="text/javascript" src="js_modules/jquery.js"></script>
 	<script type="text/javascript" src="js_modules/bootstrap.js"></script>
 	<script type="text/javascript" src="js_modules/bootstrap-datepicker.min.js"></script>
