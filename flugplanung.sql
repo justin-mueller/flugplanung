@@ -45,7 +45,7 @@ CREATE TABLE `dienste_wuensche` (
   `pilot_id` int(11) NOT NULL DEFAULT 0,
   `datum` date NOT NULL,
   `wunsch` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -62,7 +62,7 @@ CREATE TABLE `mitglieder` (
   `dienste_admin` tinyint(1) DEFAULT 0,
   `password` varchar(64) DEFAULT NULL,
   `email` varchar(64) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -76,7 +76,7 @@ CREATE TABLE `moegliche_flugtage` (
   `betrieb_ngl` tinyint(1) DEFAULT 0,
   `betrieb_hrp` tinyint(1) NOT NULL DEFAULT 0,
   `betrieb_amd` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
