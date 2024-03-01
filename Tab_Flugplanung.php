@@ -1,3 +1,6 @@
+<?php
+require 'check_login.php';
+?>
 <div class="row mt-3">
 	<div class="col-12 mb-3">
 		<form>

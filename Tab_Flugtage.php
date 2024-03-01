@@ -1,8 +1,9 @@
 <!-- Radio button for "first half / second half" -->
-<?php require 'saison.php'; ?>
+<?php
+require 'check_login.php';
 
-
-
+require 'saison.php';
+?>
 <div class="row mb-3">
 	<div class="col-md-6">
 		<div class="input-group date">

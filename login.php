@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 // Check if the user is already logged in, if yes, redirect to the main page
 if (isset($_SESSION['email'])) {

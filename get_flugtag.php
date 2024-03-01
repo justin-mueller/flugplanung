@@ -1,4 +1,5 @@
 <?php
+require 'check_login.php';
 
 require 'db_connect.php';
 require 'clubs.php';

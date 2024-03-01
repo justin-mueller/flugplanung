@@ -1,4 +1,7 @@
-<?php require 'saison.php'; ?>
+<?php
+require 'check_login.php';
+require 'saison.php';
+?>
 
 <div id="Hinweis_Wunschliste" class="alert alert-warning d-flex align-items-center mt-3" role="alert">
 	<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:">
