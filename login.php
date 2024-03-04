@@ -1,15 +1,6 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
 
-// Check if the user is already logged in, if yes, redirect to the main page
-if (isset($_SESSION['email'])) {
-    header("Location: index.php");
-    exit;
-}
-
-
+include 'check_login.php';
 require 'db_connect.php';
 
 // Check if the form is submitted

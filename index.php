@@ -7,7 +7,11 @@ $mitgliederData = isset($_SESSION['mitgliederData']) ? $_SESSION['mitgliederData
 
 // Convert the PHP array to a JSON string for JavaScript
 $mitgliederJson = json_encode($mitgliederData);
+
 ?>
+
+<script> var User_Information = <?php echo $mitgliederJson; ?>;</script>
+	
 <!DOCTYPE html>
 <html lang="de">
 
