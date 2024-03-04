@@ -31,7 +31,7 @@ if ($result->num_rows > 0) {
     }
     echo json_encode($values);
 } else {
-    echo json_encode(array('error' => 'No entries found in the "dienste_wuensche" table'));
+    echo json_encode(array('error' => 'Keine Einträge in der Chatbox!'));
 }
 
 $conn->close();

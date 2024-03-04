@@ -5,7 +5,7 @@ function loadChatbox(scroll) {
 		type: 'GET',
 		dataType: 'json',
 		success: function (data) {
-			loadChatboxMessages(data, scroll);
+			if (!data.error) loadChatboxMessages(data, scroll);
 		},
 		error: function (error) {
 			console.error('Chatbox konnte nicht geladen werden!', error);

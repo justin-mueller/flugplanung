@@ -31,7 +31,7 @@ CREATE TABLE `chatbox` (
   `pilot_id` int(11) DEFAULT NULL,
   `text` varchar(128) DEFAULT NULL,
   `datetime` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 --
