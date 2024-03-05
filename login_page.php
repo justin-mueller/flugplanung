@@ -31,7 +31,7 @@
 							<h2 class="mb-2">Anmeldung</h2>
 							<h4 class="mb-2">HDGF Flugplanung</h4>
 							<p class="mb-4" style="color: #8e8e8e;font-style: italic;">Hier bist du richtig bei unserer
-								neuen Flugplanung!<br>Ab jetzt müssen sich alle FliegerInnen registrieren!<br><br>
+								neuen Flugplanung!<br>Ab jetzt müssen sich alle Flieger registrieren!<br><br>
 								Die <a  style="color: red; font-style: italic; text-decoration: underline" href="https://hdgf.de/flugplanung_milan/milanplanung.php">Flugplanung für den Milaner e.V.</a> ist derzeit noch im alten System verfügbar.</p>
 
 
