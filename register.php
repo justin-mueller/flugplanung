@@ -7,6 +7,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $vorname = ucwords(strtolower($_POST['vorname_register']));
     $nachname = ucwords(strtolower($_POST['nachname_register']));
     $verein = $_POST['verein_register'];
+    $fluggerät_G = isset($_POST['fluggeraet_gleitschirm']) ? 'G' : '';
+    $fluggerät_D = isset($_POST['fluggeraet_drachen']) ? 'D' : '';
+    $fluggerät_S = isset($_POST['fluggeraet_sonstiges']) ? 'S' : '';    
+    $fluggeraetCombined = $fluggerät_G . $fluggerät_D . $fluggerät_S;
     $windenfahrer = $_POST['windenfahrer_register'];
     $avatar = $_POST['avatar_register'];
 
@@ -23,8 +27,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Insert new user into the database
         $insertQuery = "INSERT INTO mitglieder
-          (email, password, firstname, lastname, verein, windenfahrer, avatar) VALUES
-          ('$email', '$hashedPassword','$vorname', '$nachname','$verein', '$windenfahrer', '$avatar')";
+          (email, password, firstname, lastname, verein, fluggeraet, windenfahrer, avatar) VALUES
+          ('$email', '$hashedPassword','$vorname', '$nachname','$verein', '$fluggeraetCombined', '$windenfahrer', '$avatar')";
         if ($conn->query($insertQuery) === TRUE) {
             // Successful insertion
             echo json_encode(['success' => true]);

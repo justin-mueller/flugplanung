@@ -69,6 +69,7 @@ CREATE TABLE `mitglieder` (
   `firstname` varchar(32) NOT NULL,
   `lastname` varchar(32) NOT NULL,
   `verein` int(11) NOT NULL DEFAULT 0,
+  `fluggeraet` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'G' COMMENT '	G = Gleitschirm, D = Drachen, S = Sonstiges, mehrfaches möglich	',
   `windenfahrer` tinyint(1) NOT NULL,
   `dienste_admin` tinyint(1) DEFAULT 0,
   `password` varchar(64) DEFAULT NULL,

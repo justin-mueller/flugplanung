@@ -102,8 +102,11 @@ $(document).ready(function () {
 
     var avatarDiv = document.getElementById("avatar-header");
     var imageUrl = "img/a" + User_Information.avatar + ".png"; 
-
     avatarDiv.innerHTML = "<img src='" + imageUrl + "' alt='Avatar Preview'>";
+
+	$("#avatar-header").on('click', function () {
+		showToast('Info!', 'Nutzer Einstellungen', 'Hier kannst du demnächst Einstellungen zu Deinem Nutzerprofil machen. Noch ist dies nicht implementiert!', 'success');
+	})
 
 
 	setInterval(() => loadChatbox(false), 15000);

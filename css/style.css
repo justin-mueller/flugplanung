@@ -110,19 +110,12 @@ a {
 .custom-select {
 	display: flex;
 	align-items: center;
-	width: 100%;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	overflow: hidden;
   }
 
-  .custom-select::after {
-	content: '\25BC';
-	margin-left: auto;
-	pointer-events: none;
+  .form-check-input {
+	margin-right: 15px;
   }
-  
-  
+
   .avatar {
 	margin-right: 10px; /* Adjust spacing as needed */
 	max-width: 100px; /* Adjust the maximum width of the preview image */
@@ -137,7 +130,13 @@ a {
   }
 
   #avatar-header {
-	margin-left: 1rem;
+    margin-left: 1rem;
+    background-color: white;
+    border-radius: 30px;
+    cursor: pointer;
+    border-style: solid;
+    border-color: #ff002d;
+    border-width: 2px;
   }
   
   
