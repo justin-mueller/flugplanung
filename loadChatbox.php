@@ -1,4 +1,6 @@
 <?php
+require 'check_login.php';
+
 require 'db_connect.php';
 
 $startDate = date('Y-m-d', strtotime('-1 week'));
