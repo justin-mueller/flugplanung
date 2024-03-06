@@ -63,14 +63,14 @@ function getFlugtag() {
 				];
 
 				var pilot_count_hdgf_prio_1 = [
-					getRowCount(data, 'NGL', '0', 'HDGF'),
-					getRowCount(data, 'HRP', '0', 'HDGF'),
-					getRowCount(data, 'AMD', '0', 'HDGF')
+					getRowCount(data, 'NGL', '0', localClubId),
+					getRowCount(data, 'HRP', '0', localClubId),
+					getRowCount(data, 'AMD', '0', localClubId)
 				];
 				var pilot_count_hdgf_prio_2 = [
-					getRowCount(data, 'NGL', '1', 'HDGF'),
-					getRowCount(data, 'HRP', '1', 'HDGF'),
-					getRowCount(data, 'AMD', '1', 'HDGF')
+					getRowCount(data, 'NGL', '1', localClubId),
+					getRowCount(data, 'HRP', '1', localClubId),
+					getRowCount(data, 'AMD', '1', localClubId)
 				];
 
 				total_pilot_count_all[0] = pilot_count_all_prio_1[0] + pilot_count_all_prio_2[0];
@@ -102,7 +102,7 @@ function getFlugtag() {
 					let timestamp = new Date(row.timestamp);
 					let time_ago = Math.round((now - timestamp) / 60000);
 					let new_record = (timestamp >= oneHourBack && timestamp <= now) ? '<span class="badge bg-info">Neu vor ' + time_ago + ' min</span>' : '';
-					let hdgf_member = row.Verein == 'HDGF';
+					let hdgf_member = row.VereinId == localClubId;
 					let row_not_hdgf = hdgf_member ? '' : 'class="tr_no_hgdf"';
 					let ist_startleiter = row.Pilot_ID == startleiter_official ? '<span class="badge bg-success">SL Offiziell</span>' : '';
 					let windenfahrer_official_info = row.Pilot_ID == windenfahrer_official ? '<span class="badge bg-success">WF Offiziell</span>' : '';
