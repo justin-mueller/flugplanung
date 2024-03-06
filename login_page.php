@@ -167,6 +167,7 @@
 													<option value="17">Avatar 17</option>
 													<option value="18">Avatar 18</option>
 													<option value="19">Avatar 19</option>
+													<option value="20">Avatar 20</option>
 												</select>
 											</div>
 											<label class="form-label" for="avatar-register">Avatar</label>
