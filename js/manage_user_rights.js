@@ -1,8 +1,8 @@
 function manageUserRights() {
 
-	const HDGFMember = User_Information.vereinId === localClubId;
+	const LocalMember = User_Information.vereinId === localClubId;
 
-	if (HDGFMember) {
+	if (LocalMember) {
 		$('#nav-wunschliste-tab').css('display', 'block');
 	}
 
