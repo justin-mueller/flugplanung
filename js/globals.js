@@ -6,6 +6,7 @@ var total_pilot_count_all = [0, 0, 0];
 var total_pilot_count_hdgf = [0, 0, 0];
 var Active_Pilot_Choices = [null, null, null]
 const Fluggebiete = ['Neustadt-Glewe', 'Hörpel', 'Altenmedingen'];
+const localClubId = 198;
 var enteredDienste = [];
 var dashboardData = [];
 const thisYear = new Date().getFullYear();

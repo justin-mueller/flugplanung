@@ -11,7 +11,7 @@ $sql = "
             m.pilot_id AS Pilot_ID,
             CONCAT(m.firstname, ' ', m.lastname) AS Pilot,
             m.windenfahrer AS ist_windenfahrer,
-            m.verein AS Verein,
+            m.verein AS VereinId,
             2 AS NGL,
             2 AS HRP,
             2 AS AMD,
@@ -29,7 +29,7 @@ $sql = "
             m.pilot_id AS Pilot_ID,
             CONCAT(m.firstname, ' ', m.lastname) AS Pilot,
             m.windenfahrer AS ist_windenfahrer,
-            m.verein AS Verein,
+            m.verein AS VereinId,
             NGL,
             HRP,
             AMD,
@@ -49,7 +49,8 @@ $result = $conn->query($sql);
 $data = array();
 if ($result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
-     $row['Verein'] = $clubs[$row['Verein']];
+     $row['VereinId'] = (int)$row['VereinId'];
+     $row['Verein'] = $clubs[$row['VereinId']];
      $data[] = $row;
   }
 }
