@@ -45,7 +45,6 @@ function getFlugtag() {
 		success: function (data) {
 
 			try {
-				debugger
 				console.log('Planung für den ' + flugtag_formatted + ' erfolgreich geladen:');
 				console.log(data);
 
