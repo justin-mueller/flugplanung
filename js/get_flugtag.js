@@ -45,7 +45,7 @@ function getFlugtag() {
 		success: function (data) {
 
 			try {
-
+				debugger
 				console.log('Planung für den ' + flugtag_formatted + ' erfolgreich geladen:');
 				console.log(data);
 
@@ -64,14 +64,14 @@ function getFlugtag() {
 				];
 
 				var pilot_count_hdgf_prio_1 = [
-					getRowCount(data, 'NGL', '0', 198),
-					getRowCount(data, 'HRP', '0', 198),
-					getRowCount(data, 'AMD', '0', 198)
+					getRowCount(data, 'NGL', '0', 'HDGF'),
+					getRowCount(data, 'HRP', '0', 'HDGF'),
+					getRowCount(data, 'AMD', '0', 'HDGF')
 				];
 				var pilot_count_hdgf_prio_2 = [
-					getRowCount(data, 'NGL', '1', 198),
-					getRowCount(data, 'HRP', '1', 198),
-					getRowCount(data, 'AMD', '1', 198)
+					getRowCount(data, 'NGL', '1', 'HDGF'),
+					getRowCount(data, 'HRP', '1', 'HDGF'),
+					getRowCount(data, 'AMD', '1', 'HDGF')
 				];
 
 				total_pilot_count_all[0] = pilot_count_all_prio_1[0] + pilot_count_all_prio_2[0];
