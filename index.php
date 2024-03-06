@@ -9,9 +9,6 @@ $mitgliederData = isset($_SESSION['mitgliederData']) ? $_SESSION['mitgliederData
 $mitgliederJson = json_encode($mitgliederData);
 
 ?>
-
-<script> var User_Information = <?php echo $mitgliederJson; ?>;</script>
-	
 <!DOCTYPE html>
 <html lang="de">
 
@@ -25,7 +22,9 @@ $mitgliederJson = json_encode($mitgliederData);
 	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<link rel="stylesheet" type="text/css" href="css/chatbox.css">
-  
+
+	<script> var User_Information = <?php echo $mitgliederJson; ?>;</script>
+
 	<script type="text/javascript" src="js_modules/jquery.js"></script>
 	<script type="text/javascript" src="js_modules/bootstrap.js"></script>
 	<script type="text/javascript" src="js_modules/bootstrap-datepicker.min.js"></script>
@@ -46,7 +45,6 @@ $mitgliederJson = json_encode($mitgliederData);
 	<script src="js/wunschliste.js"></script>
 	<script src="js/dashboard.js"></script>
 	<script type="text/javascript" src="js/flugtage.js"></script>
-	</script>
 
 </head>
 
@@ -54,7 +52,7 @@ $mitgliederJson = json_encode($mitgliederData);
 	<div id="toastContainer"></div>
 	<div id="unicorn"></div>
 	<nav class="navbar navbar-dark bg-dark">
-		<div class="avatar" id="avatar-header"></div>	
+		<div class="avatar" id="avatar-header"></div>
 		<span class="navbar-brand mb-0 h1" style="margin-left: 1rem;" id="user_name_header"></span>
 		<span class="navbar-brand mb-0 h1" style="margin-left: 1rem;"><a href="logout.php">-> Abmelden</a></span>
 	</nav>
