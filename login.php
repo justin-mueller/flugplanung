@@ -1,10 +1,17 @@
 <?php
 
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
 include 'check_login.php';
 require 'db_connect.php';
 
+$error = '';
+
 // Check if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
@@ -26,14 +33,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['email'] = $email;
             $_SESSION['mitgliederData'] = $mitgliederData;
 
-            header("Location: index.php");
+            header('Location: index.php');
             exit;
-        } else {
-            // Authentication failed
-            $error = "E-Mail oder Passwort falsch!";
         }
+
+        // Authentication failed
+        $error = 'E-Mail oder Passwort falsch!';
     } else {
         // Authentication failed
-        $error = "E-Mail oder Passwort falsch!";
+        $error = 'E-Mail oder Passwort falsch!';
     }
 }
+
+// set up Twig
+$loader = new FilesystemLoader(__DIR__ . '/templates');
+$twig = new Environment($loader);
+
+echo $twig->render(
+    'login.twig.html',
+    [
+        'email' => $email ?? '',
+        'error' => $error,
+        'clubs' => require 'options_vereine.php'
+    ]
+);

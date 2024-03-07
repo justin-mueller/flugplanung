@@ -1,5 +1,3 @@
-<?php require 'login.php'; ?>
-
 <!DOCTYPE html>
 <html lang="de">
 
@@ -35,12 +33,12 @@
 								Die <a  style="color: red; font-style: italic; text-decoration: underline" href="https://hdgf.de/flugplanung_milan/milanplanung.php">Flugplanung für den Milaner e.V.</a> ist derzeit noch im alten System verfügbar.</p>
 
 
-							<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+							<form method="post" action="login.php">
 
 								<div class="form-outline mb-4">
-									<input type="email" name="email" id="typeEmailX-2" value="<?php echo htmlspecialchars($email ?? ''); ?>"
+									<input type="email" name="email" id="typeEmailX-2" value="{{ email }}"
 										class="form-control form-control-lg" required />
-									<label class="form-label" for="typeEmailX-2">E-mail</label>
+									<label class="form-label" for="typeEmailX-2">E-Mail</label>
 								</div>
 
 								<div class="form-outline mb-4">
@@ -50,9 +48,9 @@
 
 								<button class="btn btn-primary btn-lg btn-block mb-4 ui-button"	type="submit">Login</button>
 
-								<?php if (isset($error)) {
-									echo "<div class='alert alert-danger' role='alert'>E-Mail oder Passwort falsch!</div>";
-								} ?>
+								{% if error %}
+								<div class='alert alert-danger' role='alert'>{{ error }}</div>
+								{% endif %}
 
 							</form>
 
@@ -98,7 +96,7 @@
 									<div class="form-outline mb-4">
 
 									<select class="form-select" name="verein_register" id="verein_register">
-										<?php include 'options_vereine.php'; ?>
+										{{ clubs|raw }}
 									</select>
 										<label class="form-label" for="verein_register">Verein</label>
 									</div>
@@ -187,7 +185,5 @@
 		</div>
 	</section>
 </body>
-
-
 
 </html>

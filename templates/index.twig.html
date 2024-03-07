@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Tagesplanung</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+	<link rel="stylesheet" href="css/bootstrap-datepicker.min.css">
+	<link rel="stylesheet" href="css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="css/chatbox.css">
+
+    <script>var User_Information = {{ mitgliederData|json_encode|raw }};</script>
+
+	<script type="text/javascript" src="js_modules/jquery.js"></script>
+	<script type="text/javascript" src="js_modules/bootstrap.js"></script>
+	<script type="text/javascript" src="js_modules/bootstrap-datepicker.min.js"></script>
+	<script src="js/date_functions.js"></script>
+	<script type="text/javascript" src="js/globals.js"></script>
+	<script type="text/javascript" src="js/on_document_ready.js"></script>
+	<script type="text/javascript" src="js/form_choose.js"></script>
+	<script type="text/javascript" src="js/prio_calculation.js"></script>
+	<script type="text/javascript" src="js/delete_pilot.js"></script>
+	<script type="text/javascript" src="js/toasts.js"></script>
+	<script type="text/javascript" src="js/get_flugtag.js"></script>
+	<script type="text/javascript" src="js/betrieb.js"></script>
+	<script type="text/javascript" src="js/enter_pilot.js"></script>
+	<script type="text/javascript" src="js/loading_spinner.js"></script>
+	<script type="text/javascript" src="js/chatbox.js"></script>
+	<script src="js/saison.js"></script>
+	{% if mitgliederData.verein == clubId %}
+	<script src="js/wunschliste.js"></script>
+	{% endif %}
+	<script src="js/dashboard.js"></script>
+	<script type="text/javascript" src="js/flugtage.js"></script>
+</head>
+
+<body>
+	<div id="toastContainer"></div>
+	<div id="unicorn"></div>
+	<nav class="navbar navbar-dark bg-dark">
+		<div class="avatar" id="avatar-header"></div>
+		<span class="navbar-brand mb-0 h1" style="margin-left: 1rem;" id="user_name_header"></span>
+		<span class="navbar-brand mb-0 h1" style="margin-left: 1rem;"><a href="logout.php" class="btn btn-outline-light">Abmelden</a></span>
+	</nav>
+
+	<div class="container-fluid mt-3">
+
+		<nav>
+			<div class="nav nav-tabs" id="nav-tab" role="tablist">
+                {% for id, tab in tabs %}
+				<button class="nav-link {% if loop.index == 1 %}active{% endif %} ui-button" id="nav-{{ id }}-tab" data-bs-toggle="tab"
+					data-bs-target="#nav-{{ id }}" type="button" role="tab" aria-controls="nav-{{ id }}"
+					aria-selected="true">{{ tab.label }}</button>
+                {% endfor %}
+			</div>
+		</nav>
+
+		<div class="tab-content" id="nav-tabContent">
+            {% for id, tab in tabs %}
+			<div class="tab-pane fade show {% if loop.index == 1     %}active{% endif %}" id="nav-{{ id }}" role="tabpanel"
+				aria-labelledby="nav-{{ id }}-tab">
+				{{ tab.content|raw }}
+			</div>
+            {% endfor %}
+		</div>
+	</div>
+</body>
+
+</html>
