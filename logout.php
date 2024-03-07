@@ -1,7 +1,5 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+require 'check_login.php';
 
 // Remove the session cookie
 if (ini_get('session.use_cookies')) {

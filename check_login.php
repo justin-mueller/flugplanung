@@ -2,6 +2,10 @@
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
 	session_save_path(realpath(dirname($_SERVER['DOCUMENT_ROOT']) . '/../tmp'));
+	session_set_cookie_params([
+		'secure' => true,
+		'samesite' => 'Strict'
+	]);
 	session_start();
 }
 
