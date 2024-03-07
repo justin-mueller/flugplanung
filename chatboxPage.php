@@ -9,9 +9,9 @@
                 </div>
                 <div class="card-body">
                     <div class="chatbox-messages" id="chatbox-messages">
-                    </div> 
+                    </div>
                     <div class="form-outline">
-                        <textarea class="form-control" id="chatboxMessage" rows="4"></textarea>
+                        <textarea class="form-control" id="chatboxMessage" rows="4" maxlength="255"></textarea>
                         <label class="form-label" for="textAreaExample">Nachricht</label>
                     </div>
                     <button type="button" class="btn btn-outline-secondary ui-button mb-2" onclick="enterChatboxMessage(true)">
