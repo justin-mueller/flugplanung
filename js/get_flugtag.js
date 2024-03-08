@@ -123,7 +123,7 @@ function getFlugtag() {
 				$('#tagesplanung tbody').append(newRow);
 
 				var legendRow = $('<tr>');
-				legendRow.append('<td colspan="6" style="font-size: small"><span class="badge bg-success">SL Offiziell</span>= Offizieller Startleiter für den Tag<br><span class="badge bg-success">WF Offiziell</span>= Offizieller Windenfahrer für den Tag<br><span class="badge bg-primary">WF</span>= Hat einen Windenfahrerschein</td>');
+				legendRow.append('<td colspan="6" style="font-size: small"><span class="badge bg-success">SL Offiziell</span> = Offizieller Startleiter für den Tag<br><span class="badge bg-success">WF Offiziell</span> = Offizieller Windenfahrer für den Tag<br><span class="badge bg-primary">WF</span> = Hat einen Windenfahrerschein</td>');
 				$('#tagesplanung tbody').append(legendRow);
 
 				User_Information.record_present = data.some(pilot => pilot.Pilot_ID === User_Information.pilot_id && (pilot.startleiter_official == "0" || pilot.startleiter_official == "") && (pilot.windenfahrer_official == "0" || pilot.windenfahrer_official == ""));
