@@ -3,9 +3,9 @@ $(document).ready(function () {
 	
 
 	$('.date').datepicker({
-		locale: 'de',
+		language: 'de',
+		weekStart: 1,
 		format: {
-			language: 'de',
 			toDisplay: function (date, format, language) {
 				return getFormattedGermanDate(date);
 			},
