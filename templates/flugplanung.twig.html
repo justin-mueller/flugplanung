@@ -61,20 +61,20 @@
 <div class="row  d-none" id="flugbetriebAusrufen">
 	<div class="col">
 		<p>Betrieb ausrufen:</p>
-		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb0" onclick="BetriebAusrufen(0)">
+		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb0" onclick="betriebAusrufen(0)">
 			NGL
 		</button>
-		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb1" onclick="BetriebAusrufen(1)">
+		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb1" onclick="betriebAusrufen(1)">
 			HRP
 		</button>
-		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb2" onclick="BetriebAusrufen(2)">
+		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb2" onclick="betriebAusrufen(2)">
 			AMD
 		</button>
 	</div>
 
 	<div class="col">
 		<p>Betrieb absagen:</p>
-		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb_absagen" onclick="BetriebAusrufen(999)">
+		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb_absagen" onclick="betriebAusrufen(999)">
 			Für alle Fluggebiete absagen
 		</button>
 	</div>
@@ -82,7 +82,7 @@
 	<div class="col">
 		<p>Aufbau:</p>
 		<input type="time" id="aufbau" name="appt" min="09:00" max="18:00" value="10:00" style="height:40px"
-			onchange="BetriebAusrufen('timechange')" />
+			onchange="betriebAusrufen('timechange')" />
 
 	</div>
 
