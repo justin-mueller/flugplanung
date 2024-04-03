@@ -10,6 +10,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 if (!isset($_SESSION['email']) && basename($_SERVER['PHP_SELF']) !== 'login.php') {
-	header("Location: login_page.php");
+	header("Location: login.php");
 	exit;
 }
