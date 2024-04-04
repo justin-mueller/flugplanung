@@ -10,7 +10,9 @@ function SelectSeason(clickedButton, Season_Chosen) {
 	saisonStartDate = calcSeasonStart({ earliestCalenderDate: true });
 	saisonEndDate = calcSeasonEnd({ latestCalenderDate: true });
 
-	getUserWuensche();
+	if (typeof getUserWuensche === 'function') {
+		getUserWuensche();
+	}
 	getDashboardData();
 	loadFlugtage();
 
