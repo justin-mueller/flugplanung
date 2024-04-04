@@ -22,9 +22,10 @@ $(document).ready(function () {
 		BetriebAbfragen();
 	});
 
-	getUserWuensche();
+	if (typeof getUserWuensche === 'function') {
+		getUserWuensche();
+	}
 	getDashboardData();
-	manageUserRights();
 
 	$("[id^=list_fist_choice]").on('click', function (e) {
 		if (!$(this).hasClass("active")) $("[id^=list_alternative]").removeClass("active");
@@ -91,7 +92,9 @@ $(document).ready(function () {
 		saisonStartDate = calcSeasonStart({ earliestCalenderDate: true });
 		saisonEndDate = calcSeasonEnd({ latestCalenderDate: true });
 		$('.year-dropdown').val(saisonJahr);
-		getUserWuensche();
+		if (typeof getUserWuensche === 'function') {
+			getUserWuensche();
+		}
 		getDashboardData();
 		loadFlugtage();
 	});
