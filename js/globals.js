@@ -1,6 +1,9 @@
 var windenfahrer_official = null;
 var startleiter_official = null;
 var flugtag_formatted = null;
+var flugtag_unformatted = null;
+var flugtag_deadline = null;
+var intervalId = setInterval(updateCountdown, 1000);
 var min_pilot_amount_reached = false;
 var total_pilot_count_all = [0, 0, 0];
 var total_pilot_count_hdgf = [0, 0, 0];

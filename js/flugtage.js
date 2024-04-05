@@ -44,6 +44,9 @@ function loadFlugtage(init) {
 				});
 
 				flugtag_formatted = dateToSQLFormat(startFlugtag);
+				flugtag_unformatted = startFlugtag;
+				calc_deadline(flugtag_unformatted);
+
 				$('#flugtag').val(getFormattedGermanDate(startFlugtag));
 
 				getFlugtag();

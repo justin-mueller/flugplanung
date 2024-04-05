@@ -78,9 +78,10 @@ function BetriebAbfragen() {
 			if (Flugbetrieb_any) {
 				$('#banner_aufbau').removeClass('d-none');
 				$('#banner_aufbau div').html('Aufbau: ' + data.aufbau.slice(0, 5) + ' Uhr');
+				$('#minpilotreached').addClass('d-none');
 			} else {
 				$('#banner_aufbau').addClass('d-none');
-
+				$('#minpilotreached').removeClass('d-none');
 			}
 		},
 		error: function (xhr, status, error) {

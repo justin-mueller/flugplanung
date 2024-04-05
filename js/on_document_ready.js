@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+	
+
 	$('.date').datepicker({
 		locale: 'de',
 		format: {
@@ -18,6 +20,8 @@ $(document).ready(function () {
 	$("#flugtag").on("change", function () {
 		let value_from_datepicker = $('#flugtag').val();
 		flugtag_formatted = dateToSQLFormat(parseDateStringWithGermanMonth(value_from_datepicker));
+		flugtag_unformatted = parseDateStringWithGermanMonth(value_from_datepicker);
+		calc_deadline(flugtag_unformatted);
 		getFlugtag();
 		BetriebAbfragen();
 	});

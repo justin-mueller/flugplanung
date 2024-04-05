@@ -1,7 +1,7 @@
 function getRowCount(data, rowKey, targetValue, clubFilter = 0) {
 	var count = 0;
 	$.each(data, function (index, row) {
-		if (row[rowKey] === targetValue && (clubFilter === 0 || row.Verein === clubFilter)) {
+		if (row[rowKey] === targetValue && (clubFilter === 0 || row.VereinId === clubFilter)) {
 			count++;
 		}
 	});
@@ -10,11 +10,11 @@ function getRowCount(data, rowKey, targetValue, clubFilter = 0) {
 
 function getFlugtag() {
 
-	windenfahrer_official = null;
-	startleiter_official = null;
 
 	toggleSpinner(true);
 
+	min_pilot_amount_reached = false;
+	
 	var now = new Date();
 	var oneHourBack = new Date();
 	oneHourBack.setHours(oneHourBack.getHours() - 1);
@@ -32,22 +32,19 @@ function getFlugtag() {
 	$("[id=list_alternative_1]").removeClass("active");
 	$("[id=list_alternative_2]").removeClass("active");
 	$("[id=list_alternative_3]").removeClass("active");
-
-
-	$('#minpilotwarning').removeClass('d-none');
-	$('#minpilotreached').addClass('d-none');
-
+	
 	$.ajax({
 		url: 'get_flugtag.php',
 		type: 'GET',
 		data: { flugtag: flugtag_formatted },
 
 		success: function (data) {
-
-			try {
+			
+			if (typeof(data) === 'object') {
 				console.log('Planung für den ' + flugtag_formatted + ' erfolgreich geladen:');
 				console.log(data);
 
+				// Problem: Failed wenn keine Daten vorhanden.Dann wird auch kein Banner angezeigt
 				windenfahrer_official = data.some(value => value.windenfahrer_official == 1) ? (data.filter(o => o.windenfahrer_official == 1))[0].Pilot_ID : null;
 				startleiter_official = data.some(value => value.startleiter_official == 1) ? (data.filter(o => o.startleiter_official == 1))[0].Pilot_ID : null;
 
@@ -91,11 +88,6 @@ function getFlugtag() {
 
 				var possible_areas_sliced = possible_areas.slice(0, possible_areas.length - 2);
 
-				if (min_pilot_amount_reached) {
-					$('#minpilotwarning').addClass('d-none');
-					$('#minpilotreached').removeClass('d-none');
-					$('#minpilotreached').html('<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="img/info.svg#info-fill"/></svg><div>Es ist Flugbetrieb möglich in: ' + possible_areas_sliced + '</div>');
-				}
 
 				$.each(data, function (index, row) {
 
@@ -167,17 +159,49 @@ function getFlugtag() {
 						if (Active_Pilot_Choices[1] == 1) { $("[id=list_alternative_2]").addClass("active"); }
 						Active_Pilot_First_Choice = 2;
 					}
+
+					renameAlternativeButtons(Active_Pilot_First_Choice)
 				} else {
 
 					$("[id=list_fist_choice_1]").addClass("active");
 				}
 
-				renameAlternativeButtons(Active_Pilot_First_Choice)
+				
 
-			} catch (error) {
-				// Keine Einträge
+			} else {
+				windenfahrer_official = null;
+				startleiter_official = null;
 				$("[id=list_fist_choice_1]").addClass("active");
+				
 			}
+
+			if (min_pilot_amount_reached) {
+
+
+				$('#minpilotreached').html(
+					'<div style="display: flex; align-items: center;">' +
+						'<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">' +
+							'<use xlink:href="img/warning.svg#warning-fill"/>' +
+						'</svg>' +
+						'<div style="margin-left: 5px;">Es ist Flugbetrieb möglich in: ' + possible_areas_sliced + '</div>' +
+					'</div>' +
+					'<div id="countdown"></div>'
+					
+				);
+			} else {
+				$('#minpilotreached').html(
+					'<div style="display: flex; align-items: center;">' +
+						'<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:">' +
+							'<use xlink:href="img/warning.svg#warning-fill"/>' +
+						'</svg>' +
+						'<div style="margin-left: 5px;">Aktuell wird die Mindestanzahl von 3 Vereinsmitgliedern in keinem Fluggebiet erreicht!</div>' +
+					'</div>' +
+					'<div id="countdown"></div>'
+				);
+			}
+			updateCountdown();
+
+			
 		},
 
 		error: function (xhr, status, error) {

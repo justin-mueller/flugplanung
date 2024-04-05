@@ -70,6 +70,14 @@ a {
 	color: white;
 }
 
+#minpilotreached {
+	flex-direction: column;
+}
+
+#countdown {
+	margin-top: 1em;
+}
+
 .fa {
 	height: 28px;
 	margin-top: 8px;

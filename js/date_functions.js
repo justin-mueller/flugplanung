@@ -72,3 +72,36 @@ function calc_flugtag_date(datum) {
     return date_formatted;
 
 }
+
+function calc_deadline(datum) {
+    flugtag_deadline = new Date(datum);
+    flugtag_deadline.setTime(flugtag_deadline.getTime() - 86400000);
+    flugtag_deadline.setHours(20);
+    flugtag_deadline.setMinutes(0);
+    flugtag_deadline.setSeconds(0);
+}
+
+
+
+function updateCountdown() {
+    // Get the current date and time
+    const now = new Date();
+
+    // Calculate the time difference between now and the target date
+    const timeDifference = flugtag_deadline - now;
+
+    // Check if the countdown has finished
+    if (timeDifference < 0) {
+        clearInterval(intervalId); // Clear the interval using the interval ID
+        document.getElementById('countdown').innerHTML = "Warten auf Entscheidung vom Startleiter...";
+    } else {
+        // Calculate remaining time components
+        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+        // Display the remaining time
+		document.getElementById('countdown').innerHTML = `Zeit bis Entscheidung (20 Uhr Vortrag): <strong>${days} Tage, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</strong>`;
+    }
+}
