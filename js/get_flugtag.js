@@ -199,6 +199,9 @@ function getFlugtag() {
 					'<div id="countdown"></div>'
 				);
 			}
+
+			if (FlugbetriebAbgesagt) $('#minpilotreached').addClass('d-none');
+
 			updateCountdown();
 
 			

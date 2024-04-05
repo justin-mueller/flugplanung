@@ -59,20 +59,27 @@
 </div>
 
 <div class="row  d-none" id="flugbetriebAusrufen">
-	<div class="col-6 mb-3">
+	<div class="col">
 		<p>Betrieb ausrufen:</p>
-		<button type="button" class="btn btn-danger ui-button mb-2" id="btn_betrieb0" onclick="BetriebAusrufen(0)">
+		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb0" onclick="BetriebAusrufen(0)">
 			NGL
 		</button>
-		<button type="button" class="btn btn-danger ui-button mb-2" id="btn_betrieb1" onclick="BetriebAusrufen(1)">
+		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb1" onclick="BetriebAusrufen(1)">
 			HRP
 		</button>
-		<button type="button" class="btn btn-danger ui-button mb-2" id="btn_betrieb2" onclick="BetriebAusrufen(2)">
+		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb2" onclick="BetriebAusrufen(2)">
 			AMD
 		</button>
 	</div>
 
-	<div class="col-6 mb-3">
+	<div class="col">
+		<p>Betrieb absagen:</p>
+		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb_absagen" onclick="BetriebAusrufen(999)">
+			Für alle Fluggebiete absagen
+		</button>
+	</div>
+
+	<div class="col">
 		<p>Aufbau:</p>
 		<input type="time" id="aufbau" name="appt" min="09:00" max="18:00" value="10:00" style="height:40px"
 			onchange="BetriebAusrufen('timechange')" />
@@ -115,10 +122,17 @@
 			</div>
 		</div>
 		
-		<div id="minpilotreached" class="alert alert-warning d-flex align-items-center mt-3" role="alert">
+		<div id="minpilotreached" class="alert alert-warning d-flex align-items-center mt-3 fpbanner" role="alert">
 			<svg class="bi me-2" width="24" height="24" role="img" aria-label="Info:">
 				<use xlink:href="img/warning.svg#warning-fill" />
 			</svg>
+		</div>
+
+		<div id="abgesagt" class="alert alert-danger d-flex align-items-center mt-3 fpbanner" role="alert">
+			<svg class="bi me-2" width="24" height="24" role="img" aria-label="Info:">
+				<use xlink:href="img/warning.svg#warning-fill" />
+			</svg>
+			Der Flugbetrieb für diesen Tag wurde abgesagt!
 		</div>
 
 		<!--- Chatbox --->

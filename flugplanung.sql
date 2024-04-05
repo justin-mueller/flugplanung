@@ -89,7 +89,8 @@ CREATE TABLE `moegliche_flugtage` (
   `aufbau` time NOT NULL DEFAULT '10:00:00',
   `betrieb_ngl` tinyint(1) DEFAULT 0,
   `betrieb_hrp` tinyint(1) NOT NULL DEFAULT 0,
-  `betrieb_amd` tinyint(1) NOT NULL DEFAULT 0
+  `betrieb_amd` tinyint(1) NOT NULL DEFAULT 0,
+  `abgesagt` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------

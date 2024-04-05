@@ -18,3 +18,6 @@ var saisonJahr = thisYear;
 var saisonStartDate = calcSeasonStart({ earliestCalenderDate: true });
 var saisonEndDate = calcSeasonEnd({ latestCalenderDate: true });
 var Flugtage = [];
+
+var Flugbetrieb = [false, false, false]
+var FlugbetriebAbgesagt = false;

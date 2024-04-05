@@ -15,11 +15,13 @@ if ($result->num_rows > 0) {
     $betrieb_hrp = $row['betrieb_hrp'];
     $betrieb_amd = $row['betrieb_amd'];
     $aufbau = $row['aufbau'];
+    $abgesagt = $row['abgesagt'];
 
     $response = array(
         'betrieb_ngl' => $betrieb_ngl,
         'betrieb_hrp' => $betrieb_hrp,
         'betrieb_amd' => $betrieb_amd,
+        'abgesagt' => $abgesagt,
         'aufbau' => $aufbau
     );
 
