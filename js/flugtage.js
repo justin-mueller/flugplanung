@@ -33,11 +33,22 @@ function loadFlugtage(init) {
 			populateFlugtageTable(Flugtage);
 
 			if (init) {
-				let startFlugtag = new Date();
 
+
+				let startFlugtag = new Date();
+				const checkTime = new Date();
+				checkTime.setHours(14, 0, 0); 
+				
 				$.each(Flugtage, function (index, entry) {
 					let Flugtag_Converted = parseDateStringWithGermanMonth(entry.datum);
-					if (Flugtag_Converted >= startFlugtag) {
+
+					let flugtagDate = Flugtag_Converted.getFullYear().toString() + Flugtag_Converted.getMonth().toString() + Flugtag_Converted.getDate().toString();
+					let startFlugtagDate = startFlugtag.getFullYear().toString() + startFlugtag.getMonth().toString() + startFlugtag.getDate().toString();
+
+					console.log(flugtagDate == startFlugtagDate)
+					console.log(startFlugtag > checkTime)
+
+					if (Flugtag_Converted > startFlugtag || (flugtagDate == startFlugtagDate && checkTime > startFlugtag )) {
 						startFlugtag = Flugtag_Converted;
 						return false;
 					}
