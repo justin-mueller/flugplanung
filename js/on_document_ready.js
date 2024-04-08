@@ -3,9 +3,11 @@ $(document).ready(function () {
 	
 
 	$('.date').datepicker({
-		locale: 'de',
+		language: 'de',
+		weekStart: 1,
+		daysOfWeekHighlighted: [0,6],
+		todayHighlight: true,
 		format: {
-			language: 'de',
 			toDisplay: function (date, format, language) {
 				return getFormattedGermanDate(date);
 			},
