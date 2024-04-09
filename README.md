@@ -6,7 +6,7 @@ Flugplanung für Gleitschirm-Vereine mit Windenschleppbetrieb
 
 ### Technische Voraussetzungen
 
-- PHP 8
+- PHP 8 mit PDO
 - MySQL / MariaDB
 - Composer
 
@@ -14,7 +14,7 @@ Flugplanung für Gleitschirm-Vereine mit Windenschleppbetrieb
 
 - Source auf Server auspacken
 - Datenbank aus `flugplanung.sql` importieren
-- In `db_connect.php` die Datenbank-Verbindung konfigurieren
+- In `src/Database.php` die Datenbank-Verbindung konfigurieren
 - `composer install` aufrufen
 
 Nun kann die Flugplanung aufgerufen werden und die Registrierung von Nutzern ist möglich.

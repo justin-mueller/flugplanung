@@ -1,19 +1,20 @@
 <?php
-require 'check_login.php';
 
-require 'db_connect.php';
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
 
-$table = "tagesplanung";
-$pilotid = $_POST['pilotid_delete'];
+require_once __DIR__ . '/vendor/autoload.php';
 
-$sql = "DELETE FROM $table WHERE Pilot_ID = $pilotid";
+Helper::checkLogin();
+Database::connect();
 
-if ($conn->query($sql) === TRUE) {
-    $response = array('success' => true);
-    echo json_encode($response);
+$sql = 'DELETE FROM tagesplanung WHERE Pilot_ID = :pilotid';
+
+if (Database::query($sql, ['pilotid' => $_POST['pilotid_delete']]) !== false) {
+    $response = ['success' => true];
 } else {
-    $response = array('error' => 'Error deleting record: ' . $conn->error);
-    echo json_encode($response);
+    $response = ['error' => 'Error deleting record'];
 }
 
-$conn->close();
+header('Content-Type: application/json');
+echo json_encode($response, JSON_THROW_ON_ERROR);

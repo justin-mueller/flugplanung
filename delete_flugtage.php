@@ -1,15 +1,15 @@
 <?php
-require 'check_login.php';
 
-require 'db_connect.php';
-require 'insertSqlStatement.php';
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
 
-$datum = $_POST['datum'];
+require_once __DIR__ . '/vendor/autoload.php';
 
-$sql = "DELETE FROM moegliche_flugtage WHERE datum = '$datum'";
+Helper::checkLogin();
+Database::connect();
 
-insertSqlStatement($conn, $sql);
+$sql = 'DELETE FROM moegliche_flugtage WHERE datum = :datum';
+$result = Database::insertSqlStatement($sql, ['datum' => $_POST['datum']]);
 
-$conn->close();
-
-
+header('Content-Type: application/json');
+echo json_encode($result, JSON_THROW_ON_ERROR);

@@ -1,16 +1,18 @@
 <?php
-require 'check_login.php';
 
-require 'db_connect.php';
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
 
-$year = $_GET['year'];
+require_once __DIR__ . '/vendor/autoload.php';
 
-$sqlDelete = "DELETE FROM dienste WHERE YEAR(flugtag) = '$year'";
+Helper::checkLogin();
+Database::connect();
 
-if ($conn->query($sqlDelete) === TRUE) {
-    echo json_encode(['success' => true]);
+$sqlDelete = 'DELETE FROM dienste WHERE YEAR(flugtag) = :year';
+
+header('Content-Type: application/json');
+if (Database::query($sqlDelete, ['year' => $_GET['year']]) !== false) {
+    echo json_encode(['success' => true], JSON_THROW_ON_ERROR);
 } else {
-    echo json_encode(['success' => false, 'error' => $conn->error]);
+    echo json_encode(['success' => false], JSON_THROW_ON_ERROR);
 }
-
-$conn->close();

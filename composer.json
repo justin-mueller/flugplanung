@@ -5,6 +5,7 @@
     "license": "GPLv3",
     "require": {
         "php": "^8.1",
+        "ext-pdo": "*",
         "twig/twig": "^3.0"
     },
     "require-dev": {

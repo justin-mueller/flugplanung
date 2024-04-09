@@ -1,7 +1,12 @@
 <?php
-require 'check_login.php';
 
-require 'db_connect.php';
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+Helper::checkLogin();
+Database::connect();
 
 $allPilots = array(['error']);
 
@@ -28,17 +33,17 @@ LEFT JOIN
 LEFT JOIN
     dienste d ON mf.datum = d.flugtag AND m.pilot_id = d.pilot_id
 WHERE
-    mf.datum BETWEEN '$startDate' AND '$endDate'
+    mf.datum BETWEEN :startDate AND :endDate
 GROUP BY
     mf.datum;
 ";
 
-$result = $conn->query($sql);
+$result = Database::query($sql, ['startDate' => $startDate, 'endDate' => $endDate]);
 
 $data = array();
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+if ($result !== []) {
+    foreach ($result as $row) {
         $startleiterOptions = $row['startleiterOptionen'] !== null ? explode(',', $row['startleiterOptionen']) : $allPilots;
         $windenfahrerOptions = $row['windenfahrerOptionen'] !== null ? explode(',', $row['windenfahrerOptionen']) : $allPilots;
 
@@ -76,5 +81,3 @@ if ($result->num_rows > 0) {
 }
 
 echo json_encode($data);
-
-$conn->close();

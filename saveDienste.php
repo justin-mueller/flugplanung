@@ -1,17 +1,24 @@
 <?php
-require 'check_login.php';
 
-require 'db_connect.php';
-require 'insertSqlStatement.php';
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
 
-$flugtag = $_POST['flugtag'];
-$pilot_id = $_POST['pilot_id'];
-$windenfahrer = $_POST['windenfahrer'];
-$startleiter = $_POST['startleiter'];
+require_once __DIR__ . '/vendor/autoload.php';
+
+Helper::checkLogin();
+Database::connect();
 
 $sql = "INSERT INTO dienste (id, flugtag, pilot_id, windenfahrer, startleiter) 
-			  VALUES (CONCAT('$flugtag', '_' ,'$pilot_id') , '$flugtag', '$pilot_id', '$windenfahrer', '$startleiter')";
+        VALUES (CONCAT(:flugtag, '_' ,:pilot_id) , :flugtag, :pilot_id, :windenfahrer, :startleiter)";
 
-insertSqlStatement($conn, $sql);
+$result = Database::insertSqlStatement(
+    $sql,
+    [
+        'flugtag' => $_POST['flugtag'],
+        'pilot_id' => $_POST['pilot_id'],
+        'windenfahrer' => $_POST['windenfahrer'],
+        'startleiter' => $_POST['startleiter']
+    ]
+);
 
-$conn->close();
+echo json_encode($result, JSON_THROW_ON_ERROR);

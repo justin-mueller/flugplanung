@@ -1,31 +1,34 @@
 <?php
-require 'check_login.php';
 
-require 'db_connect.php';
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
 
-$pilot_id = $_GET['pilot_id'];
-$startDate = $_GET['startDate'];
-$endDate = $_GET['endDate'];
+require_once __DIR__ . '/vendor/autoload.php';
 
+Helper::checkLogin();
+Database::connect();
 
-$sql = "SELECT 
+$sql = 'SELECT 
             mf.datum, 
             COALESCE(dw.wunsch, -1) AS wunsch
         FROM moegliche_flugtage mf
-        LEFT JOIN dienste_wuensche dw ON mf.datum = dw.datum AND dw.pilot_id = $pilot_id
-		          WHERE 
-		mf.datum BETWEEN '$startDate' AND '$endDate'";
+        LEFT JOIN dienste_wuensche dw ON mf.datum = dw.datum AND dw.pilot_id = :pilot_id
+            WHERE 
+            mf.datum BETWEEN :startDate AND :endDate';
 
-$result = $conn->query($sql);
+$result = Database::query($sql, ['pilot_id' => $_GET['pilot_id'], 'startDate' => $_GET['startDate'], 'endDate' => $_GET['endDate']]);
 
 $values = array();
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $wunschValue = ($row['wunsch'] == 1) ? 'Ja' : (($row['wunsch'] == 0) ? 'Nein' : 'Egal');
+if ($result) {
+    foreach ($result as $row) {
+        $wunschValue = match ($row['wunsch']) {
+            0 => 'Nein',
+            1 => 'Ja',
+            default => 'Egal'
+        };
         $values[] = array('date' => $row['datum'], 'wunsch' => $wunschValue);
     }
 }
 
-echo json_encode($values);
-
-$conn->close();
+header('Content-Type: application/json');
+echo json_encode($values, JSON_THROW_ON_ERROR);

@@ -1,36 +1,20 @@
 <?php
-require 'check_login.php';
 
-require 'db_connect.php';
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
 
-$flugtag = $_GET['flugtag'];
+require_once __DIR__ . '/vendor/autoload.php';
 
-$query = "SELECT * FROM moegliche_flugtage WHERE datum = '$flugtag'";
-$result = $conn->query($query);
+Helper::checkLogin();
+Database::connect();
 
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
+$query = "SELECT * FROM moegliche_flugtage WHERE datum = :flugtag";
+$result = Database::query($query, ['flugtag' => $_GET['flugtag']]);
+$row = current($result);
 
-    $betrieb_ngl = $row['betrieb_ngl'];
-    $betrieb_hrp = $row['betrieb_hrp'];
-    $betrieb_amd = $row['betrieb_amd'];
-    $aufbau = $row['aufbau'];
-    $abgesagt = $row['abgesagt'];
-
-    $response = array(
-        'betrieb_ngl' => $betrieb_ngl,
-        'betrieb_hrp' => $betrieb_hrp,
-        'betrieb_amd' => $betrieb_amd,
-        'abgesagt' => $abgesagt,
-        'aufbau' => $aufbau
-    );
-
-    $jsonResponse = json_encode($response);
-
-    header('Content-Type: application/json');
-    echo $jsonResponse;
+header('Content-Type: application/json');
+if ($row) {
+    echo json_encode($row, JSON_THROW_ON_ERROR);
 } else {
-    echo json_encode(array('error' => 'No entries found in the "mitglieder" table'));
+    echo json_encode(['error' => 'No entries found in the "mitglieder" table'], JSON_THROW_ON_ERROR);
 }
-
-$conn->close();

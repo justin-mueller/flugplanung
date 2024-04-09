@@ -1,23 +1,26 @@
 <?php
-require 'check_login.php';
 
-require 'db_connect.php';
-require 'insertSqlStatement.php';
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
 
-$table = "tagesplanung";
-$kommentar = $_POST['kommentar'];
-$prio_result = $_POST['prio_result'];
-$pilotid = $_POST['pilotid'];
-$update = $_POST['update'];
-$flugtag = $_POST['flugtag'];
+require_once __DIR__ . '/vendor/autoload.php';
 
+Helper::checkLogin();
+Database::connect();
 
-if ($update) {
-	$sql = "UPDATE $table SET  Kommentar = '$kommentar', NGL = $prio_result[0], HRP = $prio_result[1], AMD = $prio_result[2], flugtag = '$flugtag'  WHERE Pilot_ID = '$pilotid' and flugtag = '$flugtag'";
+if ($_POST['update']) {
+    $sql = 'UPDATE tagesplanung SET  Kommentar = :kommentar, NGL = :ngl, HRP = :hrp, AMD = :amd, flugtag = :flugtag WHERE Pilot_ID = :pilotid AND flugtag = :flugtag';
 } else {
-	$sql = "INSERT INTO $table (Pilot_ID,  Kommentar, NGL, HRP, AMD, flugtag) VALUES ('$pilotid', '$kommentar', $prio_result[0], $prio_result[1], $prio_result[2] , '$flugtag' )";
+    $sql = 'INSERT INTO tagesplanung (Pilot_ID,  Kommentar, NGL, HRP, AMD, flugtag) VALUES (:pilotid, :kommentar, :ngl, :hrp, :amd , :flugtag)';
 }
 
-insertSqlStatement($conn, $sql);
+$result = Database::insertSqlStatement($sql, [
+    'kommentar' => $_POST['kommentar'],
+    'ngl' => $_POST['prio_result'][0],
+    'hrp' => $_POST['prio_result'][1],
+    'amd' => $_POST['prio_result'][2],
+    'pilotid' => $_POST['pilotid'],
+    'flugtag' => $_POST['flugtag']]);
 
-$conn->close();
+header('Content-Type: application/json');
+echo json_encode($result, JSON_THROW_ON_ERROR);
