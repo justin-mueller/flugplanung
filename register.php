@@ -19,8 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         echo json_encode(['success' => false, 'error' => 'E-Mail existiert bereits!'], JSON_THROW_ON_ERROR);
     } else {
         $password = $_POST['password_register'];
-        $vorname = ucwords(strtolower($_POST['vorname_register']));
-        $nachname = ucwords(strtolower($_POST['nachname_register']));
+        $vorname = $_POST['vorname_register'];
+        $nachname = $_POST['nachname_register'];
         $verein = $_POST['verein_register'];
         $fluggerät_G = isset($_POST['fluggeraet_gleitschirm']) ? 'G' : '';
         $fluggerät_D = isset($_POST['fluggeraet_drachen']) ? 'D' : '';
