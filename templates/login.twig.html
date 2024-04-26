@@ -8,10 +8,27 @@
 	
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="css/select2.min.css">
+	<style>
+		.select2-container--default .select2-selection--single {
+			border: var(--bs-border-width) solid var(--bs-border-color);
+		}
+	</style>
+
 	<script type="text/javascript" src="js_modules/jquery.js"></script>
+	<script type="text/javascript" src="js_modules/select2.full.min.js"></script>
 	<script type="text/javascript" src="js_modules/bootstrap.js"></script>
 	<script type="text/javascript" src="js/register.js"></script>
 	<script type="text/javascript" src="js/toasts.js"></script>
+
+	<script>
+		$(document).ready(function() {
+    		$('#verein_register').select2({
+				width: '100%',
+				containerCssClass: 'form-control form-control-lg'
+			});
+		});
+	</script>
 
 </head>
 
@@ -95,10 +112,9 @@
 									</div>
 									
 									<div class="form-outline mb-4">
-
-									<select class="form-select" name="verein_register" id="verein_register">
-										{{ clubs|raw }}
-									</select>
+										<select class="form-select" name="verein_register" id="verein_register">
+											{{ clubs|raw }}
+										</select>
 										<label class="form-label" for="verein_register">Verein</label>
 									</div>
 
