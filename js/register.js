@@ -29,6 +29,8 @@ $(document).ready(function () {
 				}
 			},
 			error: function (error) {
+				$('#register-error').removeClass('d-none');
+				$('#register-error').html('Das hat leider nicht geklappt. Versuch es gern nochmal…');
 				console.error('Error:', error);
 			}
 		});
