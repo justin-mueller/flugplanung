@@ -57,49 +57,52 @@ function extractNumericId(name) {
     const matches = name.match(/\d+/);
     return matches ? matches[0] : null;
 }
+
 function populateDashboardTable() {
     const tableBody = document.getElementById('table-body-dashboard');
 
-    while (tableBody.firstChild) {
-        tableBody.removeChild(tableBody.firstChild);
-    }
-
-    dashboardData.forEach(entry => {
-        if (entry.date) {
-            const date = entry.date.valueOf();
-            const row = document.createElement('tr');
-
-            // Date column
-            const dateCell = document.createElement('td');
-            dateCell.textContent = getFormattedGermanDate(date);
-            row.appendChild(dateCell);
-
-            // Startleiter Optionen column
-            const startleiterOptionenCell = document.createElement('td');
-            startleiterOptionenCell.setAttribute('id', 'Optionen_startleiter_' + date);
-            row.appendChild(startleiterOptionenCell);
-
-            // Windenfahrer Optionen column
-            const windenfahrerOptionenCell = document.createElement('td');
-            windenfahrerOptionenCell.setAttribute('id', 'Optionen_windenfahrer_' + date);
-            row.appendChild(windenfahrerOptionenCell);
-
-            // Startleiter column
-            const startleiterCell = document.createElement('td');
-            startleiterCell.setAttribute('id', 'startleiter_' + date);
-            row.appendChild(startleiterCell);
-
-            // Windenfahrer column
-            const windenfahrerCell = document.createElement('td');
-            windenfahrerCell.setAttribute('id', 'windenfahrer_' + date);
-            row.appendChild(windenfahrerCell);
-
-            populatePilotOptions(startleiterOptionenCell, startleiterCell, entry.startleiterOptionen, date, 'startleiter', entry.startleiter);
-            populatePilotOptions(windenfahrerOptionenCell, windenfahrerCell, entry.windenfahrerOptionen, date, 'windenfahrer', entry.windenfahrer);
-
-            tableBody.appendChild(row);
+    if (tableBody) {
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
         }
-    });
+
+        dashboardData.forEach(entry => {
+            if (entry.date) {
+                const date = entry.date.valueOf();
+                const row = document.createElement('tr');
+
+                // Date column
+                const dateCell = document.createElement('td');
+                dateCell.textContent = getFormattedGermanDate(date);
+                row.appendChild(dateCell);
+
+                // Startleiter Optionen column
+                const startleiterOptionenCell = document.createElement('td');
+                startleiterOptionenCell.setAttribute('id', 'Optionen_startleiter_' + date);
+                row.appendChild(startleiterOptionenCell);
+
+                // Windenfahrer Optionen column
+                const windenfahrerOptionenCell = document.createElement('td');
+                windenfahrerOptionenCell.setAttribute('id', 'Optionen_windenfahrer_' + date);
+                row.appendChild(windenfahrerOptionenCell);
+
+                // Startleiter column
+                const startleiterCell = document.createElement('td');
+                startleiterCell.setAttribute('id', 'startleiter_' + date);
+                row.appendChild(startleiterCell);
+
+                // Windenfahrer column
+                const windenfahrerCell = document.createElement('td');
+                windenfahrerCell.setAttribute('id', 'windenfahrer_' + date);
+                row.appendChild(windenfahrerCell);
+
+                populatePilotOptions(startleiterOptionenCell, startleiterCell, entry.startleiterOptionen, date, 'startleiter', entry.startleiter);
+                populatePilotOptions(windenfahrerOptionenCell, windenfahrerCell, entry.windenfahrerOptionen, date, 'windenfahrer', entry.windenfahrer);
+
+                tableBody.appendChild(row);
+            }
+        });
+    }
 }
 
 function populatePilotOptions(cell_option, cell_dienst, pilotOptions, date, dienst, entered) {
@@ -173,57 +176,58 @@ function populatePilotOptions2(cell_option, cell_dienst, pilotOptions, date, die
 function populatePilotTable() {
 
     const table = document.getElementById('pilotTable');
-    table.innerHTML = '';
+    if (table) {
+        table.innerHTML = '';
 
-    const pilotCount = {};
+        const pilotCount = {};
 
 
-    // Add Counts
-    enteredDienste.forEach(entry => {
-        const dienst_short = entry.dienst == 'windenfahrer' ? ' (WF)' : ' (SL)'
-        const pilotName = entry.name + dienst_short;
-        pilotCount[pilotName] = (pilotCount[pilotName] || 0) + 1;
-    });
-
-    // Add 0 Values
-    if (dashboardData.startleiterOptionen) {
-        dashboardData.startleiterOptionen.forEach(entry => {
-            const field = entry.name.replace("+", "").replace("-", "") + ' (SL)'
-            pilotCount[field] = (pilotCount[field] || 0);
+        // Add Counts
+        enteredDienste.forEach(entry => {
+            const dienst_short = entry.dienst == 'windenfahrer' ? ' (WF)' : ' (SL)'
+            const pilotName = entry.name + dienst_short;
+            pilotCount[pilotName] = (pilotCount[pilotName] || 0) + 1;
         });
-    }
-    if (dashboardData.windenfahrerOptionen) {
-        dashboardData.windenfahrerOptionen.forEach(entry => {
-            const field = entry.name.replace("+", "").replace("-", "") + ' (WF)'
-            pilotCount[field] = (pilotCount[field] || 0);
-        });
-    }
 
-    const headerRow = table.createTHead().insertRow();
-    const headerCellName = headerRow.insertCell(0);
-    const headerCellOccurrences = headerRow.insertCell(1);
+        // Add 0 Values
+        if (dashboardData.startleiterOptionen) {
+            dashboardData.startleiterOptionen.forEach(entry => {
+                const field = entry.name.replace("+", "").replace("-", "") + ' (SL)'
+                pilotCount[field] = (pilotCount[field] || 0);
+            });
+        }
+        if (dashboardData.windenfahrerOptionen) {
+            dashboardData.windenfahrerOptionen.forEach(entry => {
+                const field = entry.name.replace("+", "").replace("-", "") + ' (WF)'
+                pilotCount[field] = (pilotCount[field] || 0);
+            });
+        }
 
-    headerCellName.textContent = 'Pilot';
-    headerCellOccurrences.textContent = '#Dienste';
+        const headerRow = table.createTHead().insertRow();
+        const headerCellName = headerRow.insertCell(0);
+        const headerCellOccurrences = headerRow.insertCell(1);
+
+        headerCellName.textContent = 'Pilot';
+        headerCellOccurrences.textContent = '#Dienste';
 
 
-    // Populate the table
-    for (const pilotName in pilotCount) {
-        const count = pilotCount[pilotName];
+        // Populate the table
+        for (const pilotName in pilotCount) {
+            const count = pilotCount[pilotName];
 
-        // Create a new row
-        const row = table.insertRow(-1);
+            // Create a new row
+            const row = table.insertRow(-1);
 
-        // Create two cells (columns) in the row
-        const cell1 = row.insertCell(0);
-        const cell2 = row.insertCell(1);
+            // Create two cells (columns) in the row
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
 
-        // Set the content of the cells
-        cell1.textContent = pilotName;
-        cell2.textContent = count;
+            // Set the content of the cells
+            cell1.textContent = pilotName;
+            cell2.textContent = count;
+        }
     }
 }
-
 
 //Error Handling ist hier etwas schlecht
 function saveDienste() {
