@@ -49,25 +49,25 @@ function getFlugtag() {
 				startleiter_official = data.some(value => value.startleiter_official == 1) ? (data.filter(o => o.startleiter_official == 1))[0].Pilot_ID : null;
 
 				var pilot_count_all_prio_1 = [
-					getRowCount(data, 'NGL', '0'),
-					getRowCount(data, 'HRP', '0'),
-					getRowCount(data, 'AMD', '0')
+					getRowCount(data, 'NGL', 0),
+					getRowCount(data, 'HRP', 0),
+					getRowCount(data, 'AMD', 0)
 				];
 				var pilot_count_all_prio_2 = [
-					getRowCount(data, 'NGL', '1'),
-					getRowCount(data, 'HRP', '1'),
-					getRowCount(data, 'AMD', '1')
+					getRowCount(data, 'NGL', 1),
+					getRowCount(data, 'HRP', 1),
+					getRowCount(data, 'AMD', 1)
 				];
 
 				var pilot_count_hdgf_prio_1 = [
-					getRowCount(data, 'NGL', '0', localClubId),
-					getRowCount(data, 'HRP', '0', localClubId),
-					getRowCount(data, 'AMD', '0', localClubId)
+					getRowCount(data, 'NGL', 0, localClubId),
+					getRowCount(data, 'HRP', 0, localClubId),
+					getRowCount(data, 'AMD', 0, localClubId)
 				];
 				var pilot_count_hdgf_prio_2 = [
-					getRowCount(data, 'NGL', '1', localClubId),
-					getRowCount(data, 'HRP', '1', localClubId),
-					getRowCount(data, 'AMD', '1', localClubId)
+					getRowCount(data, 'NGL', 1, localClubId),
+					getRowCount(data, 'HRP', 1, localClubId),
+					getRowCount(data, 'AMD', 1, localClubId)
 				];
 
 				total_pilot_count_all[0] = pilot_count_all_prio_1[0] + pilot_count_all_prio_2[0];
@@ -94,15 +94,15 @@ function getFlugtag() {
 					let timestamp = new Date(row.timestamp);
 					let time_ago = Math.round((now - timestamp) / 60000);
 					let new_record = (timestamp >= oneHourBack && timestamp <= now) ? '<span class="badge bg-info">Neu vor ' + time_ago + ' min</span>' : '';
-					let hdgf_member = row.VereinId == localClubId;
-					let row_not_hdgf = hdgf_member ? '' : 'class="tr_no_hgdf"';
+					let local_club_member = row.VereinId === localClubId;
+					let row_not_local_club_member = local_club_member ? '' : 'class="tr_no_hgdf"';
 					let ist_startleiter = row.Pilot_ID == startleiter_official ? '<span class="badge bg-success">SL Offiziell</span>' : '';
 					let windenfahrer_official_info = row.Pilot_ID == windenfahrer_official ? '<span class="badge bg-success">WF Offiziell</span>' : '';
 					let windenfahrer_info = (row.ist_windenfahrer == 1 && row.Pilot_ID != windenfahrer_official) ? '<span class="badge bg-primary">WF</span>' : '';
-					var newRow = $('<tr ' + row_not_hdgf + '>');
+					var newRow = $('<tr ' + row_not_local_club_member + '>');
 
 					newRow.append('<td>' + row.Pilot + ' ' + windenfahrer_info + ' ' + windenfahrer_official_info + ' ' + ist_startleiter + ' ' + new_record + '</td>');
-					newRow.append('<td>' + (hdgf_member ? '<strong>' : '') + row.Verein + (hdgf_member ? '</strong>' : '') + '</td>');
+					newRow.append('<td>' + (local_club_member ? '<strong>' : '') + row.Verein + (local_club_member ? '</strong>' : '') + '</td>');
 					newRow.append('<td>' + replaceValueWithImage(row.NGL) + '</td>');
 					newRow.append('<td>' + replaceValueWithImage(row.HRP) + '</td>');
 					newRow.append('<td>' + replaceValueWithImage(row.AMD) + '</td>');
@@ -123,7 +123,7 @@ function getFlugtag() {
 				$('#tagesplanung tbody').append(newRow);
 
 				var legendRow = $('<tr>');
-				legendRow.append('<td colspan="6" style="font-size: small"><span class="badge bg-success">SL Offiziell</span>= Offizieller Startleiter für den Tag<br><span class="badge bg-success">WF Offiziell</span>= Offizieller Windenfahrer für den Tag<br><span class="badge bg-primary">WF</span>= Hat einen Windenfahrerschein</td>');
+				legendRow.append('<td colspan="6" style="font-size: small"><span class="badge bg-success">SL Offiziell</span> = Offizieller Startleiter für den Tag<br><span class="badge bg-success">WF Offiziell</span> = Offizieller Windenfahrer für den Tag<br><span class="badge bg-primary">WF</span> = Hat einen Windenfahrerschein</td>');
 				$('#tagesplanung tbody').append(legendRow);
 
 				User_Information.record_present = data.some(pilot => pilot.Pilot_ID === User_Information.pilot_id && (pilot.startleiter_official == "0" || pilot.startleiter_official == "") && (pilot.windenfahrer_official == "0" || pilot.windenfahrer_official == ""));
