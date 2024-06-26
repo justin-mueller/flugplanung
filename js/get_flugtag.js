@@ -1,7 +1,7 @@
 function getRowCount(data, rowKey, targetValue, clubFilter = 0) {
 	var count = 0;
 	$.each(data, function (index, row) {
-		if (row[rowKey] === targetValue && (clubFilter === 0 || row.VereinId === clubFilter)) {
+		if (row[rowKey] == targetValue && (clubFilter == 0 || row.VereinId == clubFilter)) {
 			count++;
 		}
 	});
@@ -113,7 +113,18 @@ function getFlugtag() {
 
 
 				var newRow = $('<tr>');
-				newRow.append('<td><strong>Max. Piloten</strong></td>');
+				newRow.append('<td><strong>Abstimmung <img src="img/stern_fav.svg" class="table-image"></strong><br>Gebiet mit den meisten Erst-Stimmen</td>');
+				newRow.append('<td></td>');
+				newRow.append('<td>' + pilot_count_all_prio_1[0] + '</td>');
+				newRow.append('<td>' + pilot_count_all_prio_1[1] + '</td>');
+				newRow.append('<td>' + pilot_count_all_prio_1[2] + '</td>');
+
+				newRow.append('<td></td>');
+				$('#tagesplanung tbody').append(newRow);
+
+
+				var newRow = $('<tr>');
+				newRow.append('<td><strong>Piloten maximal</strong> <img src="img/stern_fav.svg" class="table-image"> + <img src="img/stern.svg" class="table-image"><br>(wenn Betrieb nur diesem Fluggebiet stattfindet)</td>');
 				newRow.append('<td></td>');
 				newRow.append('<td>' + total_pilot_count_all[0] + '</td>');
 				newRow.append('<td>' + total_pilot_count_all[1] + '</td>');
@@ -121,6 +132,9 @@ function getFlugtag() {
 
 				newRow.append('<td></td>');
 				$('#tagesplanung tbody').append(newRow);
+
+
+
 
 				var legendRow = $('<tr>');
 				legendRow.append('<td colspan="6" style="font-size: small"><span class="badge bg-success">SL Offiziell</span> = Offizieller Startleiter für den Tag<br><span class="badge bg-success">WF Offiziell</span> = Offizieller Windenfahrer für den Tag<br><span class="badge bg-primary">WF</span> = Hat einen Windenfahrerschein</td>');
@@ -241,11 +255,11 @@ function getFlugtag() {
 }
 
 function replaceValueWithImage(value) {
-	if (value === 0) {
+	if (value == 0) {
 		return '<img src="img/stern_fav.svg" class="table-image">';
-	} else if (value === 1) {
+	} else if (value == 1) {
 		return '<img src="img/stern.svg" class="table-image">';
-	} else if (value === 2) {
+	} else if (value == 2) {
 		return '<img src="img/kreuz.svg" class="table-image">';
 	}
 	return value;
