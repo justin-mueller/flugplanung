@@ -1,7 +1,5 @@
 $(document).ready(function () {
 
-	
-
 	$('.date').datepicker({
 		language: 'de',
 		weekStart: 1,
@@ -105,8 +103,6 @@ $(document).ready(function () {
 		loadFlugtage();
 	});
 
-
-
 	loadChatbox(true);
 
     var avatarDiv = document.getElementById("avatar-header");
@@ -116,7 +112,6 @@ $(document).ready(function () {
 	$("#avatar-header").on('click', function () {
 		showToast('Info!', 'Nutzer Einstellungen', 'Hier kannst du demnächst Einstellungen zu Deinem Nutzerprofil machen. Noch ist dies nicht implementiert!', 'success');
 	})
-
 
 	setInterval(() => loadChatbox(false), 15000);
 });
