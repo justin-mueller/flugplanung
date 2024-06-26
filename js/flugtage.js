@@ -45,9 +45,6 @@ function loadFlugtage(init) {
 					let flugtagDate = Flugtag_Converted.getFullYear().toString() + Flugtag_Converted.getMonth().toString() + Flugtag_Converted.getDate().toString();
 					let startFlugtagDate = startFlugtag.getFullYear().toString() + startFlugtag.getMonth().toString() + startFlugtag.getDate().toString();
 
-					console.log(flugtagDate == startFlugtagDate)
-					console.log(startFlugtag > checkTime)
-
 					if (Flugtag_Converted > startFlugtag || (flugtagDate == startFlugtagDate && checkTime > startFlugtag )) {
 						startFlugtag = Flugtag_Converted;
 						return false;
