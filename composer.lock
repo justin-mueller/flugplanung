@@ -4,8 +4,62 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1655adee90490f01f6f133e8eab180a4",
+    "content-hash": "e6f01035e67d8c6e5addbede663be827",
     "packages": [
+        {
+            "name": "adriansuter/twig-cache-busting",
+            "version": "3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/adriansuter/Twig-Cache-Busting.git",
+                "reference": "942c7100b2e71cc60ed322f1e1bdba6b4252ef5f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/adriansuter/Twig-Cache-Busting/zipball/942c7100b2e71cc60ed322f1e1bdba6b4252ef5f",
+                "reference": "942c7100b2e71cc60ed322f1e1bdba6b4252ef5f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8",
+                "twig/twig": "^3.5"
+            },
+            "require-dev": {
+                "phpspec/prophecy-phpunit": "^2.0",
+                "phpstan/phpstan": "^1.9",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AdrianSuter\\TwigCacheBusting\\": "src",
+                    "AdrianSuter\\TwigCacheBusting\\Tests\\": "tests"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Adrian Suter",
+                    "email": "adrian@suter-wirz.ch",
+                    "homepage": "https://www.adriansuter.ch/"
+                }
+            ],
+            "description": "Twig Cache Busting is an add-on for Twig to support cache busting on template compilation.",
+            "keywords": [
+                "cache",
+                "cache busting",
+                "twig"
+            ],
+            "support": {
+                "issues": "https://github.com/adriansuter/Twig-Cache-Busting/issues",
+                "source": "https://github.com/adriansuter/Twig-Cache-Busting/tree/3.0"
+            },
+            "time": "2023-01-18T07:20:46+00:00"
+        },
         {
             "name": "symfony/polyfill-ctype",
             "version": "v1.29.0",
@@ -1068,7 +1122,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.1"
+        "php": "^8.1",
+        "ext-pdo": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.6.0"

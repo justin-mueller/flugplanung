@@ -1,5 +1,8 @@
 <?php
 
+use AdrianSuter\TwigCacheBusting\CacheBusters\QueryParamCacheBuster;
+use AdrianSuter\TwigCacheBusting\CacheBustingTwigExtension;
+use AdrianSuter\TwigCacheBusting\HashGenerators\FileMD5HashGenerator;
 use JustinMueller\Flugplanung\Helper;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -17,6 +20,11 @@ $clubId = 198;
 // set up Twig
 $loader = new FilesystemLoader(__DIR__ . '/templates');
 $twig = new Environment($loader);
+$twig->addExtension(
+    CacheBustingTwigExtension::create(
+        new QueryParamCacheBuster(__DIR__, new FileMD5HashGenerator())
+    )
+);
 
 // populate tabs
 $tabs = [

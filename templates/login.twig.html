@@ -5,25 +5,20 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Login</title>
-	
-	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<link rel="stylesheet" type="text/css" href="css/select2.min.css">
-	<style>
-		.select2-container--default .select2-selection--single {
-			border: var(--bs-border-width) solid var(--bs-border-color);
-		}
-	</style>
 
-	<script type="text/javascript" src="js_modules/jquery.js"></script>
-	<script type="text/javascript" src="js_modules/select2.full.min.js"></script>
-	<script type="text/javascript" src="js_modules/bootstrap.js"></script>
-	<script type="text/javascript" src="js/register.js"></script>
-	<script type="text/javascript" src="js/toasts.js"></script>
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/bootstrap.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/select2.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/style.css' %}">
+
+	<script src="{% cache_busting 'js_modules/jquery.js' %}"></script>
+	<script src="{% cache_busting 'js_modules/select2.full.min.js' %}"></script>
+	<script src="{% cache_busting 'js_modules/bootstrap.js' %}"></script>
+	<script src="{% cache_busting 'js/register.js' %}"></script>
+	<script src="{% cache_busting 'js/toasts.js' %}"></script>
 
 	<script>
 		$(document).ready(function() {
-    		$('#verein_register').select2({
+			$('#verein_register').select2({
 				width: '100%',
 				containerCssClass: 'form-control form-control-lg'
 			});
@@ -110,7 +105,7 @@
 											class="form-control form-control-lg" required />
 										<label class="form-label" for="vorname_register">Nachname</label>
 									</div>
-									
+
 									<div class="form-outline mb-4">
 										<select class="form-select" name="verein_register" id="verein_register">
 											{{ clubs|raw }}
@@ -151,7 +146,7 @@
 								</div>
 
 
-	
+
 								<div class="card mb-4">
 									<div class="card-header">
 										<h5 class="card-title">Aussehen</h5>
@@ -161,7 +156,7 @@
 										<div class="form-outline mb-4">
 											<div class="custom-select">
 												<div class="avatar" id="avatar-preview">
-												</div>	
+												</div>
 												<select id="avatar-register" name="avatar_register" class="form-select" onchange="updatePreview()">
 													<option value="1">Avatar 1</option>
 													<option value="2">Avatar 2</option>

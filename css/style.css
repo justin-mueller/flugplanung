@@ -7,6 +7,9 @@
 	--scroll-bar-bg-color: #f6f6f6;
 }
 
+.select2-container--default .select2-selection--single {
+	border: var(--bs-border-width) solid var(--bs-border-color);
+}
 
 ::-webkit-scrollbar-corner { background: rgba(0,0,0,0.5); }
 
@@ -132,7 +135,7 @@ a {
   .avatar img {
 	width: 48px;
   }
-  
+
   #avatar {
 	flex: 1;
   }
@@ -146,8 +149,8 @@ a {
     border-color: #ff002d;
     border-width: 2px;
   }
-  
-  
+
+
 
 .chatbox-messages {
 	max-height: 300px;

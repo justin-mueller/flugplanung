@@ -1,5 +1,8 @@
 <?php
 
+use AdrianSuter\TwigCacheBusting\CacheBusters\QueryParamCacheBuster;
+use AdrianSuter\TwigCacheBusting\CacheBustingTwigExtension;
+use AdrianSuter\TwigCacheBusting\HashGenerators\FileMD5HashGenerator;
 use JustinMueller\Flugplanung\Database;
 use JustinMueller\Flugplanung\Helper;
 use Twig\Environment;
@@ -29,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (password_verify($password, $hashedPasswordFromDB)) {
             require 'clubs.php';
             $mitgliederData['vereinId'] = (int)$mitgliederData['verein'];
-            $mitgliederData['verein'] = $clubs[$mitgliederData['vereinId']];
+            $mitgliederData['verein'] = $clubs[$mitgliederData['vereinId']]['shortName'] ?: $clubs[$mitgliederData['vereinId']]['name'];
             // Authentication successful, store username and additional data in session
             $_SESSION['email'] = $email;
             $_SESSION['mitgliederData'] = $mitgliederData;
@@ -49,6 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // set up Twig
 $loader = new FilesystemLoader(__DIR__ . '/templates');
 $twig = new Environment($loader);
+$twig->addExtension(
+    CacheBustingTwigExtension::create(
+        new QueryParamCacheBuster(__DIR__, new FileMD5HashGenerator())
+    )
+);
 
 echo $twig->render(
     'login.twig.html',
