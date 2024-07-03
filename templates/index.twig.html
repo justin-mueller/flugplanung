@@ -6,36 +6,36 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-	<link rel="stylesheet" href="css/bootstrap-datepicker.min.css">
-	<link rel="stylesheet" href="css/font-awesome.min.css">
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<link rel="stylesheet" type="text/css" href="css/chatbox.css">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/bootstrap.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/bootstrap-datepicker.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/font-awesome.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/style.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/chatbox.css' %}">
 
     <script>var User_Information = {{ mitgliederData|json_encode|raw }};</script>
 
-	<script type="text/javascript" src="js_modules/jquery.js"></script>
-	<script type="text/javascript" src="js_modules/bootstrap.js"></script>
-	<script type="text/javascript" src="js_modules/bootstrap-datepicker.min.js"></script>
-	<script type="text/javascript" src="js_modules/bootstrap-datepicker.de.min.js"></script>
-	<script src="js/date_functions.js"></script>
-	<script type="text/javascript" src="js/globals.js"></script>
-	<script type="text/javascript" src="js/on_document_ready.js"></script>
-	<script type="text/javascript" src="js/form_choose.js"></script>
-	<script type="text/javascript" src="js/prio_calculation.js"></script>
-	<script type="text/javascript" src="js/delete_pilot.js"></script>
-	<script type="text/javascript" src="js/toasts.js"></script>
-	<script type="text/javascript" src="js/get_flugtag.js"></script>
-	<script type="text/javascript" src="js/betrieb.js"></script>
-	<script type="text/javascript" src="js/enter_pilot.js"></script>
-	<script type="text/javascript" src="js/loading_spinner.js"></script>
-	<script type="text/javascript" src="js/chatbox.js"></script>
-	<script src="js/saison.js"></script>
+	<script src="{% cache_busting 'js_modules/jquery.js' %}"></script>
+	<script src="{% cache_busting 'js_modules/bootstrap.js' %}"></script>
+	<script src="{% cache_busting 'js_modules/bootstrap-datepicker.min.js' %}"></script>
+	<script src="{% cache_busting 'js_modules/bootstrap-datepicker.de.min.js' %}"></script>
+	<script src="{% cache_busting 'js/date_functions.js' %}"></script>
+	<script src="{% cache_busting 'js/globals.js' %}"></script>
+	<script src="{% cache_busting 'js/on_document_ready.js' %}"></script>
+	<script src="{% cache_busting 'js/form_choose.js' %}"></script>
+	<script src="{% cache_busting 'js/prio_calculation.js' %}"></script>
+	<script src="{% cache_busting 'js/delete_pilot.js' %}"></script>
+	<script src="{% cache_busting 'js/toasts.js' %}"></script>
+	<script src="{% cache_busting 'js/get_flugtag.js' %}"></script>
+	<script src="{% cache_busting 'js/betrieb.js' %}"></script>
+	<script src="{% cache_busting 'js/enter_pilot.js' %}"></script>
+	<script src="{% cache_busting 'js/loading_spinner.js' %}"></script>
+	<script src="{% cache_busting 'js/chatbox.js' %}"></script>
+	<script src="{% cache_busting 'js/saison.js' %}"></script>
 	{% if mitgliederData.vereinId == clubId %}
-	<script src="js/wunschliste.js"></script>
+	<script src="{% cache_busting 'js/wunschliste.js' %}"></script>
 	{% endif %}
-	<script src="js/dashboard.js"></script>
-	<script type="text/javascript" src="js/flugtage.js"></script>
+	<script src="{% cache_busting 'js/dashboard.js' %}"></script>
+	<script src="{% cache_busting 'js/flugtage.js' %}"></script>
 </head>
 
 <body>
