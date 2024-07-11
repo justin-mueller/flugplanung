@@ -2,8 +2,8 @@
 require 'clubs.php';
 
 $options = '';
-foreach ($clubs as $id => $name) {
-    $options .= sprintf('<option value="%s">%s</option>', $id, htmlentities($name)) . PHP_EOL;
+foreach ($clubs as $id => $names) {
+    $options .= sprintf('<option value="%s">%s</option>', $id, htmlentities($names['name'])) . PHP_EOL;
 }
 
 return $options;

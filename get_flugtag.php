@@ -48,9 +48,9 @@ $result = Database::query($sql, ['flugtag' => $_GET['flugtag']]);
 if ($result) {
     $data = [];
     foreach ($result as $row) {
-     $row['VereinId'] = (int)$row['VereinId'];
-     $row['Verein'] = $clubs[$row['VereinId']];
-     $data[] = $row;
+        $row['VereinId'] = (int)$row['VereinId'];
+        $row['Verein'] = $clubs[$row['VereinId']]['shortName'] ?: $clubs[$row['VereinId']]['name'];
+        $data[] = $row;
     }
 } else {
     $data = 'Keine Daten vorhanden.';
