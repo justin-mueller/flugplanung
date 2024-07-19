@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (password_verify($password, $hashedPasswordFromDB)) {
             require 'clubs.php';
             $mitgliederData['vereinId'] = (int)$mitgliederData['verein'];
-            $mitgliederData['verein'] = $clubs[$mitgliederData['vereinId']]['shortName'] ?: $clubs[$mitgliederData['vereinId']]['name'];
+            $mitgliederData['verein'] = $clubs[$mitgliederData['vereinId']];
             // Authentication successful, store username and additional data in session
             $_SESSION['email'] = $email;
             $_SESSION['mitgliederData'] = $mitgliederData;
