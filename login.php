@@ -62,6 +62,7 @@ $twig->addExtension(
 echo $twig->render(
     'login.twig.html',
     [
+        'clubId' => Helper::$configuration['clubId'],
         'email' => $email ?? '',
         'error' => $error,
         'clubs' => Helper::$configuration['clubs']
