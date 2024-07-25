@@ -45,7 +45,12 @@ function getUserWuensche() {
         type: 'GET',
         data: { pilot_id: User_Information.pilot_id, startDate: startDate, endDate: endDate },
         success: function (data) {
-            populateWuenscheValues(JSON.parse(data));
+            if (Array.isArray(data)) {
+                populateWuenscheValues(data);
+            } else {
+                console.log('data should be returned as array already!');
+                populateWuenscheValues(JSON.parse(data));
+            }
         },
         error: function (xhr, status, error) {
             console.log(xhr);
