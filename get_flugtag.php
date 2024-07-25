@@ -5,9 +5,9 @@ use JustinMueller\Flugplanung\Helper;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
-require 'clubs.php';
 
 $sql = "SELECT
             m.pilot_id AS Pilot_ID,
@@ -49,7 +49,7 @@ if ($result) {
     $data = [];
     foreach ($result as $row) {
         $row['VereinId'] = (int)$row['VereinId'];
-        $row['Verein'] = $clubs[$row['VereinId']]['shortName'] ?: $clubs[$row['VereinId']]['name'];
+        $row['Verein'] = Helper::$configuration['clubs'][$row['VereinId']]['shortName'] ?: Helper::$configuration['clubs'][$row['VereinId']]['name'];
         $data[] = $row;
     }
 } else {

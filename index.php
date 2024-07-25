@@ -9,13 +9,11 @@ use Twig\Loader\FilesystemLoader;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+Helper::loadConfiguration();
 Helper::checkLogin();
 
 // Access additional user data stored in the session, if available
 $mitgliederData = $_SESSION['mitgliederData'] ?? [];
-
-// HGDF club id
-$clubId = 198;
 
 // set up Twig
 $loader = new FilesystemLoader(__DIR__ . '/templates');
@@ -53,7 +51,8 @@ if ($mitgliederData['dienste_admin']) {
 echo $twig->render(
     'index.twig.html',
     [
-		'clubId' => $clubId,
+        'clubId' => Helper::$configuration['clubId'],
+        'sites' => Helper::$configuration['sites'],
         'mitgliederData' => $mitgliederData,
         'tabs' => $tabs
     ]

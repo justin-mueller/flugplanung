@@ -1,7 +1,11 @@
 <?php
+
+use JustinMueller\Flugplanung\Helper;
+
 require_once __DIR__ . '/vendor/autoload.php';
 
-\JustinMueller\Flugplanung\Helper::checkLogin();
+Helper::loadConfiguration();
+Helper::checkLogin();
 
 // Remove the session cookie
 if (ini_get('session.use_cookies')) {

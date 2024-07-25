@@ -1,10 +1,13 @@
 <?php
 
 use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+Helper::loadConfiguration();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     Database::connect();
 
     $email = $_POST['email_register'];
@@ -22,10 +25,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $vorname = $_POST['vorname_register'];
         $nachname = $_POST['nachname_register'];
         $verein = $_POST['verein_register'];
-        $fluggerät_G = isset($_POST['fluggeraet_gleitschirm']) ? 'G' : '';
-        $fluggerät_D = isset($_POST['fluggeraet_drachen']) ? 'D' : '';
-        $fluggerät_S = isset($_POST['fluggeraet_sonstiges']) ? 'S' : '';
-        $fluggeraetCombined = $fluggerät_G . $fluggerät_D . $fluggerät_S;
+        $fluggeraetG = isset($_POST['fluggeraet_gleitschirm']) ? 'G' : '';
+        $fluggeraetD = isset($_POST['fluggeraet_drachen']) ? 'D' : '';
+        $fluggeraetS = isset($_POST['fluggeraet_sonstiges']) ? 'S' : '';
+        $fluggeraetCombined = $fluggeraetG . $fluggeraetD . $fluggeraetS;
         $windenfahrer = $_POST['windenfahrer_register'];
         $avatar = $_POST['avatar_register'];
 

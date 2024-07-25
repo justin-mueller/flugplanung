@@ -108,7 +108,9 @@
 
 									<div class="form-outline mb-4">
 										<select class="form-select" name="verein_register" id="verein_register">
-											{{ clubs|raw }}
+											{% for id, club in clubs %}
+											<option value="{{ id }}">{{ club.name }}</option>
+											{% endfor %}
 										</select>
 										<label class="form-label" for="verein_register">Verein</label>
 									</div>
