@@ -27,6 +27,7 @@ Die Default-Settings stehen in`config.dist.php`:
 - die `clubId` (`198` , d.h. HGDF)
 - die Fluggebiete (`sites = ['Neustadt-Glewe', 'Hörpel', 'Altenmedingen']`, für den HGDF)
 - In `db` die DB-Zugangsdaten (`servername`, `username`, `password`, `dbname`, `port`)
+- Der `basePath` für die Asset-URLs (`flugplanung`, für den HGDF)
 - die verfügbaren Vereine
 
 Die DB-Zugangsdaten weren aus Environment-Variablen gelesen, wenn gesetzt:
@@ -44,6 +45,8 @@ Wenn die nicht gesetzt sind, gilt
 - `3306` als Port.
 
 Eine optionale Datei `config.php` wird ebenfalls gelesen und überschreibt die Default-Konfiguration aus `config.dist.php`. Die `config.php` wird in `.gitingore` ignoriert und kann die Konfiguration für eine spezifische Instanz anpassen.
+
+Über `basePath` kann bei Betrieb in einem Verzeichnis unterhalb des Webserver-Root das Laden der Assets ermöglicht werden.
 
 Nun kann die Flugplanung aufgerufen werden und die Registrierung von Nutzern ist möglich.
 

@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'basePath' => 'flugplanung',
+
     'clubId' => 198,
 
     'sites' => ['Neustadt-Glewe', 'Hörpel', 'Altenmedingen'],

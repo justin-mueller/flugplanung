@@ -54,7 +54,8 @@ $loader = new FilesystemLoader(__DIR__ . '/templates');
 $twig = new Environment($loader);
 $twig->addExtension(
     CacheBustingTwigExtension::create(
-        new QueryParamCacheBuster(__DIR__, new FileMD5HashGenerator())
+        new QueryParamCacheBuster(__DIR__, new FileMD5HashGenerator()),
+        Helper::$configuration['basePath']
     )
 );
 
