@@ -32,12 +32,7 @@ $tabs = [
         'content' => $twig->render('flugplanung.twig.html')
     ]
 ];
-if ($mitgliederData['vereinId'] === $clubId) {
-    $tabs['wunschliste'] = [
-        'label' => 'Wunschliste',
-        'content' => $twig->render('wunschliste.twig.html')
-    ];
-}
+
 if ($mitgliederData['dienste_admin']) {
     $tabs['dienste'] = [
         'label' => 'Dienste',
@@ -58,3 +53,10 @@ echo $twig->render(
         'tabs' => $tabs
     ]
 );
+
+if ($mitgliederData['vereinId'] === $clubId) {
+    $tabs['wunschliste'] = [
+        'label' => 'Wunschliste',
+        'content' => $twig->render('wunschliste.twig.html')
+    ];
+}
