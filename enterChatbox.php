@@ -5,6 +5,7 @@ use JustinMueller\Flugplanung\Helper;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 

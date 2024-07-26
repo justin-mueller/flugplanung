@@ -10,6 +10,7 @@ use Twig\Loader\FilesystemLoader;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+Helper::loadConfiguration();
 Helper::checkLogin();
 
 $error = '';
@@ -30,9 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         unset($mitgliederData['password']);
         // Validate credentials using password_verify
         if (password_verify($password, $hashedPasswordFromDB)) {
-            require 'clubs.php';
             $mitgliederData['vereinId'] = (int)$mitgliederData['verein'];
-            $mitgliederData['verein'] = $clubs[$mitgliederData['vereinId']];
+            $mitgliederData['verein'] = Helper::$configuration['clubs'][$mitgliederData['vereinId']];
             // Authentication successful, store username and additional data in session
             $_SESSION['email'] = $email;
             $_SESSION['mitgliederData'] = $mitgliederData;
@@ -54,15 +54,17 @@ $loader = new FilesystemLoader(__DIR__ . '/templates');
 $twig = new Environment($loader);
 $twig->addExtension(
     CacheBustingTwigExtension::create(
-        new QueryParamCacheBuster(__DIR__, new FileMD5HashGenerator())
+        new QueryParamCacheBuster(__DIR__, new FileMD5HashGenerator()),
+        Helper::$configuration['basePath']
     )
 );
 
 echo $twig->render(
     'login.twig.html',
     [
+        'clubId' => Helper::$configuration['clubId'],
         'email' => $email ?? '',
         'error' => $error,
-        'clubs' => require 'options_vereine.php'
+        'clubs' => Helper::$configuration['clubs']
     ]
 );

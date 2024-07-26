@@ -4,6 +4,18 @@ namespace JustinMueller\Flugplanung;
 
 class Helper
 {
+
+    static array $configuration = [];
+
+    public static function loadConfiguration(): void
+    {
+        self::$configuration = include __DIR__ . '/../config.dist.php';
+
+        if (file_exists(__DIR__ . '/../config.php')) {
+            self::$configuration = array_merge(self::$configuration, include __DIR__ . '/../config.php');
+        }
+    }
+
     public static function checkLogin(): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {

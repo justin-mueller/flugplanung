@@ -8,22 +8,14 @@ class Database
 
     public static function connect(): void
     {
-        if ($_SERVER['SERVER_NAME'] === 'localhost' || $_SERVER['SERVER_ADDR'] === '127.0.0.1') {
-            $servername = "localhost";
-            $username = "root";
-            $password = "";
-            $dbname = "flugplanung";
-            $port = 3306;
-        } else {
-            $servername = "localhost";
-            $username = "-";
-            $password = "-";
-            $dbname = "-";
-            $port = 3306;
-        }
+        $servername = Helper::$configuration['db']['servername'];
+        $username = Helper::$configuration['db']['username'];
+        $password = Helper::$configuration['db']['password'];
+        $dbname = Helper::$configuration['db']['dbname'];
+        $port = Helper::$configuration['db']['port'];
 
         self::$conn = new \PDO(
-            sprintf('mysql:host=%s;port=%s;dbname=%s', $servername, $port, $dbname),
+            sprintf('mysql:host=%s;port=%d;dbname=%s', $servername, $port, $dbname),
             $username,
             $password
         );
