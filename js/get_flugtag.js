@@ -115,9 +115,9 @@ function getFlugtag() {
 				var newRow = $('<tr>');
 				newRow.append('<td><strong>Abstimmung</td>');
 				newRow.append('<td></td>');
-				newRow.append('<td>' + pilot_count_all_prio_1[0] + '</td>');
-				newRow.append('<td>' + pilot_count_all_prio_1[1] + '</td>');
-				newRow.append('<td>' + pilot_count_all_prio_1[2] + '</td>');
+				newRow.append('<td>' + pilot_count_hdgf_prio_1[0] + '</td>');
+				newRow.append('<td>' + pilot_count_hdgf_prio_1[1] + '</td>');
+				newRow.append('<td>' + pilot_count_hdgf_prio_1[2] + '</td>');
 
 				newRow.append('<td></td>');
 				$('#tagesplanung tbody').append(newRow);
