@@ -214,7 +214,7 @@ return [
         195 => ['name' => 'Govertical', 'shortName' => ''],
         196 => ['name' => 'Grenzlandflieger-FRG e.V.', 'shortName' => ''],
         197 => ['name' => 'GSC Albatros Bad Reichenhall e.V.', 'shortName' => ''],
-        198 => ['name' => 'Hamburger Gleitschirm- und Drachenflieger', 'shortName' => 'HGDF'],
+        198 => ['name' => 'Hamburger Drachen- und Gleitschirmflieger', 'shortName' => 'HDGF'],
         199 => ['name' => 'Haengegleiter Club Region Blauen e.V.', 'shortName' => ''],
         200 => ['name' => 'Haengegleiter Schleppverein Nix wie Nuff Offenbach e. V.', 'shortName' => ''],
         201 => ['name' => 'Haengegleiter-Club Einkorn Schwaebisch Hall e.V.', 'shortName' => ''],
