@@ -24,10 +24,10 @@ Nach einem Update ebenfalls `composer install`, um ggf. neue Dependencies zu ins
 
 Die Default-Settings stehen in`config.dist.php`:
 
-- die `clubId` (`198` , d.h. HGDF)
-- die Fluggebiete (`sites = ['Neustadt-Glewe', 'Hörpel', 'Altenmedingen']`, für den HGDF)
+- die `clubId` (`198` , d.h. HDGF)
+- die Fluggebiete (`sites = ['Neustadt-Glewe', 'Hörpel', 'Altenmedingen']`, für den HDGF)
 - In `db` die DB-Zugangsdaten (`servername`, `username`, `password`, `dbname`, `port`)
-- Der `basePath` für die Asset-URLs (`flugplanung`, für den HGDF)
+- Der `basePath` für die Asset-URLs (`flugplanung`, für den HDGF)
 - die verfügbaren Vereine
 
 Die DB-Zugangsdaten weren aus Environment-Variablen gelesen, wenn gesetzt:
