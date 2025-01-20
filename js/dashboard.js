@@ -57,7 +57,6 @@ function extractNumericId(name) {
     const matches = name.match(/\d+/);
     return matches ? matches[0] : null;
 }
-
 function populateDashboardTable() {
     const tableBody = document.getElementById('table-body-dashboard');
 
@@ -69,37 +68,93 @@ function populateDashboardTable() {
         dashboardData.forEach(entry => {
             if (entry.date) {
                 const date = entry.date.valueOf();
-                const row = document.createElement('tr');
 
-                // Date column
-                const dateCell = document.createElement('td');
-                dateCell.textContent = getFormattedGermanDate(date);
-                row.appendChild(dateCell);
+                // Create a new table for each date
+                const dateTable = document.createElement('table');
+                dateTable.classList.add('date-table');
 
-                // Startleiter Optionen column
-                const startleiterOptionenCell = document.createElement('td');
-                startleiterOptionenCell.setAttribute('id', 'Optionen_startleiter_' + date);
-                row.appendChild(startleiterOptionenCell);
+                // Create table header
+                const headerRow = document.createElement('tr');
 
-                // Windenfahrer Optionen column
-                const windenfahrerOptionenCell = document.createElement('td');
-                windenfahrerOptionenCell.setAttribute('id', 'Optionen_windenfahrer_' + date);
-                row.appendChild(windenfahrerOptionenCell);
+                const dateHeaderCell = document.createElement('th');
+                dateHeaderCell.textContent = getFormattedGermanDate(date);
+                dateHeaderCell.colSpan = 2; // Span for expandability
+                dateHeaderCell.style.width = '60%'; 
+                headerRow.appendChild(dateHeaderCell);
 
-                // Startleiter column
+                const startleiterHeaderCell = document.createElement('th');
+                startleiterHeaderCell.textContent = 'Startleiter';
+                startleiterHeaderCell.style.width = '20%'; 
+                headerRow.appendChild(startleiterHeaderCell);
+
+                const windenfahrerHeaderCell = document.createElement('th');
+                windenfahrerHeaderCell.textContent = 'Windenfahrer';
+                windenfahrerHeaderCell.style.width = '20%'; 
+                headerRow.appendChild(windenfahrerHeaderCell);
+
+                dateTable.appendChild(headerRow);
+
+                // Add main row
+                const mainRow = document.createElement('tr');
+                mainRow.classList.add('main-row');
+
+                // Expandable section
+                const expandableCell = document.createElement('td');
+                expandableCell.colSpan = 2; // For the first two columns
+                const expandButton = document.createElement('button');
+                expandButton.textContent = '+';
+                expandButton.classList.add('expand-button');
+                expandButton.addEventListener('click', function () {
+                    const detailRow = document.getElementById(`detail-row-${date}`);
+                    if (detailRow.style.display === 'none') {
+                        detailRow.style.display = '';
+                        expandButton.textContent = '-';
+                    } else {
+                        detailRow.style.display = 'none';
+                        expandButton.textContent = '+';
+                    }
+                });
+                expandableCell.appendChild(expandButton);
+                mainRow.appendChild(expandableCell);
+
+                // Startleiter cell
                 const startleiterCell = document.createElement('td');
                 startleiterCell.setAttribute('id', 'startleiter_' + date);
-                row.appendChild(startleiterCell);
+                mainRow.appendChild(startleiterCell);
 
-                // Windenfahrer column
+                // Windenfahrer cell
                 const windenfahrerCell = document.createElement('td');
                 windenfahrerCell.setAttribute('id', 'windenfahrer_' + date);
-                row.appendChild(windenfahrerCell);
+                mainRow.appendChild(windenfahrerCell);
 
+                dateTable.appendChild(mainRow);
+
+                // Add detail row (initially hidden)
+                const detailRow = document.createElement('tr');
+                detailRow.setAttribute('id', `detail-row-${date}`);
+                detailRow.style.display = 'none';
+
+                const startleiterOptionenCell = document.createElement('td');
+                startleiterOptionenCell.setAttribute('id', 'Optionen_startleiter_' + date);
+                startleiterOptionenCell.style.width = '30%'; 
+                detailRow.appendChild(startleiterOptionenCell);
+
+                const windenfahrerOptionenCell = document.createElement('td');
+                windenfahrerOptionenCell.setAttribute('id', 'Optionen_windenfahrer_' + date);
+                windenfahrerOptionenCell.style.width = '30%'; 
+                detailRow.appendChild(windenfahrerOptionenCell);
+
+                // Empty cells for alignment with the main row
+                detailRow.appendChild(document.createElement('td'));
+                detailRow.appendChild(document.createElement('td'));
+
+                dateTable.appendChild(detailRow);
+
+                // Populate the cells
                 populatePilotOptions(startleiterOptionenCell, startleiterCell, entry.startleiterOptionen, date, 'startleiter', entry.startleiter);
                 populatePilotOptions(windenfahrerOptionenCell, windenfahrerCell, entry.windenfahrerOptionen, date, 'windenfahrer', entry.windenfahrer);
 
-                tableBody.appendChild(row);
+                tableBody.appendChild(dateTable);
             }
         });
     }
@@ -136,7 +191,7 @@ function populatePilotOptions(cell_option, cell_dienst, pilotOptions, date, dien
 }
 
 
-
+/*
 function populatePilotOptions2(cell_option, cell_dienst, pilotOptions, date, dienst, entered) {
 
     pilotOptions.forEach(pilotId => {
@@ -170,7 +225,7 @@ function populatePilotOptions2(cell_option, cell_dienst, pilotOptions, date, die
 
     });
 
-}
+}*/
 
 
 function populatePilotTable() {
