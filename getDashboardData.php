@@ -14,6 +14,7 @@ $allPilots = array(['error']);
 $startDate = $_GET['startDate'];
 $endDate = $_GET['endDate'];
 
+
 $sql = "
 SELECT
     mf.datum,
@@ -34,12 +35,20 @@ LEFT JOIN
 LEFT JOIN
     dienste d ON mf.datum = d.flugtag AND m.pilot_id = d.pilot_id
 WHERE
-    mf.datum BETWEEN :startDate AND :endDate
+    (mf.datum BETWEEN :startDate AND :endDate)
+    AND
+    (m.verein = 198)
 GROUP BY
     mf.datum;
 ";
 
-$result = Database::query($sql, ['startDate' => $startDate, 'endDate' => $endDate]);
+//hardcoded HDGF, as I failed to parse the $clubId to the query
+
+$result = Database::query($sql, [
+    'startDate' => $startDate,
+    'endDate' => $endDate
+    //,'clubId' => $clubId
+]);
 
 $data = array();
 

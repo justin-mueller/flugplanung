@@ -301,3 +301,40 @@ form {
 .pilot-div-wish {
 	background-color: #8bffb1;
 }
+
+
+
+
+
+
+.date-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.date-table th, .date-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.main-row {
+    background-color: #f9f9f9;
+}
+
+.expand-button {
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.expand-button:hover {
+    background-color: #0056b3;
+}
+
+.detail-row {
+    background-color: #f1f1f1;
+}

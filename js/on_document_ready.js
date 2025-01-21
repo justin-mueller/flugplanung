@@ -115,3 +115,18 @@ $(document).ready(function () {
 
 	setInterval(() => loadChatbox(false), 15000);
 });
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const observer = new MutationObserver((mutationsList, observer) => {
+        const countdownElement = document.getElementById('countdown');
+        if (countdownElement) {
+            intervalId = setInterval(updateCountdown, 1000);
+            observer.disconnect();
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+});
+
