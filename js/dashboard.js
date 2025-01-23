@@ -4,52 +4,94 @@ function getDashboardData() {
     let endDate = formatDateString(saisonEndDate);
 
     enteredDienste = [];
-    $.ajax({
-        url: 'getDashboardData.php',
-        type: 'GET',
-        dataType: 'json',
-        data: { startDate: startDate, endDate: endDate },
-        success: function (data) {
 
-            // Clean data, weil SQL code nicht richtig funktioniert!
+    const promises = [
+        $.ajax({
+            url: 'getDashboardData.php',
+            type: 'GET',
+            dataType: 'json',
+            data: { startDate: startDate, endDate: endDate }
+        }),
+        $.ajax({
+            url: 'getDashboardDataHistory.php',
+            type: 'GET',
+            dataType: 'json',
+            data: { startDate: startDate, endDate: endDate }
+        }),
+    ];
 
-            data.forEach(entry => {
-                const startleiterWithPlus = new Set(entry.startleiterOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id) })));
-                const windenfahrerWithPlus = new Set(entry.windenfahrerOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id) })));
+    $.when(...promises).then(function (dataResponse, historyResponse) {
 
-                const deleteId = (pilotSet, pilotWithoutPlus) => {
-                    const indexToDelete = [...pilotSet].findIndex(pilot => pilot.name === pilotWithoutPlus);
-                    if (indexToDelete !== -1) {
-                        pilotSet.delete([...pilotSet][indexToDelete]);
-                    }
-                };
+        const data = dataResponse[0];
+        const history = historyResponse[0];
 
-                entry.startleiterOptionen.forEach(pilot => {
-                    if (pilot.name.endsWith('+') || pilot.name.endsWith('-')) {
-                        const pilotWithoutPlus = pilot.name.slice(0, -1); // Remove '+' or '-'
-                        deleteId(startleiterWithPlus, pilotWithoutPlus);
-                    }
-                });
 
-                entry.windenfahrerOptionen.forEach(pilot => {
-                    if (pilot.name.endsWith('+') || pilot.name.endsWith('-')) {
-                        const pilotWithoutPlus = pilot.name.slice(0, -1); // Remove '+' or '-'
-                        deleteId(windenfahrerWithPlus, pilotWithoutPlus);
-                    }
-                });
+        // Clean data, weil SQL code nicht richtig funktioniert!
 
-                // Convert the Sets back to arrays of objects
-                entry.startleiterOptionen = Array.from(startleiterWithPlus);
-                entry.windenfahrerOptionen = Array.from(windenfahrerWithPlus);
+        data.forEach(entry => {
+            const startleiterWithPlus = new Set(entry.startleiterOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id) })));
+            const windenfahrerWithPlus = new Set(entry.windenfahrerOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id) })));
+
+            const deleteId = (pilotSet, pilotWithoutPlus) => {
+                const indexToDelete = [...pilotSet].findIndex(pilot => pilot.name === pilotWithoutPlus);
+                if (indexToDelete !== -1) {
+                    pilotSet.delete([...pilotSet][indexToDelete]);
+                }
+            };
+
+            entry.startleiterOptionen.forEach(pilot => {
+                if (pilot.name.endsWith('+') || pilot.name.endsWith('-')) {
+                    const pilotWithoutPlus = pilot.name.slice(0, -1); // Remove '+' or '-'
+                    deleteId(startleiterWithPlus, pilotWithoutPlus);
+                }
             });
 
-            dashboardData = data;
-            populateDashboardTable();
-            populatePilotTable();
-        },
-        error: function (xhr, status, error) {
-            console.error('Dashboard Daten konnten nicht geladen werden:', status, error);
-        }
+            entry.windenfahrerOptionen.forEach(pilot => {
+                if (pilot.name.endsWith('+') || pilot.name.endsWith('-')) {
+                    const pilotWithoutPlus = pilot.name.slice(0, -1); // Remove '+' or '-'
+                    deleteId(windenfahrerWithPlus, pilotWithoutPlus);
+                }
+            });
+
+            // Convert the Sets back to arrays of objects
+            entry.startleiterOptionen = Array.from(startleiterWithPlus);
+            entry.windenfahrerOptionen = Array.from(windenfahrerWithPlus);
+        });
+
+        console.log(data[0].startleiterOptionen)
+        console.log(history)
+
+        dashboardData = data;
+        dashboardDataHistory = history;
+        populateDashboardTable();
+        populatePilotTable();
+        populateDashboardHistory();
+    }).fail(function (xhr, status, error) {
+        console.error('Dashboard Daten konnten nicht geladen werden:', status, error);
+    });
+}
+
+function populateDashboardHistory() {
+    console.log(dashboardDataHistory);
+    const tbody = document.querySelector('#diensteHistory tbody');
+    tbody.innerHTML = ''; // Clear the table body
+
+    // Populate table rows
+    dashboardDataHistory.forEach(row => {
+        const tr = document.createElement('tr');
+
+        // Create cells
+        const yearCell = `<td>${row.year}</td>`;
+        const firstnameCell = `<td>${row.firstname + ' ' + row.lastname}</td>`;
+        
+        // Conditionally format the last two columns
+        const noDutiesCell = `<td style="background-color: ${row.no_duties_count === 0 ? 'orange' : 'inherit'}">${row.no_duties_count}</td>`;
+
+        const activeDutiesCell = `<td style="background-color: ${row.active_duties_count === 0 ? 'orange' : 'inherit'}">${row.active_duties_count}</td>`;
+
+        // Add cells to the row
+        tr.innerHTML = yearCell + firstnameCell  + noDutiesCell + activeDutiesCell
+        tbody.appendChild(tr);
     });
 }
 
@@ -57,6 +99,7 @@ function extractNumericId(name) {
     const matches = name.match(/\d+/);
     return matches ? matches[0] : null;
 }
+
 function populateDashboardTable() {
     const tableBody = document.getElementById('table-body-dashboard');
 

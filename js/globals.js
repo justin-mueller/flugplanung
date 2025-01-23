@@ -10,6 +10,7 @@ var total_pilot_count_hdgf = [0, 0, 0];
 var Active_Pilot_Choices = [null, null, null]
 var enteredDienste = [];
 var dashboardData = [];
+var dashboardDataHistory = [];
 const thisYear = new Date().getFullYear();
 var Saison = 1;
 var saisonJahr = thisYear;
