@@ -48,41 +48,57 @@ $(document).ready(function () {
 			e.preventDefault();
 		}
 	});
-
 	$('#table-body-dashboard').on('click', '.pilot-div', function () {
-
 		const clickedDiv = $(this);
 		const sourceColumn = clickedDiv.parent().attr('id');
 		const dienst = sourceColumn.includes('windenfahrer') ? 'windenfahrer' : 'startleiter';
-		const pilot_id = clickedDiv.attr('data-pilot-id');
-
-		const date = sourceColumn.slice(-10);
-		var name = clickedDiv[0].innerHTML
-
+		const pilot_id = parseInt(clickedDiv.attr('data-pilot-id')); // Ensure pilot_id is an integer
+	
+		const date = sourceColumn.slice(-10); // Extract the date
+		let name = clickedDiv[0].innerHTML;
+	
+		// Remove any trailing "+" or "-" from the name
 		name = (name.endsWith('+') || name.endsWith('-')) ? name.slice(0, -1) : name;
-
+	
 		let destinationColumn;
-
+	
 		if (sourceColumn.includes('Optionen')) {
 			destinationColumn = sourceColumn.replace('Optionen_', '');
-
+	
+			// Find the pilot in dashboardDataHistory and subtract 1 from duties_count_thisyear
+			const pilotData = dashboardDataHistory.find(item => item.pilot_id === pilot_id);
+			if (pilotData) {
+				pilotData.duties_count_thisyear += 1;
+			}
 		} else {
 			destinationColumn = 'Optionen_' + sourceColumn;
+	
+			// Find the pilot in dashboardDataHistory and add 1 to duties_count_thisyear
+			const pilotData = dashboardDataHistory.find(item => item.pilot_id === pilot_id);
+			if (pilotData) {
+				pilotData.duties_count_thisyear = Math.max(0, pilotData.duties_count_thisyear - 1);
+				
+			}
 		}
+	
 		const destinationCell = $(`#${destinationColumn}`);
-
+	
 		if ((!destinationCell.text().trim() && !destinationCell.attr('id').includes('Optionen')) || destinationCell.attr('id').includes('Optionen')) {
 			destinationCell.append(clickedDiv);
 			clickedDiv.data('column', destinationColumn);
+	
 			if (sourceColumn.includes('Optionen')) {
+				// Add the entry to enteredDienste when moving into "active" columns
 				enteredDienste.push({ pilot_id: pilot_id, name: name, date: date, dienst: dienst });
 			} else {
+				// Remove the entry from enteredDienste when moving into "Optionen" columns
 				enteredDienste = enteredDienste.filter(item => !(item.name === name && item.date === date));
 			}
 		}
-		populatePilotTable();
 
+		populateDashboardHistory()
 	});
+	
 
 	$(".year-dropdown").each(function () {
 		for (let year = thisYear - 2; year <= thisYear + 1; year++) {

@@ -17,30 +17,42 @@ $endDate = isset($_GET['endDate']) ? $_GET['endDate'] : null;
 
 $sql = "
 
-
 SELECT
-    EXTRACT(YEAR FROM d.flugtag) AS year,
-    m.firstname, 
-    m.lastname,
-    COUNT(CASE WHEN (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1) THEN d.pilot_id END) AS active_duties_count,
-    COUNT(CASE WHEN (mf.betrieb_ngl = 0 AND mf.betrieb_hrp = 0 AND mf.betrieb_amd = 0) THEN d.pilot_id END) AS no_duties_count
-FROM 
-    moegliche_flugtage mf
-LEFT JOIN 
-    dienste d ON mf.datum = d.flugtag
-LEFT JOIN 
-    mitglieder m ON m.pilot_id = d.pilot_id
-WHERE 
-    m.verein = 198
-    AND mf.datum IS NOT NULL
-    AND d.flugtag IS NOT NULL
-    AND (d.windenfahrer = 1 OR d.startleiter = 1)
-GROUP BY 
-    EXTRACT(YEAR FROM d.flugtag),
+	m.pilot_id,
     m.firstname,
     m.lastname,
-    m.pilot_id;
-
+    -- Historical Counts
+    COUNT(CASE 
+        WHEN mf.datum < DATE_FORMAT(CURDATE(), '%Y-01-01') 
+             AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1) 
+        THEN d.pilot_id 
+        END) AS active_duties_count_history,
+    COUNT(CASE 
+        WHEN mf.datum < DATE_FORMAT(CURDATE(), '%Y-01-01') 
+        THEN d.pilot_id 
+        END) AS duties_count_history,
+    -- Current Year Counts
+    COUNT(CASE 
+        WHEN mf.datum >= DATE_FORMAT(CURDATE(), '%Y-01-01') 
+             AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1) 
+        THEN d.pilot_id 
+        END) AS active_duties_count_thisyear,
+    COUNT(CASE 
+        WHEN mf.datum >= DATE_FORMAT(CURDATE(), '%Y-01-01') 
+        THEN d.pilot_id 
+        END) AS duties_count_thisyear
+FROM 
+    mitglieder m
+LEFT JOIN 
+    dienste d ON m.pilot_id = d.pilot_id
+LEFT JOIN 
+    moegliche_flugtage mf ON mf.datum = d.flugtag
+WHERE 
+    m.verein = 198
+GROUP BY 
+	m.pilot_id,
+    m.firstname,
+    m.lastname;
 
 ";
 

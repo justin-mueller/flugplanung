@@ -58,13 +58,12 @@ function getDashboardData() {
             entry.windenfahrerOptionen = Array.from(windenfahrerWithPlus);
         });
 
-        console.log(data[0].startleiterOptionen)
-        console.log(history)
+
 
         dashboardData = data;
         dashboardDataHistory = history;
         populateDashboardTable();
-        populatePilotTable();
+        //populatePilotTable();
         populateDashboardHistory();
     }).fail(function (xhr, status, error) {
         console.error('Dashboard Daten konnten nicht geladen werden:', status, error);
@@ -72,7 +71,8 @@ function getDashboardData() {
 }
 
 function populateDashboardHistory() {
-    console.log(dashboardDataHistory);
+    console.log("history")
+    console.log(dashboardDataHistory)
     const tbody = document.querySelector('#diensteHistory tbody');
     tbody.innerHTML = ''; // Clear the table body
 
@@ -81,16 +81,17 @@ function populateDashboardHistory() {
         const tr = document.createElement('tr');
 
         // Create cells
-        const yearCell = `<td>${row.year}</td>`;
         const firstnameCell = `<td>${row.firstname + ' ' + row.lastname}</td>`;
         
         // Conditionally format the last two columns
-        const noDutiesCell = `<td style="background-color: ${row.no_duties_count === 0 ? 'orange' : 'inherit'}">${row.no_duties_count}</td>`;
-
-        const activeDutiesCell = `<td style="background-color: ${row.active_duties_count === 0 ? 'orange' : 'inherit'}">${row.active_duties_count}</td>`;
+        const noDutiesCell_hist = `<td style="background-color: ${row.duties_count_history === 0 ? 'orange' : 'inherit'}">${row.duties_count_history}</td>`;
+        const activeDutiesCell_hist = `<td style="background-color: ${row.active_duties_count_history === 0 ? 'orange' : 'inherit'}">${row.active_duties_count_history}</td>`;
+        const noDutiesCell_thisSeason = `<td style="background-color: ${row.duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.duties_count_thisyear}</td>`;
+        const activeDutiesCell_thisSeason = `<td style="background-color: ${row.active_duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.active_duties_count_thisyear}</td>`;
+        const points = `<td style="background-color: ${row.duties_count_history+row.active_duties_count_history+row.duties_count_thisyear+row.active_duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.duties_count_history+row.active_duties_count_history+row.duties_count_thisyear+row.active_duties_count_thisyear}</td>`;
 
         // Add cells to the row
-        tr.innerHTML = yearCell + firstnameCell  + noDutiesCell + activeDutiesCell
+        tr.innerHTML = firstnameCell  + noDutiesCell_hist + activeDutiesCell_hist + noDutiesCell_thisSeason + activeDutiesCell_thisSeason + points
         tbody.appendChild(tr);
     });
 }
@@ -122,17 +123,17 @@ function populateDashboardTable() {
                 const dateHeaderCell = document.createElement('th');
                 dateHeaderCell.textContent = getFormattedGermanDate(date);
                 dateHeaderCell.colSpan = 2; // Span for expandability
-                dateHeaderCell.style.width = '60%'; 
+                //dateHeaderCell.style.width = '60%'; 
                 headerRow.appendChild(dateHeaderCell);
 
                 const startleiterHeaderCell = document.createElement('th');
                 startleiterHeaderCell.textContent = 'Startleiter';
-                startleiterHeaderCell.style.width = '20%'; 
+                //startleiterHeaderCell.style.width = '20%'; 
                 headerRow.appendChild(startleiterHeaderCell);
 
                 const windenfahrerHeaderCell = document.createElement('th');
                 windenfahrerHeaderCell.textContent = 'Windenfahrer';
-                windenfahrerHeaderCell.style.width = '20%'; 
+                //windenfahrerHeaderCell.style.width = '20%'; 
                 headerRow.appendChild(windenfahrerHeaderCell);
 
                 dateTable.appendChild(headerRow);
@@ -271,6 +272,13 @@ function populatePilotOptions2(cell_option, cell_dienst, pilotOptions, date, die
 }*/
 
 
+function populatePilotTable() {}
+
+/*
+
+
+
+
 function populatePilotTable() {
 
     const table = document.getElementById('pilotTable');
@@ -325,7 +333,7 @@ function populatePilotTable() {
             cell2.textContent = count;
         }
     }
-}
+}*/
 
 //Error Handling ist hier etwas schlecht
 function saveDienste() {
