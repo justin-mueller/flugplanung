@@ -51,6 +51,11 @@ if ($mitgliederData['dienste_admin']) {
     ];
 }
 
+$tabs['einstellungen'] = [
+    'label' => 'Einstellungen',
+    'content' => $twig->render('einstellungen.twig.html')
+];
+
 echo $twig->render(
     'index.twig.html',
     [

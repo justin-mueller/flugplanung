@@ -135,6 +135,7 @@ $(document).ready(function () {
 
 document.addEventListener('DOMContentLoaded', function () {
 
+	//Countdown
     const observer = new MutationObserver((mutationsList, observer) => {
         const countdownElement = document.getElementById('countdown');
         if (countdownElement) {
@@ -144,5 +145,55 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
+
+	//User Settings
+	const table = document.getElementById('userSettings');
+
+	let ignoreKeys = ['pilot_id', 'dienste_admin']; // Keys to ignore
+	let additionalKeys = [{ newsletter: false }, { blabla: false }]; // Additional keys to add
+	
+	// Iterate through User_Information
+	Object.entries(User_Information).forEach(([key, value]) => {
+		if (ignoreKeys.includes(key)) {
+			return; // Skip keys in the ignore list
+		}
+	
+		const row = table.insertRow(); // Create a new row
+		const attrNameCell = row.insertCell(); // First column for the key
+		const attrValueCell = row.insertCell(); // Second column for the value
+	
+		// Set the name column
+		attrNameCell.textContent = key;
+	
+		// Check if the value is an object
+		if (typeof value === 'object' && value !== null) {
+			// If the value is an object, use its first key-value pair
+			const [firstKey, firstValue] = Object.entries(value)[0] || ['-', '-'];
+			attrValueCell.textContent = `${firstKey}: ${firstValue}`;
+		} else {
+			// Otherwise, just use the value as-is
+			attrValueCell.textContent = value;
+		}
+	});
+	
+	// Add additional keys to the table
+	additionalKeys.forEach((additionalKey) => {
+		Object.entries(additionalKey).forEach(([key, value]) => {
+			const row = table.insertRow(); // Create a new row
+			const attrNameCell = row.insertCell(); // First column
+			const attrValueCell = row.insertCell(); // Second column
+	
+			// Set the name and value for additional keys
+			attrNameCell.textContent = key;
+			attrValueCell.textContent = value;
+		});
+	});
+	
+	
+	
+	
+	
+
 });
+
 
