@@ -1,10 +1,254 @@
-<table class="table" id="userSettings">
-	<thead>
-		<tr>
+<section>
+  <div class="container py-5">
+    <div class="row d-flex justify-content-center align-items-center">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-2-strong" style="border-radius: 1rem">
+          <div class="card-body p-5 text-center">
+            <form method="post" id="update-user-info-form">
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h5 class="card-title">Persönliche Daten</h5>
+                </div>
+                <div class="card-body">
+                  <div class="form-outline mb-4">
+                    <input
+                      type="text"
+                      name="vorname"
+                      id="vorname"
+                      class="form-control form-control-lg"
+                      required
+                      value="{{ User_Information.firstname }}"
+                    />
+                    <label class="form-label" for="vorname"
+                      >Vorname</label
+                    >
+                  </div>
+                  <div class="form-outline mb-4">
+                    <input
+                      type="text"
+                      name="nachname"
+                      id="nachname"
+                      class="form-control form-control-lg"
+                      required
+                    />
+                    <label class="form-label" for="vorname"
+                      >Nachname</label
+                    >
+                  </div>
 
-		</tr>
-	</thead>
-	<tbody id="table-body"></tbody>
-</table>
+                  <div class="form-outline mb-4">
+                    <select
+                      class="form-select"
+                      name="verein"
+                      id="verein"
+                    >
+                      {% for id, club in clubs %}
+                      <option value="{{ id }}">{{ club.name }}</option>
+                      {% endfor %}
+                      
+                    </select>
+                    <label class="form-label" for="verein">Verein</label>
+                  </div>
 
-<button class="btn btn-primary ui-button" id="saveButton" onclick="saveEinstellungen()">Speichern</button>
+                  <div class="form-check d-flex justify-content-start mb-4">
+                    <input
+                      class="form-check-input"
+                      name="windenfahrer"
+                      type="checkbox"
+                      value=""
+                      id="windenfahrer"
+                    />
+                    <label class="form-check-label" for="windenfahrer"
+                      >Ich habe einen Windenfahrerschein!</label
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h5 class="card-title">Fluggerät</h5>
+                </div>
+                <div class="card-body">
+                  <div class="form-check d-flex justify-content-start mb-4">
+                    <input
+                      class="form-check-input"
+                      name="fluggeraet_gleitschirm"
+                      type="checkbox"
+                      value=""
+                      id="fluggeraet_gleitschirm"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="fluggeraet_gleitschirm"
+                      >Gleitschirm</label
+                    >
+                  </div>
+
+                  <div class="form-check d-flex justify-content-start mb-4">
+                    <input
+                      class="form-check-input"
+                      name="fluggeraet_drachen"
+                      type="checkbox"
+                      value=""
+                      id="fluggeraet_drachen"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="fluggeraet_drachen"
+                      >Drachen/Starrflügler</label
+                    >
+                  </div>
+
+                  <div class="form-check d-flex justify-content-start mb-4">
+                    <input
+                      class="form-check-input"
+                      name="fluggeraet_sonstiges"
+                      type="checkbox"
+                      value=""
+                      id="fluggeraet_sonstiges"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="fluggeraet_sonstiges"
+                      >Sonstiges</label
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h5 class="card-title">Aussehen</h5>
+                </div>
+                <div class="card-body">
+                  <div class="form-outline mb-4">
+                    <div class="custom-select">
+                      <div class="avatar" id="avatar-preview-update"></div>
+                      <select
+                        id="avatar-update"
+                        name="avatar-update"
+                        class="form-select"
+                        onchange="updatePreview('update')"
+                      >
+                        <option value="1">Avatar 1</option>
+                        <option value="2">Avatar 2</option>
+                        <option value="3">Avatar 3</option>
+                        <option value="4">Avatar 4</option>
+                        <option value="5">Avatar 5</option>
+                        <option value="6">Avatar 6</option>
+                        <option value="7">Avatar 7</option>
+                        <option value="8">Avatar 8</option>
+                        <option value="9">Avatar 9</option>
+                        <option value="10">Avatar 10</option>
+                        <option value="11">Avatar 11</option>
+                        <option value="12">Avatar 12</option>
+                        <option value="13">Avatar 13</option>
+                        <option value="14">Avatar 14</option>
+                        <option value="15">Avatar 15</option>
+                        <option value="16">Avatar 16</option>
+                        <option value="17">Avatar 17</option>
+                        <option value="18">Avatar 18</option>
+                        <option value="19">Avatar 19</option>
+                        <option value="20">Avatar 20</option>
+                      </select>
+                    </div>
+                    <label class="form-label" for="avatar-preview-update"
+                      >Avatar</label
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h5 class="card-title">Zugangsdaten</h5>
+                  <p>
+                    Nur ausfüllen, wenn eine neue E-mail oder ein neues Passwort
+                    gesetzt werden soll
+                  </p>
+                </div>
+                <div class="card-body">
+                  <div class="form-outline mb-4">
+                    <input
+                      type="email"
+                      name="email"
+                      id="email"
+                      class="form-control form-control-lg"
+                      autocomplete="off"
+                    />
+                    <label class="form-label" for="email">E-mail</label>
+                  </div>
+                  <div class="form-outline mb-4">
+                    <input
+                      type="password"
+                      name="password"
+                      id="password"
+                      class="form-control form-control-lg"
+                      autocomplete="new-password"
+                    />
+                    <label class="form-label" for="password"
+                      >Neues Passwort</label
+                    >
+                    <input
+                      type="password"
+                      name="password_confirm"
+                      id="password_confirm"
+                      class="form-control form-control-lg"
+                      autocomplete="new-password"
+                    />
+                    <label class="form-label" for="password_confirm"
+                      >Neues Passwort wiederholen</label
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <button
+                class="btn btn-primary btn-lg btn-block mb-4 ui-button"
+                type="submit"
+              >
+                Aktualisieren
+              </button>
+              <div
+                id="update-error"
+                class="alert alert-danger d-none"
+                role="alert"
+              ></div>
+            </form>
+
+            <form method="post" id="delete-user-form">
+              <div class="card mb-4">
+                <div class="card-header bg-danger">
+                  <h5 class="card-title">Gefahrenzone</h5>
+                </div>
+                <div class="card-body">
+                  <div class="form-outline mb-4">
+                    <p>
+                      Um Deinen Account zu löschen, trage bitte in das Feld ein:
+                    </p>
+                    <p><strong>bitte lösche meinen account</strong></p>
+                    <input
+                      type="text"
+                      name="confirm_delete_account"
+                      id="confirm_delete_account"
+                      class="form-control form-control-lg"
+                    />
+
+                    <button
+                      class="btn btn-danger btn-lg btn-block ui-button mt-2"
+                      type="submit"
+                    >
+                      Account Löschen
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+

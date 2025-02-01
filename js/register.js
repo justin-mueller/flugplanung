@@ -36,7 +36,7 @@ $(document).ready(function () {
 		});
 	});
 
-	updatePreview();
+	updatePreview('register',0);
 
 });
 
@@ -48,12 +48,3 @@ function forgotPassword() {
 	alert('Funktion ist noch in Arbeit. Bitte bei Justin melden!');
 }
 
-function updatePreview() {
-    var selectBox = document.getElementById("avatar-register");
-    var selectedValue = selectBox.options[selectBox.selectedIndex].value;
-    var previewDiv = document.getElementById("avatar-preview");
-
-    var imageUrl = "img/a" + selectedValue + ".png"; 
-
-    previewDiv.innerHTML = "<img src='" + imageUrl + "' alt='Avatar Preview'>";
-  }
