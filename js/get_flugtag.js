@@ -88,7 +88,6 @@ function getFlugtag() {
 
 				var possible_areas_sliced = possible_areas.slice(0, possible_areas.length - 2);
 
-
 				$.each(data, function (index, row) {
 
 					let timestamp = new Date(row.timestamp);
@@ -100,8 +99,12 @@ function getFlugtag() {
 					let windenfahrer_official_info = row.Pilot_ID == windenfahrer_official ? '<span class="badge bg-success">WF Offiziell</span>' : '';
 					let windenfahrer_info = (row.ist_windenfahrer == 1 && row.Pilot_ID != windenfahrer_official) ? '<span class="badge bg-primary">WF</span>' : '';
 					var newRow = $('<tr ' + row_not_local_club_member + '>');
-
+					let fluggerateIMG = row.fluggeraet.includes('G') ? replaceValueWithImage('G') : '' 
+					fluggerateIMG += row.fluggeraet.includes('D') ? replaceValueWithImage('D') : ''
+					fluggerateIMG += row.fluggeraet.includes('S') ? replaceValueWithImage('S') : '';
+					
 					newRow.append('<td>' + row.Pilot + ' ' + windenfahrer_info + ' ' + windenfahrer_official_info + ' ' + ist_startleiter + ' ' + new_record + '</td>');
+					newRow.append('<td  style="display: flex; justify-content: space-evenly;"> ' +  fluggerateIMG + '</td>');
 					newRow.append('<td>' + (local_club_member ? '<strong>' : '') + row.Verein + (local_club_member ? '</strong>' : '') + '</td>');
 					newRow.append('<td>' + replaceValueWithImage(row.NGL) + '</td>');
 					newRow.append('<td>' + replaceValueWithImage(row.HRP) + '</td>');
@@ -261,6 +264,13 @@ function replaceValueWithImage(value) {
 		return '<img src="img/stern.svg" class="table-image">';
 	} else if (value == 2) {
 		return '<img src="img/kreuz.svg" class="table-image">';
+
+	} else if (value == "G") {
+		return '<img src="img/G.png" class="table-image">';
+	} else if (value == "D") {
+		return '<img src="img/d.png" class="table-image">';
+	} else if (value == "S") {
+		return '<img src="img/s.png" class="table-image">';
 	}
 	return value;
 }
