@@ -37,17 +37,15 @@ LEFT JOIN
 WHERE
     (mf.datum BETWEEN :startDate AND :endDate)
     AND
-    (m.verein = 198)
+    (m.verein = :clubId)
 GROUP BY
     mf.datum;
 ";
 
-//hardcoded HDGF, as I failed to parse the $clubId to the query
-
 $result = Database::query($sql, [
     'startDate' => $startDate,
-    'endDate' => $endDate
-    //,'clubId' => $clubId
+    'endDate' => $endDate,
+    'clubId' => Helper::$configuration['clubId']
 ]);
 
 $data = array();
