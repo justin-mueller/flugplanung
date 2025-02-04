@@ -48,7 +48,7 @@ LEFT JOIN
 LEFT JOIN 
     moegliche_flugtage mf ON mf.datum = d.flugtag
 WHERE 
-    m.verein = 198
+    m.verein = :clubId
 GROUP BY 
 	m.pilot_id,
     m.firstname,
@@ -61,6 +61,7 @@ if ($startDate && $endDate) {
     $params = [
         'startDate' => $startDate,
         'endDate' => $endDate,
+        'clubId' => Helper::$configuration['clubId'],
     ];
 } else {
     $params = []; // No parameters needed if no date filter is applied
