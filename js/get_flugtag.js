@@ -268,9 +268,9 @@ function replaceValueWithImage(value) {
 	} else if (value == "G") {
 		return '<img src="img/G.png" class="table-image">';
 	} else if (value == "D") {
-		return '<img src="img/d.png" class="table-image">';
+		return '<img src="img/D.png" class="table-image">';
 	} else if (value == "S") {
-		return '<img src="img/s.png" class="table-image">';
+		return '<img src="img/S.png" class="table-image">';
 	}
 	return value;
 }
