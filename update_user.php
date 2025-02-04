@@ -6,49 +6,59 @@ use JustinMueller\Flugplanung\Helper;
 require_once __DIR__ . '/vendor/autoload.php';
 
 Helper::loadConfiguration();
-
-header('Content-Type: application/json');
-
+Helper::checkLogin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     Database::connect();
 
-    $params = ['pilotId' => $_POST['pilot_id']];
-    $params['vorname'] = $_POST['vorname'];
-    $params['nachname'] = $_POST['nachname'];
-    $params['verein'] = $_POST['verein'];
-    $params['windenfahrer'] = $_POST['windenfahrer'];
-    $params['fluggeraet'] = $_POST['fluggeraete_combined'];
-    $params['avatar'] = $_POST['avatar'];
+    $params = [
+        'pilotId' => $_SESSION['mitgliederData']['pilot_id'],
+        'vorname' => $_POST['vorname'],
+        'nachname' => $_POST['nachname'],
+        'verein' => $_POST['verein'],
+        'windenfahrer' => $_POST['windenfahrer'],
+        'fluggeraet' => $_POST['fluggeraete_combined'],
+        'avatar' => $_POST['avatar'],
+    ];
 
-    $pw = $_POST['password'];
+    $password = $_POST['password'];
 
-    if (!empty($pw)) {
-
-        if ($_POST['password'] === $_POST['password_confirm']) {
-            $params['password'] = password_hash($pw, PASSWORD_DEFAULT);
+    if (!empty($password)) {
+        if ($password === $_POST['password_confirm']) {
+            $params['password'] = password_hash($password, PASSWORD_DEFAULT);
             $passwordString = ', password = :password';
         } else {
-            throw new Exception('Passwörter stimmen nicht überein!');
+            throw new RuntimeException('Passwörter stimmen nicht überein!');
         }
     } else {
         $passwordString = '';
     }
 
     $emailString = empty($_POST['email']) ? '' : ', email = :email';
-   
-    $updateQuery = "UPDATE mitglieder SET 
-    `firstname` = :vorname ,
-    `lastname` = :nachname , 
-    `windenfahrer` = :windenfahrer , 
-    `fluggeraet` = :fluggeraet , 
-    `verein` = :verein ,
-    `avatar` = :avatar " . $emailString . $passwordString . " WHERE pilot_id = :pilotId";
 
-    $result = Database::query($updateQuery, $params);
+    $updateQuery = 'UPDATE mitglieder SET 
+    firstname = :vorname ,
+    lastname = :nachname , 
+    windenfahrer = :windenfahrer , 
+    fluggeraet = :fluggeraet , 
+    verein = :verein ,
+    avatar = :avatar ' . $emailString . $passwordString . ' WHERE pilot_id = :pilotId';
 
-    if ($result) {
+    $result = Database::execute($updateQuery, $params);
+
+    header('Content-Type: application/json');
+    if ($result['success']) {
+        $sql = 'SELECT * FROM mitglieder WHERE pilot_id = :pilotId';
+        $mitgliederData = current(Database::query($sql, ['pilotId' => $_SESSION['mitgliederData']['pilot_id']]));
+
+        if ($mitgliederData) {
+            unset($mitgliederData['password']);
+            $mitgliederData['vereinId'] = (int)$mitgliederData['verein'];
+            $mitgliederData['verein'] = Helper::$configuration['clubs'][$mitgliederData['vereinId']];
+            $_SESSION['email'] = $mitgliederData['email'];
+            $_SESSION['mitgliederData'] = $mitgliederData;
+        }
         echo json_encode([
             'success' => true,
             'message' => 'Update erfolgreich!'
@@ -59,5 +69,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'error' => 'Query failed. Please check the database.'
         ], JSON_THROW_ON_ERROR);
     }
-    
+
 }

@@ -15,10 +15,10 @@ $(document).ready(function () {
     // Ensure unchecked checkboxes are also included
 
     let fluggeraete_combined = ''
-    fluggeraete_combined += $("#fluggeraet_gleitschirm").is(":checked") ? "G" : "" 
-    fluggeraete_combined += $("#fluggeraet_drachen").is(":checked") ? "D" : "" 
+    fluggeraete_combined += $("#fluggeraet_gleitschirm").is(":checked") ? "G" : ""
+    fluggeraete_combined += $("#fluggeraet_drachen").is(":checked") ? "D" : ""
     fluggeraete_combined += $("#fluggeraet_sonstiges").is(":checked") ? "S" : "";
-    
+
     formDataArray.push({
       name: 'fluggeraete_combined',
       value: fluggeraete_combined
@@ -31,14 +31,7 @@ $(document).ready(function () {
       value: windenfahrerCheckbox.is(":checked") ? 1 : 0,
     });
 
-    // Add pilot ID
-    formDataArray.push({
-      name: "pilot_id",
-      value: User_Information.pilot_id,
-    });
-
     var formData = $.param(formDataArray);
-
 
     $.ajax({
       url: "update_user.php",
