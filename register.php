@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fluggeraetS = isset($_POST['fluggeraet_sonstiges']) ? 'S' : '';
         $fluggeraetCombined = $fluggeraetG . $fluggeraetD . $fluggeraetS;
         $windenfahrer = $_POST['windenfahrer_register'];
-        $avatar = $_POST['avatar_register'];
+        $avatar = $_POST['avatar'];
 
         // Hash the password
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);

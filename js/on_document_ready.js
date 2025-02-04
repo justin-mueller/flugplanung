@@ -163,24 +163,24 @@ document.addEventListener("DOMContentLoaded", function () {
   observer.observe(document.body, { childList: true, subtree: true });
 
 
-   
+
   //Fill User Update Form
 	const observer2 = new MutationObserver((mutationsList, observer) => {
 		const countdownElement2 = document.getElementById("update-user-info-form");
-	
+
 		if (countdownElement2) {
 			$("#nachname").val(User_Information.lastname);
 			$("#vorname").val(User_Information.firstname);
-		  
+
 			$("#avatar-update").val(User_Information.avatar).change();
-		  
+
       $("#verein").val(User_Information.vereinId).change();
 
 			$("#fluggeraet_gleitschirm").prop(
 			  "checked",
 			  User_Information.fluggeraet.includes("G")
 			);
-		  
+
 			$("#fluggeraet_drachen").prop(
 			  "checked",
 			  User_Information.fluggeraet.includes("D")
@@ -189,9 +189,9 @@ document.addEventListener("DOMContentLoaded", function () {
 			  "checked",
 			  User_Information.fluggeraet.includes("S")
 			);
-			
-			updatePreview("update",User_Information.avatar-1);
-		  
+
+			updatePreview(User_Information.avatar-1);
+
 
 			$("#windenfahrer").prop(
 				"checked",
@@ -201,8 +201,8 @@ document.addEventListener("DOMContentLoaded", function () {
 		  observer2.disconnect();
 		}
 	  });
-	
+
 	  observer2.observe(document.body, { childList: true, subtree: true });
-	
+
 
 });

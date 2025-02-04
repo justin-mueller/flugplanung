@@ -20,8 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $params['verein'] = $_POST['verein'];
     $params['windenfahrer'] = $_POST['windenfahrer'];
     $params['fluggeraet'] = $_POST['fluggeraete_combined'];
-    $params['avatar'] = $_POST['avatar-update'];
-  
+    $params['avatar'] = $_POST['avatar'];
 
     $pw = $_POST['password'];
 

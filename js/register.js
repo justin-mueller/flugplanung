@@ -36,7 +36,7 @@ $(document).ready(function () {
 		});
 	});
 
-	updatePreview('register',0);
+	updatePreview(0);
 
 });
 
