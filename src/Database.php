@@ -28,7 +28,7 @@ class Database
         return $statement->fetchAll(\PDO::FETCH_ASSOC) ?: [];
     }
 
-    public static function insertSqlStatement(string $sql, array $parameters): array
+    public static function execute(string $sql, array $parameters): array
     {
         $statement = self::$conn->prepare($sql);
         $success = $statement->execute($parameters);

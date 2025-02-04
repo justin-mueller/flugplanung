@@ -20,14 +20,14 @@ $resultCheck = Database::query($sqlCheck, ['pilot_id' => $pilot_id, 'datum' => $
 if ($resultCheck) {
     if ($wunsch === 'Egal') {
         $sql = 'DELETE FROM dienste_wuensche WHERE pilot_id = :pilot_id AND datum = :datum';
-        Database::insertSqlStatement($sql, ['pilot_id' => $pilot_id, 'datum' => $datum]);
+        Database::execute($sql, ['pilot_id' => $pilot_id, 'datum' => $datum]);
     } else {
         $wunsch = ($wunsch === 'Ja') ? '1' : '0';
         $sql = 'UPDATE dienste_wuensche SET wunsch = :wunsch WHERE pilot_id = :pilot_id AND datum = :datum';
-        Database::insertSqlStatement($sql, ['wunsch' => $wunsch, 'pilot_id' => $pilot_id, 'datum' => $datum]);
+        Database::execute($sql, ['wunsch' => $wunsch, 'pilot_id' => $pilot_id, 'datum' => $datum]);
     }
 } elseif ($wunsch !== 'Egal') {
     $wunsch = ($wunsch === 'Ja') ? '1' : '0';
     $sql = 'INSERT INTO dienste_wuensche (pilot_id, datum, wunsch) VALUES (:pilot_id, :datum, :wunsch)';
-    Database::insertSqlStatement($sql, ['wunsch' => $wunsch, 'pilot_id' => $pilot_id, 'datum' => $datum]);
+    Database::execute($sql, ['wunsch' => $wunsch, 'pilot_id' => $pilot_id, 'datum' => $datum]);
 }

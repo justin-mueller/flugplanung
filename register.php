@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $insertQuery = 'INSERT INTO mitglieder
           (email, password, firstname, lastname, verein, fluggeraet, windenfahrer, avatar) VALUES
           (:email, :hashedPassword, :vorname, :nachname, :verein, :fluggeraet, :windenfahrer, :avatar)';
-        $result = Database::insertSqlStatement(
+        $result = Database::execute(
             $insertQuery,
             [
                 'email' => $email,
