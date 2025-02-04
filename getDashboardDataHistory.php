@@ -9,16 +9,16 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$allPilots = array(['error']);
+$allPilots = [['error']];
 
 // Check if startDate and endDate are provided
-$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;
-$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : null;
+$startDate = $_GET['startDate'] ?? null;
+$endDate = $_GET['endDate'] ?? null;
 
 $sql = "
 
 SELECT
-	m.pilot_id,
+    m.pilot_id,
     m.firstname,
     m.lastname,
     -- Historical Counts
@@ -50,14 +50,14 @@ LEFT JOIN
 WHERE 
     m.verein = 198
 GROUP BY 
-	m.pilot_id,
+    m.pilot_id,
     m.firstname,
     m.lastname;
 
 ";
 
 if ($startDate && $endDate) {
-    $sql .= " AND (mf.datum BETWEEN :startDate AND :endDate)";
+    $sql .= ' AND (mf.datum BETWEEN :startDate AND :endDate)';
     $params = [
         'startDate' => $startDate,
         'endDate' => $endDate,
@@ -66,7 +66,7 @@ if ($startDate && $endDate) {
     $params = []; // No parameters needed if no date filter is applied
 }
 
-$sql .= " GROUP BY mf.datum;";
+$sql .= ' GROUP BY mf.datum;';
 
 $result = Database::query($sql, $params);
 

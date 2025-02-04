@@ -9,7 +9,7 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$allPilots = array(['error']);
+$allPilots = [['error']];
 
 $startDate = $_GET['startDate'];
 $endDate = $_GET['endDate'];
@@ -50,44 +50,45 @@ $result = Database::query($sql, [
     //,'clubId' => $clubId
 ]);
 
-$data = array();
+$data = [];
 
 if ($result !== false && $result !== []) {
     foreach ($result as $row) {
         $startleiterOptions = $row['startleiterOptionen'] !== null ? explode(',', $row['startleiterOptionen']) : $allPilots;
         $windenfahrerOptions = $row['windenfahrerOptionen'] !== null ? explode(',', $row['windenfahrerOptionen']) : $allPilots;
 
-        $startleiterOptionsWithId = array();
-        $startleiterIds = $row['startleiterOptionen_ID'] !== null ? explode(',', $row['startleiterOptionen_ID']) : array();
+        $startleiterOptionsWithId = [];
+        $startleiterIds = $row['startleiterOptionen_ID'] !== null ? explode(',', $row['startleiterOptionen_ID']) : [];
 
         foreach ($startleiterOptions as $index => $pilot) {
             $id = isset($startleiterIds[$index]) && $startleiterIds[$index] !== 'null' ? $startleiterIds[$index] : null;
-            $startleiterOptionsWithId[] = array(
+            $startleiterOptionsWithId[] = [
                 'name' => $pilot,
                 'id' => $id,
-            );
+            ];
         }
 
-        $windenfahrerOptionsWithId = array();
-        $windenfahrerIds = $row['windenfahrerOptionen_ID'] !== null ? explode(',', $row['windenfahrerOptionen_ID']) : array();
+        $windenfahrerOptionsWithId = [];
+        $windenfahrerIds = $row['windenfahrerOptionen_ID'] !== null ? explode(',', $row['windenfahrerOptionen_ID']) : [];
 
         foreach ($windenfahrerOptions as $index => $pilot) {
             $id = isset($windenfahrerIds[$index]) && $windenfahrerIds[$index] !== 'null' ? $windenfahrerIds[$index] : null;
-            $windenfahrerOptionsWithId[] = array(
+            $windenfahrerOptionsWithId[] = [
                 'name' => $pilot,
                 'id' => $id,
-            );
+            ];
         }
 
-        $entry = array(
+        $entry = [
             'date' => $row['datum'],
             'startleiterOptionen' => $startleiterOptionsWithId,
             'windenfahrerOptionen' => $windenfahrerOptionsWithId,
             'startleiter' => $row['startleiter'],
             'windenfahrer' => $row['windenfahrer'],
-        );
+        ];
         $data[] = $entry;
     }
 }
 
-echo json_encode($data);
+header('Content-Type: application/json');
+echo json_encode($data, JSON_THROW_ON_ERROR);

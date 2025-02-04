@@ -9,7 +9,7 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$query = "SELECT * FROM moegliche_flugtage WHERE datum = :flugtag";
+$query = 'SELECT * FROM moegliche_flugtage WHERE datum = :flugtag';
 $result = Database::query($query, ['flugtag' => $_GET['flugtag']]);
 
 header('Content-Type: application/json');

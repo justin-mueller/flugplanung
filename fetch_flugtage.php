@@ -12,7 +12,7 @@ Database::connect();
 $startDate = $_GET['startDate'];
 $endDate = $_GET['endDate'];
 
-$query = "SELECT datum FROM moegliche_flugtage WHERE datum BETWEEN :startDate AND :endDate ORDER BY datum DESC";
+$query = 'SELECT datum FROM moegliche_flugtage WHERE datum BETWEEN :startDate AND :endDate ORDER BY datum DESC';
 
 $result = Database::query($query, ['startDate' => $startDate, 'endDate' => $endDate]);
 

@@ -4,7 +4,7 @@ namespace JustinMueller\Flugplanung;
 
 class Database
 {
-    static protected \PDO $conn;
+    protected static \PDO $conn;
 
     public static function connect(): void
     {
