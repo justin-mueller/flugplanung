@@ -13,12 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $sql = 'DELETE FROM mitglieder WHERE pilot_id = :pilotid';
 
-    if (Database::query($sql, ['pilotid' => $_SESSION['mitgliederData']['pilot_id']]) !== false) {
-        $response = ['success' => true];
-    } else {
-        $response = ['error' => 'Error deleting record'];
-    }
+    $result = Database::query($sql, ['pilotid' => $_SESSION['mitgliederData']['pilot_id']]);
 
     header('Content-Type: application/json');
-    echo json_encode($response, JSON_THROW_ON_ERROR);
+    echo json_encode($result, JSON_THROW_ON_ERROR);
 }

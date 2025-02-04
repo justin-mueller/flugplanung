@@ -24,9 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Retrieve the hashed password from the database
     $sql = 'SELECT * FROM mitglieder WHERE email = :email';
-    $mitgliederData = current(Database::query($sql, ['email' => $email]));
+    $result = Database::query($sql, ['email' => $email]);
 
-    if ($mitgliederData) {
+    if ($result !== false && $result !== []) {
+        $mitgliederData = current($result);
         $hashedPasswordFromDB = $mitgliederData['password'];
         unset($mitgliederData['password']);
         // Validate credentials using password_verify

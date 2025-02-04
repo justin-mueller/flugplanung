@@ -11,11 +11,7 @@ Database::connect();
 
 $sql = 'DELETE FROM tagesplanung WHERE Pilot_ID = :pilotid';
 
-if (Database::query($sql, ['pilotid' => $_POST['pilotid_delete']]) !== false) {
-    $response = ['success' => true];
-} else {
-    $response = ['error' => 'Error deleting record'];
-}
+$result = Database::execute($sql, ['pilotid' => $_POST['pilotid_delete']]);
 
 header('Content-Type: application/json');
-echo json_encode($response, JSON_THROW_ON_ERROR);
+echo json_encode($result, JSON_THROW_ON_ERROR);

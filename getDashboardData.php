@@ -52,7 +52,7 @@ $result = Database::query($sql, [
 
 $data = array();
 
-if ($result !== []) {
+if ($result !== false && $result !== []) {
     foreach ($result as $row) {
         $startleiterOptions = $row['startleiterOptionen'] !== null ? explode(',', $row['startleiterOptionen']) : $allPilots;
         $windenfahrerOptions = $row['windenfahrerOptionen'] !== null ? explode(',', $row['windenfahrerOptionen']) : $allPilots;
