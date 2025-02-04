@@ -2,7 +2,7 @@ $(document).ready(function () {
     $("#delete-user-form").submit(function (event) {
 
       event.preventDefault();
-  
+
       $("#delete-error").addClass("d-none");
 
       $("#update-error").addClass("d-none");
@@ -11,16 +11,11 @@ $(document).ready(function () {
           $("#update-error").html("Die Phrase ist nicht korrekt!");
           return;
          }
-  
+
       var formDataArray = $(this).serializeArray();
 
-      formDataArray.push({
-        name: "pilot_id",
-        value: User_Information.pilot_id,
-      });
-  
       var formData = $.param(formDataArray);
-  
+
       $.ajax({
         url: "delete_user.php",
         method: "POST",
@@ -39,4 +34,3 @@ $(document).ready(function () {
       });
     });
   });
-  
