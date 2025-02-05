@@ -29,7 +29,40 @@ function loadFlugtage(init) {
 		dataType: 'json',
 		success: function (data) {
 
-			Flugtage = data;
+
+			Flugtage = JSON.parse(JSON.stringify(data));
+			FlugtageRaw = JSON.parse(JSON.stringify(data));
+
+
+			//Fill Datepicker
+			let highlightedDates = new Set(FlugtageRaw.map(item => new Date(item.datum).toDateString()));
+
+			$('.date').datepicker({
+				language: 'de',
+				weekStart: 1,
+				todayHighlight: true,
+				format: {
+					toDisplay: function (date, format, language) {
+						return getFormattedGermanDate(date);
+					},
+					toValue: function (date, format, language) {
+						return date;
+					}
+				},
+				beforeShowDay: function (date) {
+					if (highlightedDates.has(date.toDateString())) {
+						console.log('highlighted ' + date.toDateString());
+						return { classes: 'highlight-day', tooltip: 'Highlighted date' };
+					
+					} else {
+						console.log('not highlighted ' + date.toDateString());
+						return { classes: 'non-highlight-day', tooltip: 'Regular date' };
+					}
+				}
+			})
+
+
+
 			populateFlugtageTable(Flugtage);
 
 			if (init) {

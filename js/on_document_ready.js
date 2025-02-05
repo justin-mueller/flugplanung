@@ -149,10 +149,15 @@ $(document).ready(function () {
   setInterval(() => loadChatbox(false), 15000);
 });
 
+
+	loadFlugtage(true);
+
+
 document.addEventListener("DOMContentLoaded", function () {
   //Countdown
   const observer = new MutationObserver((mutationsList, observer) => {
     const countdownElement = document.getElementById("countdown");
+
 
     if (countdownElement) {
       intervalId = setInterval(updateCountdown, 1000);

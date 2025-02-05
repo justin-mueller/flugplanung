@@ -337,3 +337,43 @@ form {
 .detail-row {
     background-color: #f1f1f1;
 }
+
+.highlight-day {
+    background-color: var(--standard-green);
+	font-weight: 700 !important;
+    color: black !important;
+    border-radius: unset !important;
+    border-style: solid !important;
+    border-width: thin !important;
+	border-color: black;
+}
+
+.non-highlight-day {
+	background-color: #b1b1b1 !important;
+    color: #6a6a6a !important;
+    border-radius: unset !important;
+    border-style: solid !important;
+    border-width: thin !important;
+	border-color: black;
+}
+
+.datepicker table td.highlight-day.active {
+    background-color: #26631b !important;
+	background-image: none !important;
+    color: white !important;
+    border-radius: unset !important;
+    border-style: solid !important;
+    border-width: thin !important;
+	border-color: black;
+}
+
+.datepicker table td.non-highlight-day.active {
+    background-color: #d2d2d2 !important;
+	background-image: none !important;
+    color: #6a6a6a !important;
+    border-radius: unset !important;
+    border-style: solid !important;
+    border-width: thin !important;
+	border-color: black;
+}
+
