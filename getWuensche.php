@@ -19,7 +19,7 @@ $sql = 'SELECT
 
 $result = Database::query($sql, ['pilot_id' => $_GET['pilot_id'], 'startDate' => $_GET['startDate'], 'endDate' => $_GET['endDate']]);
 
-$values = array();
+$values = [];
 if ($result) {
     foreach ($result as $row) {
         $wunschValue = match ($row['wunsch']) {
@@ -27,7 +27,7 @@ if ($result) {
             1 => 'Ja',
             default => 'Egal'
         };
-        $values[] = array('date' => $row['datum'], 'wunsch' => $wunschValue);
+        $values[] = ['date' => $row['datum'], 'wunsch' => $wunschValue];
     }
 }
 

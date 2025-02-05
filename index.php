@@ -51,6 +51,13 @@ if ($mitgliederData['dienste_admin']) {
     ];
 }
 
+$tabs['einstellungen'] = [
+    'label' => 'Nutzerkonto',
+    'content' => $twig->render('einstellungen.twig.html', [
+        'clubs' => Helper::$configuration['clubs']
+    ])
+];
+
 echo $twig->render(
     'index.twig.html',
     [

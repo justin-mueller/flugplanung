@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fluggeraetS = isset($_POST['fluggeraet_sonstiges']) ? 'S' : '';
         $fluggeraetCombined = $fluggeraetG . $fluggeraetD . $fluggeraetS;
         $windenfahrer = $_POST['windenfahrer_register'];
-        $avatar = $_POST['avatar_register'];
+        $avatar = $_POST['avatar'];
 
         // Hash the password
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $insertQuery = 'INSERT INTO mitglieder
           (email, password, firstname, lastname, verein, fluggeraet, windenfahrer, avatar) VALUES
           (:email, :hashedPassword, :vorname, :nachname, :verein, :fluggeraet, :windenfahrer, :avatar)';
-        $result = Database::insertSqlStatement(
+        $result = Database::execute(
             $insertQuery,
             [
                 'email' => $email,

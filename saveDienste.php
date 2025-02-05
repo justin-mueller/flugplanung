@@ -12,7 +12,7 @@ Database::connect();
 $sql = "INSERT INTO dienste (id, flugtag, pilot_id, windenfahrer, startleiter) 
         VALUES (CONCAT(:flugtag, '_' ,:pilot_id) , :flugtag, :pilot_id, :windenfahrer, :startleiter)";
 
-$result = Database::insertSqlStatement(
+$result = Database::execute(
     $sql,
     [
         'flugtag' => $_POST['flugtag'],

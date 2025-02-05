@@ -31,7 +31,7 @@ if ($result) {
             'lastname' => $row['lastname'],
             'avatar' => $row['avatar']];
     }
-    echo json_encode($values);
+    echo json_encode($values, JSON_THROW_ON_ERROR);
 } else {
-    echo json_encode(['error' => 'Keine Einträge in der Chatbox!']);
+    echo json_encode(['error' => 'Keine Einträge in der Chatbox!'], JSON_THROW_ON_ERROR);
 }

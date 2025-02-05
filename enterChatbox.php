@@ -11,7 +11,7 @@ Database::connect();
 
 $sql = 'INSERT INTO chatbox  (Pilot_ID, text) VALUES (:pilotId, :text)';
 
-Database::insertSqlStatement(
+Database::execute(
     $sql,
     [
         'pilotId' => $_POST['pilot_id'],
