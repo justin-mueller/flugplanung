@@ -15,7 +15,7 @@ if ($_POST['update']) {
     $sql = 'INSERT INTO tagesplanung (Pilot_ID,  Kommentar, NGL, HRP, AMD, flugtag) VALUES (:pilotid, :kommentar, :ngl, :hrp, :amd , :flugtag)';
 }
 
-$result = Database::insertSqlStatement($sql, [
+$result = Database::execute($sql, [
     'kommentar' => $_POST['kommentar'],
     'ngl' => $_POST['prio_result'][0],
     'hrp' => $_POST['prio_result'][1],

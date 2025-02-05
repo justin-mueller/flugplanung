@@ -47,7 +47,7 @@ $sql = "SELECT
 
 
 $result = Database::query($sql, ['flugtag' => $_GET['flugtag']]);
-if ($result) {
+if ($result !== false && $result !== []) {
     $data = [];
     foreach ($result as $row) {
         $row['VereinId'] = (int)$row['VereinId'];

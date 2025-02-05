@@ -10,7 +10,7 @@ Helper::checkLogin();
 Database::connect();
 
 $sql = 'UPDATE moegliche_flugtage SET betrieb_ngl = :betrieb_ngl, betrieb_hrp = :betrieb_hrp, betrieb_amd = :betrieb_amd, abgesagt = :abgesagt, aufbau = :aufbau WHERE  datum = :flugtag';
-$result = Database::insertSqlStatement($sql, [
+$result = Database::execute($sql, [
         'flugtag' => $_POST['flugtag'],
         'betrieb_ngl' => $_POST['flugbetrieb_ngl'],
         'betrieb_hrp' => $_POST['flugbetrieb_hrp'],

@@ -1,203 +1,290 @@
 <!DOCTYPE html>
 <html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
 
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Login</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% cache_busting 'css/bootstrap.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% cache_busting 'css/select2.min.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% cache_busting 'css/style.css' %}"
+    />
 
-	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/bootstrap.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/select2.min.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/style.css' %}">
+    <script src="{% cache_busting 'js_modules/jquery.js' %}"></script>
+    <script src="{% cache_busting 'js_modules/select2.full.min.js' %}"></script>
+    <script src="{% cache_busting 'js_modules/bootstrap.js' %}"></script>
+    <script src="{% cache_busting 'js/register.js' %}"></script>
+    <script src="{% cache_busting 'js/avatar.js' %}"></script>
+    <script src="{% cache_busting 'js/toasts.js' %}"></script>
 
-	<script src="{% cache_busting 'js_modules/jquery.js' %}"></script>
-	<script src="{% cache_busting 'js_modules/select2.full.min.js' %}"></script>
-	<script src="{% cache_busting 'js_modules/bootstrap.js' %}"></script>
-	<script src="{% cache_busting 'js/register.js' %}"></script>
-	<script src="{% cache_busting 'js/toasts.js' %}"></script>
+    <script>
+      $(document).ready(function () {
+        $("#verein_register").select2({
+          width: "100%",
+          containerCssClass: "form-control form-control-lg",
+        });
+      });
+    </script>
+  </head>
 
-	<script>
-		$(document).ready(function() {
-			$('#verein_register').select2({
-				width: '100%',
-				containerCssClass: 'form-control form-control-lg'
-			});
-		});
-	</script>
+  <body>
+    <div id="toastContainer"></div>
 
-</head>
+    <section class="login">
+      <div class="container py-5">
+        <div class="row d-flex justify-content-center align-items-center">
+          <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card shadow-2-strong" style="border-radius: 1rem">
+              <div class="card-body p-5 text-center">
+                <h2 class="mb-2">Anmeldung</h2>
+                <h4 class="mb-2">Flugplanung des {{ clubs[clubId].name }}</h4>
+                <p class="mb-4" style="color: #8e8e8e; font-style: italic">
+                  Hier bist du richtig bei unserer neuen Flugplanung!<br />Ab
+                  jetzt müssen sich alle Flieger registrieren!<br /><br />
+                  Die Flugplanung für den Milaner e.V. ist jetzt
+                  <a
+                    style="
+                      color: red;
+                      font-style: italic;
+                      text-decoration: underline;
+                    "
+                    href="https://milaner.uber.space/login.php"
+                    >hier</a
+                  >
+                  zu finden!
+                </p>
 
-<body>
+                <form method="post" action="login.php">
+                  <div class="form-outline mb-4">
+                    <input
+                      type="email"
+                      name="email"
+                      id="typeEmailX-2"
+                      value="{{ email }}"
+                      class="form-control form-control-lg"
+                      required
+                    />
+                    <label class="form-label" for="typeEmailX-2">E-Mail</label>
+                  </div>
 
-	<div id="toastContainer"></div>
+                  <div class="form-outline mb-4">
+                    <input
+                      type="password"
+                      name="password"
+                      id="typePasswordX-2"
+                      class="form-control form-control-lg"
+                      required
+                    />
+                    <label class="form-label" for="typePasswordX-2"
+                      >Passwort</label
+                    >
+                  </div>
 
-	<section class="login">
+                  <button
+                    class="btn btn-primary btn-lg btn-block mb-4 ui-button"
+                    type="submit"
+                  >
+                    Login
+                  </button>
 
-		<div class="container py-5">
-			<div class="row d-flex justify-content-center align-items-center">
-				<div class="col-12 col-md-8 col-lg-6 col-xl-5">
-					<div class="card shadow-2-strong" style="border-radius: 1rem;">
-						<div class="card-body p-5 text-center">
+                  {% if error %}
+                  <div class="alert alert-danger" role="alert">{{ error }}</div>
+                  {% endif %}
+                </form>
 
-							<h2 class="mb-2">Anmeldung</h2>
-							<h4 class="mb-2">Flugplanung des {{ clubs[clubId].name }}</h4>
-							<p class="mb-4" style="color: #8e8e8e;font-style: italic;">Hier bist du richtig bei unserer
-								neuen Flugplanung!<br>Ab jetzt müssen sich alle Flieger registrieren!<br><br>
-								Die Flugplanung für den Milaner e.V. ist jetzt <a  style="color: red; font-style: italic; text-decoration: underline" href="https://milaner.uber.space/login.php">hier</a> zu finden!</p>
+                <hr class="my-4" />
 
+                <p class="small mb-5 pb-lg-2">
+                  <a class="text-muted" href="#!" onclick="forgotPassword()"
+                    >Passwort vergessen?</a
+                  >
+                </p>
 
-							<form method="post" action="login.php">
+                <p>Noch keinen Account?</p>
+                <button
+                  type="button"
+                  class="btn btn-danger mb-5 btn-lg ui-button"
+                  onclick="openRegisterForm()"
+                >
+                  Hier registrieren!
+                </button>
 
-								<div class="form-outline mb-4">
-									<input type="email" name="email" id="typeEmailX-2" value="{{ email }}"
-										class="form-control form-control-lg" required />
-									<label class="form-label" for="typeEmailX-2">E-Mail</label>
-								</div>
+                <form method="post" id="registration-form" class="d-none">
+                  <div class="card mb-4">
+                    <div class="card-header">
+                      <h5 class="card-title">Allgemeine Daten</h5>
+                    </div>
+                    <div class="card-body">
+                      <div class="form-outline mb-4">
+                        <input
+                          type="email"
+                          name="email_register"
+                          id="email_register"
+                          class="form-control form-control-lg"
+                          required
+                        />
+                        <label class="form-label" for="email_register"
+                          >E-mail</label
+                        >
+                      </div>
+                      <div class="form-outline mb-4">
+                        <input
+                          type="password"
+                          name="password_register"
+                          id="password_register"
+                          class="form-control form-control-lg"
+                          required
+                        />
+                        <label class="form-label" for="password_register"
+                          >Passwort</label
+                        >
+                      </div>
+                      <div class="form-outline mb-4">
+                        <input
+                          type="text"
+                          name="vorname_register"
+                          id="vorname_register"
+                          class="form-control form-control-lg"
+                          required
+                        />
+                        <label class="form-label" for="vorname_register"
+                          >Vorname</label
+                        >
+                      </div>
+                      <div class="form-outline mb-4">
+                        <input
+                          type="text"
+                          name="nachname_register"
+                          id="nachname_register"
+                          class="form-control form-control-lg"
+                          required
+                        />
+                        <label class="form-label" for="vorname_register"
+                          >Nachname</label
+                        >
+                      </div>
 
-								<div class="form-outline mb-4">
-									<input type="password" name="password" id="typePasswordX-2"	class="form-control form-control-lg" required />
-									<label class="form-label" for="typePasswordX-2">Passwort</label>
-								</div>
+                      <div class="form-outline mb-4">
+                        <select
+                          class="form-select"
+                          name="verein_register"
+                          id="verein_register"
+                        >
+                          {% for id, club in clubs %}
+                          <option value="{{ id }}">{{ club.name }}</option>
+                          {% endfor %}
+                        </select>
+                        <label class="form-label" for="verein_register"
+                          >Verein</label
+                        >
+                      </div>
 
-								<button class="btn btn-primary btn-lg btn-block mb-4 ui-button"	type="submit">Login</button>
+                      <div class="form-check d-flex justify-content-start mb-4">
+                        <input
+                          class="form-check-input"
+                          name="windenfahrer_register"
+                          type="checkbox"
+                          value=""
+                          id="windenfahrer_register"
+                        />
+                        <label
+                          class="form-check-label"
+                          for="windenfahrer_register"
+                          >Ich habe einen Windenfahrerschein!</label
+                        >
+                      </div>
+                    </div>
+                  </div>
 
-								{% if error %}
-								<div class='alert alert-danger' role='alert'>{{ error }}</div>
-								{% endif %}
+                  <div class="card mb-4">
+                    <div class="card-header">
+                      <h5 class="card-title">Fluggerät</h5>
+                    </div>
+                    <div class="card-body">
+                      <div class="form-check d-flex justify-content-start mb-4">
+                        <input
+                          class="form-check-input"
+                          name="fluggeraet_gleitschirm"
+                          type="checkbox"
+                          value=""
+                          id="fluggeraet_gleitschirm"
+                        />
+                        <label
+                          class="form-check-label"
+                          for="fluggeraet_gleitschirm"
+                          >Gleitschirm</label
+                        >
+                      </div>
 
-							</form>
+                      <div class="form-check d-flex justify-content-start mb-4">
+                        <input
+                          class="form-check-input"
+                          name="fluggeraet_drachen"
+                          type="checkbox"
+                          value=""
+                          id="fluggeraet_drachen"
+                        />
+                        <label class="form-check-label" for="fluggeraet_drachen"
+                          >Drachen/Starrflügler</label
+                        >
+                      </div>
 
-							<hr class="my-4">
+                      <div class="form-check d-flex justify-content-start mb-4">
+                        <input
+                          class="form-check-input"
+                          name="fluggeraet_sonstiges"
+                          type="checkbox"
+                          value=""
+                          id="fluggeraet_sonstiges"
+                        />
+                        <label
+                          class="form-check-label"
+                          for="fluggeraet_sonstiges"
+                          >Sonstiges</label
+                        >
+                      </div>
+                    </div>
+                  </div>
 
-							<p class="small mb-5 pb-lg-2"><a class="text-muted" href="#!"
-									onclick="forgotPassword()">Passwort vergessen?</a></p>
+                  <div class="card mb-4">
+                    <div class="card-header">
+                      <h5 class="card-title">Aussehen</h5>
+                    </div>
+                    <div class="card-body">
+                      <div class="form-outline mb-4">
+                        {% include('partials/avatar-selector.twig.html') %}
+                      </div>
+                    </div>
+                  </div>
 
-							<p>Noch keinen Account?</p>
-							<button type="button" class="btn btn-danger mb-5 btn-lg ui-button" onclick="openRegisterForm()">
-								Hier registrieren!
-							</button>
-
-							<form method="post" id="registration-form" class="d-none">
-
-							<div class="card mb-4">
-								<div class="card-header">
-									<h5 class="card-title">Allgemeine Daten</h5>
-								</div>
-								<div class="card-body">
-
-									<div class="form-outline mb-4">
-										<input type="email" name="email_register" id="email_register"
-											class="form-control form-control-lg" required />
-										<label class="form-label" for="email_register">E-mail</label>
-									</div>
-									<div class="form-outline mb-4">
-										<input type="password" name="password_register" id="password_register"
-											class="form-control form-control-lg" required />
-										<label class="form-label" for="password_register">Passwort</label>
-									</div>
-									<div class="form-outline mb-4">
-										<input type="text" name="vorname_register" id="vorname_register"
-											class="form-control form-control-lg" required />
-										<label class="form-label" for="vorname_register">Vorname</label>
-									</div>
-									<div class="form-outline mb-4">
-										<input type="text" name="nachname_register" id="nachname_register"
-											class="form-control form-control-lg" required />
-										<label class="form-label" for="vorname_register">Nachname</label>
-									</div>
-
-									<div class="form-outline mb-4">
-										<select class="form-select" name="verein_register" id="verein_register">
-											{% for id, club in clubs %}
-											<option value="{{ id }}">{{ club.name }}</option>
-											{% endfor %}
-										</select>
-										<label class="form-label" for="verein_register">Verein</label>
-									</div>
-
-									<div class="form-check d-flex justify-content-start mb-4">
-										<input class="form-check-input" name="windenfahrer_register" type="checkbox"
-											value="" id="windenfahrer_register" />
-										<label class="form-check-label" for="windenfahrer_register">Ich habe einen
-											Windenfahrerschein!</label>
-									</div>
-								</div>
-							</div>
-
-
-								<div class="card mb-4">
-									<div class="card-header">
-										<h5 class="card-title">Fluggerät</h5>
-									</div>
-									<div class="card-body">
-										<div class="form-check d-flex justify-content-start mb-4">
-											<input class="form-check-input" name="fluggeraet_gleitschirm" type="checkbox" value="" id="fluggeraet_gleitschirm" />
-											<label class="form-check-label" for="fluggeraet_gleitschirm">Gleitschirm</label>
-										</div>
-
-										<div class="form-check d-flex justify-content-start mb-4">
-											<input class="form-check-input" name="fluggeraet_drachen" type="checkbox" value="" id="fluggeraet_drachen" />
-											<label class="form-check-label" for="fluggeraet_drachen">Drachen/Starrflügler</label>
-										</div>
-
-										<div class="form-check d-flex justify-content-start mb-4">
-											<input class="form-check-input" name="fluggeraet_sonstiges" type="checkbox" value="" id="fluggeraet_sonstiges" />
-											<label class="form-check-label" for="fluggeraet_sonstiges">Sonstiges</label>
-										</div>
-									</div>
-								</div>
-
-
-
-								<div class="card mb-4">
-									<div class="card-header">
-										<h5 class="card-title">Aussehen</h5>
-									</div>
-									<div class="card-body">
-
-										<div class="form-outline mb-4">
-											<div class="custom-select">
-												<div class="avatar" id="avatar-preview">
-												</div>
-												<select id="avatar-register" name="avatar_register" class="form-select" onchange="updatePreview()">
-													<option value="1">Avatar 1</option>
-													<option value="2">Avatar 2</option>
-													<option value="3">Avatar 3</option>
-													<option value="4">Avatar 4</option>
-													<option value="5">Avatar 5</option>
-													<option value="6">Avatar 6</option>
-													<option value="7">Avatar 7</option>
-													<option value="8">Avatar 8</option>
-													<option value="9">Avatar 9</option>
-													<option value="10">Avatar 10</option>
-													<option value="11">Avatar 11</option>
-													<option value="12">Avatar 12</option>
-													<option value="13">Avatar 13</option>
-													<option value="14">Avatar 14</option>
-													<option value="15">Avatar 15</option>
-													<option value="16">Avatar 16</option>
-													<option value="17">Avatar 17</option>
-													<option value="18">Avatar 18</option>
-													<option value="19">Avatar 19</option>
-													<option value="20">Avatar 20</option>
-												</select>
-											</div>
-											<label class="form-label" for="avatar-register">Avatar</label>
-										</div>
-									</div>
-								</div>
-
-								<button class="btn btn-primary btn-lg btn-block mb-4 ui-button" type="submit">Registrieren</button>
-								<div id='register-error' class="alert alert-danger  d-none" role="alert"></div>
-							</form>
-
-
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-</body>
-
+                  <button
+                    class="btn btn-primary btn-lg btn-block mb-4 ui-button"
+                    type="submit"
+                  >
+                    Registrieren
+                  </button>
+                  <div
+                    id="register-error"
+                    class="alert alert-danger d-none"
+                    role="alert"
+                  ></div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
 </html>

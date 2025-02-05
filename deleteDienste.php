@@ -11,9 +11,7 @@ Database::connect();
 
 $sqlDelete = 'DELETE FROM dienste WHERE YEAR(flugtag) = :year';
 
+$result = Database::query($sqlDelete, ['year' => $_GET['year']]);
+
 header('Content-Type: application/json');
-if (Database::query($sqlDelete, ['year' => $_GET['year']]) !== false) {
-    echo json_encode(['success' => true], JSON_THROW_ON_ERROR);
-} else {
-    echo json_encode(['success' => false], JSON_THROW_ON_ERROR);
-}
+echo json_encode($result, JSON_THROW_ON_ERROR);

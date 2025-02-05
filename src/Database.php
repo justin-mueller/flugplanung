@@ -4,7 +4,7 @@ namespace JustinMueller\Flugplanung;
 
 class Database
 {
-    static protected \PDO $conn;
+    protected static \PDO $conn;
 
     public static function connect(): void
     {
@@ -23,20 +23,23 @@ class Database
 
     public static function query(string $sql, array $parameters): bool|array
     {
-        $statement = self::$conn->prepare($sql);
-        $statement->execute($parameters);
-        return $statement->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+        try {
+            $statement = self::$conn->prepare($sql);
+            $statement->execute($parameters);
+        } catch (\PDOException) {
+            return false;
+        }
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public static function insertSqlStatement(string $sql, array $parameters): array
+    public static function execute(string $sql, array $parameters): array
     {
-        $statement = self::$conn->prepare($sql);
-        $success = $statement->execute($parameters);
-
-        if ($success === TRUE) {
-            return ['success' => true];
+        try {
+            $statement = self::$conn->prepare($sql);
+            $success = $statement->execute($parameters);
+            return ['success' => $success];
+        } catch (\PDOException) {
+            return ['success' => false, 'error' => implode(' -- ', $statement->errorInfo())];
         }
-
-        return ['success' => false, 'error' => implode(' -- ', $statement->errorInfo())];
     }
 }
