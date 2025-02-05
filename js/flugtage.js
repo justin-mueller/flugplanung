@@ -51,18 +51,31 @@ function loadFlugtage(init) {
 				},
 				beforeShowDay: function (date) {
 					if (highlightedDates.has(date.toDateString())) {
-						console.log('highlighted ' + date.toDateString());
+
 						return { classes: 'highlight-day', tooltip: 'Highlighted date' };
 					
 					} else {
-						console.log('not highlighted ' + date.toDateString());
 						return { classes: 'non-highlight-day', tooltip: 'Regular date' };
 					}
 				}
 			})
 
 
-
+			$(".date").datepicker({
+				language: "de",
+				weekStart: 1,
+				daysOfWeekHighlighted: [0, 6],
+				todayHighlight: true,
+				format: {
+				  toDisplay: function (date, format, language) {
+					return getFormattedGermanDate(date);
+				  },
+				  toValue: function (date, format, language) {
+					return date;
+				  },
+				},
+			  });
+			  
 			populateFlugtageTable(Flugtage);
 
 			if (init) {
