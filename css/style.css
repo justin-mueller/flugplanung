@@ -377,3 +377,10 @@ form {
 	border-color: black;
 }
 
+img.table-image.aircraft {
+    height: 16px;
+}
+
+img.table-image.vote {
+    height: 20px;
+}
