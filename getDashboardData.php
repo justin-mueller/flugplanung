@@ -27,7 +27,7 @@ SELECT
     IFNULL(GROUP_CONCAT(DISTINCT CASE WHEN d.windenfahrer = '0' THEN d.pilot_id END), 'Kein SL') AS startleiter,
     IFNULL(GROUP_CONCAT(DISTINCT CASE WHEN d.windenfahrer = '1' THEN d.pilot_id END), 'Kein WF') AS windenfahrer
 FROM
-    moegliche_flugtage mf
+    flugtage mf
 LEFT JOIN
     dienste_wuensche dw ON mf.datum = dw.datum
 LEFT JOIN

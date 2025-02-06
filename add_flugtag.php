@@ -9,7 +9,7 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$sql = 'INSERT INTO moegliche_flugtage (datum) VALUES (:datum)';
+$sql = 'INSERT INTO flugtage (datum) VALUES (:datum)';
 $result = Database::execute($sql, ['datum' => $_POST['datum']]);
 
 header('Content-Type: application/json');

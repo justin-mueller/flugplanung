@@ -12,7 +12,7 @@ Database::connect();
 $sql = 'SELECT 
             mf.datum, 
             COALESCE(dw.wunsch, -1) AS wunsch
-        FROM moegliche_flugtage mf
+        FROM flugtage mf
         LEFT JOIN dienste_wuensche dw ON mf.datum = dw.datum AND dw.pilot_id = :pilot_id
             WHERE 
             mf.datum BETWEEN :startDate AND :endDate';

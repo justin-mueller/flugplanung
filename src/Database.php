@@ -19,8 +19,21 @@ class Database
             $username,
             $password
         );
+
+        self::setupSchema();
     }
 
+    private static function setupSchema(): void
+    {
+        // rename moegliche_flugtage -> flugtage (#16)
+        $result =  self::query(
+            'SELECT COUNT(*) AS exists FROM information_schema.tables WHERE table_schema = database() AND table_name = :tableName',
+            ['tableName' => 'moegliche_flugtage']
+        );
+        if (is_array($result) && current($result)['exists'] === 1) {
+            self::$conn->exec('RENAME TABLE moegliche_flugtage TO flugtage;');
+        }
+    }
     public static function query(string $sql, array $parameters): bool|array
     {
         try {
