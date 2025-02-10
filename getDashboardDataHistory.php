@@ -46,7 +46,7 @@ FROM
 LEFT JOIN 
     dienste d ON m.pilot_id = d.pilot_id
 LEFT JOIN 
-    moegliche_flugtage mf ON mf.datum = d.flugtag
+    flugtage mf ON mf.datum = d.flugtag
 WHERE 
     m.verein = :clubId
 GROUP BY 

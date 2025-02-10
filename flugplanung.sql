@@ -81,10 +81,10 @@ CREATE TABLE `mitglieder` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `moegliche_flugtage`
+-- Tabellenstruktur für Tabelle `flugtage`
 --
 
-CREATE TABLE `moegliche_flugtage` (
+CREATE TABLE `flugtage` (
   `datum` date NOT NULL,
   `aufbau` time NOT NULL DEFAULT '10:00:00',
   `betrieb_ngl` tinyint(1) DEFAULT 0,
@@ -138,9 +138,9 @@ ALTER TABLE `mitglieder`
   ADD PRIMARY KEY (`pilot_id`);
 
 --
--- Indizes für die Tabelle `moegliche_flugtage`
+-- Indizes für die Tabelle `flugtage`
 --
-ALTER TABLE `moegliche_flugtage`
+ALTER TABLE `flugtage`
   ADD PRIMARY KEY (`datum`);
 
 --
