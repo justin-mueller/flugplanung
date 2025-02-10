@@ -14,7 +14,7 @@ function getFlugtag() {
 	toggleSpinner(true);
 
 	min_pilot_amount_reached = false;
-	
+
 	var now = new Date();
 	var oneHourBack = new Date();
 	oneHourBack.setHours(oneHourBack.getHours() - 1);
@@ -32,14 +32,14 @@ function getFlugtag() {
 	$("[id=list_alternative_1]").removeClass("active");
 	$("[id=list_alternative_2]").removeClass("active");
 	$("[id=list_alternative_3]").removeClass("active");
-	
+
 	$.ajax({
 		url: 'get_flugtag.php',
 		type: 'GET',
 		data: { flugtag: flugtag_formatted },
 
 		success: function (data) {
-			
+
 			if (typeof(data) === 'object') {
 				console.log('Planung für den ' + flugtag_formatted + ' erfolgreich geladen:');
 				console.log(data);
@@ -99,12 +99,11 @@ function getFlugtag() {
 					let windenfahrer_official_info = row.Pilot_ID == windenfahrer_official ? '<span class="badge bg-success">WF Offiziell</span>' : '';
 					let windenfahrer_info = (row.ist_windenfahrer == 1 && row.Pilot_ID != windenfahrer_official) ? '<span class="badge bg-primary">WF</span>' : '';
 					var newRow = $('<tr ' + row_not_local_club_member + '>');
-					let fluggerateIMG = row.fluggeraet.includes('G') ? replaceValueWithImage('G') : '' 
+					let fluggerateIMG = row.fluggeraet.includes('G') ? replaceValueWithImage('G') : ''
 					fluggerateIMG += row.fluggeraet.includes('D') ? replaceValueWithImage('D') : ''
 					fluggerateIMG += row.fluggeraet.includes('S') ? replaceValueWithImage('S') : '';
-					
-					newRow.append('<td>' + row.Pilot + ' ' + windenfahrer_info + ' ' + windenfahrer_official_info + ' ' + ist_startleiter + ' ' + new_record + '</td>');
-					newRow.append('<td  style="display: flex; justify-content: space-evenly;"> ' +  fluggerateIMG + '</td>');
+
+					newRow.append('<td>' + row.Pilot + ' ' + windenfahrer_info + ' ' + windenfahrer_official_info + ' ' + ist_startleiter + ' ' + fluggerateIMG + new_record + '</td>');
 					newRow.append('<td>' + (local_club_member ? '<strong>' : '') + row.Verein + (local_club_member ? '</strong>' : '') + '</td>');
 					newRow.append('<td>' + replaceValueWithImage(row.NGL) + '</td>');
 					newRow.append('<td>' + replaceValueWithImage(row.HRP) + '</td>');
@@ -118,7 +117,6 @@ function getFlugtag() {
 				var newRow = $('<tr>');
 				newRow.append('<td><strong>Abstimmung</td>');
 				newRow.append('<td></td>');
-				newRow.append('<td></td>');
 				newRow.append('<td>' + pilot_count_hdgf_prio_1[0] + '</td>');
 				newRow.append('<td>' + pilot_count_hdgf_prio_1[1] + '</td>');
 				newRow.append('<td>' + pilot_count_hdgf_prio_1[2] + '</td>');
@@ -129,7 +127,6 @@ function getFlugtag() {
 
 				var newRow = $('<tr>');
 				newRow.append('<td><strong>Piloten maximal</strong></td>');
-				newRow.append('<td></td>');
 				newRow.append('<td></td>');
 				newRow.append('<td>' + total_pilot_count_all[0] + '</td>');
 				newRow.append('<td>' + total_pilot_count_all[1] + '</td>');
@@ -185,13 +182,13 @@ function getFlugtag() {
 					$("[id=list_fist_choice_1]").addClass("active");
 				}
 
-				
+
 
 			} else {
 				windenfahrer_official = null;
 				startleiter_official = null;
 				$("[id=list_fist_choice_1]").addClass("active");
-				
+
 			}
 
 			if (min_pilot_amount_reached) {
@@ -205,7 +202,7 @@ function getFlugtag() {
 						'<div style="margin-left: 5px;">Es ist Flugbetrieb möglich in: ' + possible_areas_sliced + '</div>' +
 					'</div>' +
 					'<div id="countdown"></div>'
-					
+
 				);
 			} else {
 				$('#minpilotreached').html(
@@ -223,7 +220,7 @@ function getFlugtag() {
 
 			updateCountdown();
 
-			
+
 		},
 
 		error: function (xhr, status, error) {
@@ -261,18 +258,12 @@ function getFlugtag() {
 
 function replaceValueWithImage(value) {
 	if (value == 0) {
-		return '<img src="img/stern_fav.svg" class="table-image">';
+		return '<img src="img/stern_fav.svg" class="table-image vote">';
 	} else if (value == 1) {
-		return '<img src="img/stern.svg" class="table-image">';
+		return '<img src="img/stern.svg" class="table-image vote">';
 	} else if (value == 2) {
-		return '<img src="img/kreuz.svg" class="table-image">';
-
-	} else if (value == "G") {
-		return '<img src="img/G.png" class="table-image">';
-	} else if (value == "D") {
-		return '<img src="img/D.png" class="table-image">';
-	} else if (value == "S") {
-		return '<img src="img/S.png" class="table-image">';
+		return '<img src="img/kreuz.svg" class="table-image vote">';
 	}
-	return value;
+
+	return '<img src="img/' + value + '.png" class="table-image aircraft">';
 }
