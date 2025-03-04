@@ -238,7 +238,7 @@ function getFlugtag() {
 			let Startleiterinfotext = Active_User_Is_Startleiter ? ' <br>Du bist für diesen Tag Startleiter!' : '';
 			let Windenfahrerinfotext = Active_User_Is_Windenfahrer ? ' <br>Du bist für diesen Tag Windenfahrer!' : '';
 
-			$('#user_name_header').html('Hallo, ' + User_Information.firstname + ' ' + User_Information.lastname + '! ' + Startleiterinfotext + Windenfahrerinfotext);
+			$('#user_name_header').html('Hallo, ' + User_Information.firstname + '! ' + Startleiterinfotext + Windenfahrerinfotext);
 
 			//Banner für Flugbetrieb ausrufen
 			if (Active_User_Is_Startleiter) {
