@@ -27,6 +27,8 @@ return [
         'from' => $_SERVER['EMAIL_FROM'] ?? 'no-reply@nothing.invalid'
     ],
 
+    'paraglideableApiKey' => $_SERVER['PARAGLIDEABLE_API_KEY'] ?? '',
+
     'clubs' => [
         0 => ['name' => 'Kein Verein', 'shortName' => ''],
         1 => ['name' => '08/15 Parajumpers e.V.', 'shortName' => ''],

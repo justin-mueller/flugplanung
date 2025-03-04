@@ -192,8 +192,8 @@ function getFlugtag() {
 
 			}
 
-			isFlugtag = FlugtageRaw.find((item) => item.datum === flugtag_formatted) ? true : false; 
-			
+			isFlugtag = FlugtageRaw.find((item) => item.datum === flugtag_formatted) ? true : false;
+
 			/*banner_aufbau
 			minpilotreached
 			no_official_flugtag
@@ -206,16 +206,16 @@ function getFlugtag() {
 				$('#no_official_flugtag').addClass('d-none');
 				$('#minpilotreached').removeClass('d-none');
 				$('#btn_open_flugtag').addClass('d-none');
-				
+
 
 				if( isLocalClubMember && (User_Information.pilot_id != startleiter_official || User_Information.pilot_id != windenfahrer_official )) {
 					$('#take_over_duty').removeClass('d-none');
 					$('#take_over_duty_text').html("Ich möchte den Dienst als " +  (User_Information.windenfahrer == 0 ? "Startleiter" : "Windenfahrer") + 	" für diesen Tag übernehmen:");
 				}
-			
+
 				if (min_pilot_amount_reached) {
 
-					
+
 
 					$('#minpilotreached').html(
 						'<div style="display: flex; align-items: center;">' +
@@ -254,7 +254,7 @@ function getFlugtag() {
 			}
 
 			updateCountdown();
-	
+
 		},
 
 		error: function (xhr, status, error) {
@@ -286,7 +286,7 @@ function getFlugtag() {
 			if (Active_User_Is_Windenfahrer) {
 				$('#btn_enter').addClass('d-none');
 			}
-			
+
 			// Load reparaturen counts after flugplanung data is loaded
 			loadReparaturenCounts();
 
@@ -424,32 +424,32 @@ function loadReparaturenCounts() {
 
 function updateReparaturenBadges() {
 	const fluggebiete = ['ngl', 'hrp', 'amd'];
-	
+
 	fluggebiete.forEach(function(fluggebiet) {
 		const fluggebietUpper = fluggebiet.toUpperCase();
 		const elementId = 'reparaturen-' + fluggebiet;
 		const element = document.getElementById(elementId);
-		
+
 		if (element && reparaturenData[fluggebietUpper]) {
 			const level0Count = reparaturenData[fluggebietUpper].level0.count;
 			const level1Count = reparaturenData[fluggebietUpper].level1.count;
-			
+
 			let badgesHtml = '';
-			
+
 			if (level0Count > 0) {
 				badgesHtml += `<span class="badge bg-warning reparaturen-badge" 
 					data-fluggebiet="${fluggebietUpper}" 
 					data-level="0" 
 					style="cursor: pointer; margin-right: 2px;">${level0Count}</span>`;
 			}
-			
+
 			if (level1Count > 0) {
 				badgesHtml += `<span class="badge bg-danger reparaturen-badge" 
 					data-fluggebiet="${fluggebietUpper}" 
 					data-level="1" 
 					style="cursor: pointer;">${level1Count}</span>`;
 			}
-			
+
 			element.innerHTML = badgesHtml;
 		}
 	});
@@ -457,12 +457,12 @@ function updateReparaturenBadges() {
 
 function showReparaturenModal(fluggebiet) {
 	if (!reparaturenData[fluggebiet]) return;
-	
+
 	const level0Data = reparaturenData[fluggebiet].level0;
 	const level1Data = reparaturenData[fluggebiet].level1;
-	
+
 	let modalContent = '';
-	
+
 	// Level 0 (Geringfügig)
 	if (level0Data.count > 0) {
 		modalContent += '<div class="mb-3">';
@@ -474,7 +474,7 @@ function showReparaturenModal(fluggebiet) {
 		modalContent += '</ul>';
 		modalContent += '</div>';
 	}
-	
+
 	// Level 1 (Flugbetrieb nicht möglich)
 	if (level1Data.count > 0) {
 		modalContent += '<div class="mb-3">';
@@ -486,14 +486,14 @@ function showReparaturenModal(fluggebiet) {
 		modalContent += '</ul>';
 		modalContent += '</div>';
 	}
-	
+
 	if (modalContent === '') {
 		modalContent = '<p class="text-muted">Keine offenen Reparaturen vorhanden.</p>';
 	}
-	
+
 	document.getElementById('modal-fluggebiet').textContent = fluggebiet;
 	document.getElementById('reparaturen-modal-content').innerHTML = modalContent;
-	
+
 	const modal = new bootstrap.Modal(document.getElementById('reparaturenModal'));
 	modal.show();
 }
@@ -502,7 +502,7 @@ function showReparaturenModal(fluggebiet) {
 function updateEnterModalReparaturenWarnings() {
 	const container = document.getElementById('reparaturen-warnings-container');
 	if (!container) return;
-	
+
 	let warningsHtml = '';
 	const fluggebiete = ['NGL', 'HRP', 'AMD'];
 	const fluggebietNames = {
@@ -510,7 +510,7 @@ function updateEnterModalReparaturenWarnings() {
 		'HRP': 'Hörpel',
 		'AMD': 'Altenmedingen'
 	};
-	
+
 	// Check each Fluggebiet for open repairs
 	fluggebiete.forEach(function(fluggebiet) {
 		if (reparaturenData[fluggebiet]) {
@@ -518,7 +518,7 @@ function updateEnterModalReparaturenWarnings() {
 			const level1Count = reparaturenData[fluggebiet].level1.count;
 			const level0Texts = reparaturenData[fluggebiet].level0.texts;
 			const level1Texts = reparaturenData[fluggebiet].level1.texts;
-			
+
 			// Show critical (level 1) repairs in red
 			if (level1Count > 0) {
 				warningsHtml += `<div class="alert alert-danger d-flex align-items-start mb-2" role="alert">
@@ -535,7 +535,7 @@ function updateEnterModalReparaturenWarnings() {
 					</div>
 				</div>`;
 			}
-			
+
 			// Show minor (level 0) repairs in yellow
 			if (level0Count > 0) {
 				warningsHtml += `<div class="alert alert-warning d-flex align-items-start mb-2" role="alert">
@@ -554,7 +554,7 @@ function updateEnterModalReparaturenWarnings() {
 			}
 		}
 	});
-	
+
 	container.innerHTML = warningsHtml;
 }
 
@@ -562,7 +562,7 @@ function updateEnterModalReparaturenWarnings() {
 document.addEventListener('DOMContentLoaded', function() {
 	// Load reparaturen counts when page loads
 	loadReparaturenCounts();
-	
+
 	// Add click event listeners for reparaturen badges
 	document.addEventListener('click', function(e) {
 		if (e.target.classList.contains('reparaturen-badge')) {
@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			showReparaturenModal(fluggebiet);
 		}
 	});
-	
+
 	// Update reparaturen warnings when enter modal is shown
 	const enterModal = document.getElementById('enterModal');
 	if (enterModal) {
@@ -579,3 +579,31 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 });
+
+function fetchParaglideable() {
+	$.ajax({
+		url: 'paraglideable.php',
+		type: 'GET',
+		success: function (data) {
+			if (data === null) {
+				document.getElementById('paraglideable-forecast').hidden = true;
+			} else if (data[flugtag_formatted]) {
+				document.getElementById('paraglideable-forecast').hidden = false;
+				document.getElementById('paraglideable-forecast').style.opacity = 1;
+				document.getElementById('forecast-fly').value = data[flugtag_formatted][0].forecast.fly;
+				document.getElementById('forecast-xc').value = data[flugtag_formatted][0].forecast.XC;
+				document.getElementById('paraglideable-forecast').querySelector('a').setAttribute('href', 'https://paraglidable.com/?lat=' + data[flugtag_formatted][0].lat + '&lon=' + data[flugtag_formatted][0].lon + '&zoom=11');
+			} else {
+				document.getElementById('paraglideable-forecast').hidden = false;
+				document.getElementById('paraglideable-forecast').style.opacity = .2;
+				document.getElementById('forecast-fly').value = 0;
+				document.getElementById('forecast-xc').value = 0;
+				document.getElementById('paraglideable-forecast').querySelector('a').setAttribute('href', 'https://paraglidable.com/');
+			}
+		},
+		error: function (xhr, status, error) {
+			console.log(xhr);
+			console.log(error);
+		}
+	});
+}
