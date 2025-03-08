@@ -18,10 +18,9 @@
                       class="form-control form-control-lg"
                       required
                       value="{{ User_Information.firstname }}"
+                      placeholder="Vorname"
+                      aria-label="Vorname"
                     />
-                    <label class="form-label" for="vorname"
-                      >Vorname</label
-                    >
                   </div>
                   <div class="form-outline mb-4">
                     <input
@@ -30,10 +29,9 @@
                       id="nachname"
                       class="form-control form-control-lg"
                       required
+                      placeholder="Nachname"
+                      aria-label="Nachname"
                     />
-                    <label class="form-label" for="vorname"
-                      >Nachname</label
-                    >
                   </div>
 
                   <div class="form-outline mb-4">
@@ -41,13 +39,13 @@
                       class="form-select"
                       name="verein"
                       id="verein"
+                      aria-label="Verein"
                     >
                       {% for id, club in clubs %}
                       <option value="{{ id }}">{{ club.name }}</option>
                       {% endfor %}
 
                     </select>
-                    <label class="form-label" for="verein">Verein</label>
                   </div>
 
                   <div class="form-check d-flex justify-content-start mb-4">
@@ -143,8 +141,9 @@
                       id="email"
                       class="form-control form-control-lg"
                       autocomplete="off"
+                      placeholder="E-Mail"
+                      aria-label="E-Mail"
                     />
-                    <label class="form-label" for="email">E-mail</label>
                   </div>
                   <div class="form-outline mb-4">
                     <input
@@ -153,20 +152,18 @@
                       id="password"
                       class="form-control form-control-lg"
                       autocomplete="new-password"
+                      placeholder="Neues Passwort"
+                      aria-label="Neues Passwort"
                     />
-                    <label class="form-label" for="password"
-                      >Neues Passwort</label
-                    >
                     <input
                       type="password"
                       name="password_confirm"
                       id="password_confirm"
                       class="form-control form-control-lg"
                       autocomplete="new-password"
+                      placeholder="Neues Passwort wiederholen"
+                      aria-label="Neues Passwort wiederholen"
                     />
-                    <label class="form-label" for="password_confirm"
-                      >Neues Passwort wiederholen</label
-                    >
                   </div>
                 </div>
               </div>
@@ -187,7 +184,7 @@
             <form method="post" id="delete-user-form">
               <div class="card mb-4">
                 <div class="card-header bg-danger">
-                  <h5 class="card-title">Gefahrenzone</h5>
+                  <h5 class="card-title bg-danger text-white">Gefahrenzone</h5>
                 </div>
                 <div class="card-body">
                   <div class="form-outline mb-4">
@@ -203,10 +200,10 @@
                     />
 
                     <button
-                      class="btn btn-danger btn-lg btn-block ui-button mt-2"
+                      class="btn btn-danger btn-md btn-block ui-button mt-2"
                       type="submit"
                     >
-                      Account Löschen
+                      Account löschen
                     </button>
                   </div>
                 </div>
