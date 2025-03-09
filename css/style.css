@@ -33,6 +33,10 @@
 	border: 3px solid var(--scroll-bar-bg-color);
 }
 
+body {
+	padding-top: env(safe-area-inset-top);
+}
+
 .table-image {
 	max-width: 30px;
 	height: auto;
