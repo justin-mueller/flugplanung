@@ -52,8 +52,8 @@ if ($mitgliederData['dienste_admin']) {
 }
 
 if ($mitgliederData['vereinId'] === Helper::$configuration['clubId']) {
-    $tabs['dienste_übersicht'] = [
-        'label' => 'Dienste Übersicht',
+    $tabs['dienste_uebersicht'] = [
+        'label' => 'Dienste Uebersicht',
         'content' => $twig->render('dienste_uebersicht.twig.html')
     ];
 }
@@ -74,3 +74,4 @@ echo $twig->render(
         'tabs' => $tabs
     ]
 );
+
