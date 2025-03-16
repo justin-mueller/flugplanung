@@ -24,9 +24,17 @@ SELECT
         ELSE NULL 
     END SEPARATOR ', '), '') AS Windenfahrer,
     NULLIF(GROUP_CONCAT(CASE 
-        WHEN m.windenfahrer = 0 THEN CONCAT(m.firstname, ' ', m.lastname) 
+        WHEN m.windenfahrer = 0 THEN CONCAT(m.firstname, ' ',  m.lastname) 
         ELSE NULL 
-    END SEPARATOR ', '), '') AS Startleiter
+    END SEPARATOR ', '), '') AS Startleiter,
+    NULLIF(GROUP_CONCAT(CASE 
+        WHEN m.windenfahrer = 1 THEN m.pilot_id
+        ELSE NULL
+    END SEPARATOR ', '), '') AS Windenfahrer_ids,
+    NULLIF(GROUP_CONCAT(CASE 
+        WHEN m.windenfahrer = 0 THEN m.pilot_id
+        ELSE NULL
+    END SEPARATOR ', '), '') AS Startleiter_ids
 FROM 
     mitglieder m
 LEFT JOIN 
@@ -37,6 +45,7 @@ GROUP BY
     d.flugtag
 ORDER BY 
     d.flugtag;
+
 
 ";
 
