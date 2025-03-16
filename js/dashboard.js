@@ -88,13 +88,18 @@ function populateDashboardHistory() {
         const activeDutiesCell_hist = `<td style="background-color: ${row.active_duties_count_history === 0 ? 'orange' : 'inherit'}">${row.active_duties_count_history}</td>`;
         const noDutiesCell_thisSeason = `<td style="background-color: ${row.duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.duties_count_thisyear}</td>`;
         const activeDutiesCell_thisSeason = `<td style="background-color: ${row.active_duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.active_duties_count_thisyear}</td>`;
-        const points = `<td style="background-color: ${row.duties_count_history+row.active_duties_count_history+row.duties_count_thisyear+row.active_duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.duties_count_history+row.active_duties_count_history+row.duties_count_thisyear+row.active_duties_count_thisyear}</td>`;
+        const activeFlyingDaysHistory = `<td style="background-color: ${row.active_flying_days_history === 0 ? 'green' : 'orange'}">${row.active_flying_days_history}</td>`;
+
+        // Calculate points (fixing activeFlyingDaysHistory usage)
+        const points = `<td style="background-color: ${row.duties_count_history + row.active_duties_count_history + row.duties_count_thisyear + row.active_duties_count_thisyear - row.active_flying_days_history * 0.2 <= 0 ? 'orange' : 'inherit'}">
+                        ${row.duties_count_history + row.active_duties_count_history + row.duties_count_thisyear + row.active_duties_count_thisyear - row.active_flying_days_history * 0.2}</td>`;
 
         // Add cells to the row
-        tr.innerHTML = firstnameCell  + noDutiesCell_hist + activeDutiesCell_hist + noDutiesCell_thisSeason + activeDutiesCell_thisSeason + points
+        tr.innerHTML = firstnameCell + noDutiesCell_hist + activeDutiesCell_hist + noDutiesCell_thisSeason + activeDutiesCell_thisSeason + activeFlyingDaysHistory + points;
         tbody.appendChild(tr);
     });
 }
+
 
 function extractNumericId(name) {
     const matches = name.match(/\d+/);
