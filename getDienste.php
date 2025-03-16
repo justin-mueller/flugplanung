@@ -1,0 +1,57 @@
+<?php
+
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+Helper::loadConfiguration();
+Helper::checkLogin();
+Database::connect();
+
+$allPilots = [['error']];
+
+// Check if startDate and endDate are provided
+$startDate = $_GET['startDate'] ?? null;
+$endDate = $_GET['endDate'] ?? null;
+
+$sql = "
+
+SELECT
+    d.flugtag,
+    NULLIF(GROUP_CONCAT(CASE 
+        WHEN m.windenfahrer = 1 THEN CONCAT(m.firstname, ' ', m.lastname) 
+        ELSE NULL 
+    END SEPARATOR ', '), '') AS Windenfahrer,
+    NULLIF(GROUP_CONCAT(CASE 
+        WHEN m.windenfahrer = 0 THEN CONCAT(m.firstname, ' ', m.lastname) 
+        ELSE NULL 
+    END SEPARATOR ', '), '') AS Startleiter
+FROM 
+    mitglieder m
+LEFT JOIN 
+    dienste d ON m.pilot_id = d.pilot_id
+WHERE 
+    m.verein = :clubId
+GROUP BY 
+    d.flugtag
+ORDER BY 
+    d.flugtag;
+
+";
+
+if ($startDate && $endDate) {
+    $sql .= ' AND (mf.datum BETWEEN :startDate AND :endDate)';
+    $params = [
+        'startDate' => $startDate,
+        'endDate' => $endDate,
+        'clubId' => Helper::$configuration['clubId'],
+    ];
+} else {
+    $params = []; // No parameters needed if no date filter is applied
+}
+
+$result = Database::query($sql, $params);
+
+header('Content-Type: application/json');
+echo json_encode($result ?: [], JSON_THROW_ON_ERROR);

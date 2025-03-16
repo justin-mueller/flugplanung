@@ -19,6 +19,7 @@ $(document).ready(function () {
     getUserWuensche();
   }
   getDashboardData();
+  getDienste();
 
   $("[id^=list_fist_choice]").on("click", function (e) {
     if (!$(this).hasClass("active"))

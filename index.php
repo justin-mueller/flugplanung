@@ -41,9 +41,9 @@ if ($mitgliederData['vereinId'] === Helper::$configuration['clubId']) {
 }
 
 if ($mitgliederData['dienste_admin']) {
-    $tabs['dienste'] = [
-        'label' => 'Dienste',
-        'content' => $twig->render('dienste.twig.html')
+    $tabs['dienste_planung'] = [
+        'label' => 'Dienste Planung',
+        'content' => $twig->render('dienste_planung.twig.html')
     ];
     $tabs['flugtage'] = [
         'label' => 'Flugtage',

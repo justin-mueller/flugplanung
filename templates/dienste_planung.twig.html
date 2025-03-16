@@ -1,0 +1,38 @@
+{% include('partials/saison.twig.html') %}
+
+<div class="row">
+	<div class="col-md-6">
+
+		<div class="accordion">
+			<table id="diensteHistory" class="table table-striped">
+				<thead>
+					<tr>
+						<th>Nameth>
+						<th>Dienste<br>eingetragen<br>&#60;2025</th>
+						<th>Davon an Flugtagen<br>mit Betrieb<br>&#60;2025</th>
+						<th>Dienste<br>eingetragen<br>2025</th>
+						<th>Davon an Flugtagen<br>mit Betrieb<br>2025</th>
+						<th>Gesamtpunkte</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+
+
+
+	</div>
+
+	<div class="col-md-6">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Date</th>
+	
+				</tr>
+			</thead>
+			<tbody id="table-body-dashboard"></tbody>
+		</table>
+		<button class="btn btn-primary ui-button" id="saveButton" onclick="saveDienste()">Speichern</button>
+	</div>
+</div>
