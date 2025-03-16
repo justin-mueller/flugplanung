@@ -15,45 +15,58 @@ $allPilots = [['error']];
 $startDate = $_GET['startDate'] ?? null;
 $endDate = $_GET['endDate'] ?? null;
 
-$sql = "
+$sql = "SELECT
+m.pilot_id,
+m.firstname,
+m.lastname,
+-- Historical Counts
+(SELECT COUNT(d.pilot_id)
+ FROM dienste d
+ LEFT JOIN flugtage mf ON mf.datum = d.flugtag
+ WHERE d.pilot_id = m.pilot_id
+   AND mf.datum < DATE_FORMAT(CURDATE(), '%Y-01-01')
+   AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
+) AS active_duties_count_history,
 
-SELECT
-    m.pilot_id,
-    m.firstname,
-    m.lastname,
-    -- Historical Counts
-    COUNT(CASE 
-        WHEN mf.datum < DATE_FORMAT(CURDATE(), '%Y-01-01') 
-             AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1) 
-        THEN d.pilot_id 
-        END) AS active_duties_count_history,
-    COUNT(CASE 
-        WHEN mf.datum < DATE_FORMAT(CURDATE(), '%Y-01-01') 
-        THEN d.pilot_id 
-        END) AS duties_count_history,
-    -- Current Year Counts
-    COUNT(CASE 
-        WHEN mf.datum >= DATE_FORMAT(CURDATE(), '%Y-01-01') 
-             AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1) 
-        THEN d.pilot_id 
-        END) AS active_duties_count_thisyear,
-    COUNT(CASE 
-        WHEN mf.datum >= DATE_FORMAT(CURDATE(), '%Y-01-01') 
-        THEN d.pilot_id 
-        END) AS duties_count_thisyear
-FROM 
-    mitglieder m
-LEFT JOIN 
-    dienste d ON m.pilot_id = d.pilot_id
-LEFT JOIN 
-    flugtage mf ON mf.datum = d.flugtag
+(SELECT COUNT( d.pilot_id)
+ FROM dienste d
+ LEFT JOIN flugtage mf ON mf.datum = d.flugtag
+ WHERE d.pilot_id = m.pilot_id
+   AND mf.datum < DATE_FORMAT(CURDATE(), '%Y-01-01')
+) AS duties_count_history,
+
+-- Current Year Counts
+(SELECT COUNT( d.pilot_id)
+ FROM dienste d
+ LEFT JOIN flugtage mf ON mf.datum = d.flugtag
+ WHERE d.pilot_id = m.pilot_id
+   AND mf.datum >= DATE_FORMAT(CURDATE(), '%Y-01-01')
+   AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
+) AS active_duties_count_thisyear,
+
+(SELECT COUNT( d.pilot_id)
+ FROM dienste d
+ LEFT JOIN flugtage mf ON mf.datum = d.flugtag
+ WHERE d.pilot_id = m.pilot_id
+   AND mf.datum >= DATE_FORMAT(CURDATE(), '%Y-01-01')
+) AS duties_count_thisyear,
+
+-- Active Flying Days History
+-- Active Flying Days History
+(SELECT COUNT(tp.pilot_id)
+FROM tagesplanung tp
+LEFT JOIN flugtage mf ON mf.datum = tp.flugtag
+WHERE tp.pilot_id = m.pilot_id
+AND tp.flugtag < DATE_FORMAT(CURDATE(), '%Y-01-01')
+AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
+AND (tp.flugtag = mf.datum OR tp.flugtag IS NULL)
+) AS active_flying_days_history
+
+
+FROM
+mitglieder m
 WHERE 
-    m.verein = :clubId
-GROUP BY 
-    m.pilot_id,
-    m.firstname,
-    m.lastname;
-
+    m.verein = :clubId;
 ";
 
 if ($startDate && $endDate) {
