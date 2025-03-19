@@ -69,10 +69,18 @@ function getDashboardData() {
         console.error('Dashboard Daten konnten nicht geladen werden:', status, error);
     });
 }
-
 function populateDashboardHistory() {
-    console.log("history")
-    console.log(dashboardDataHistory)
+    console.log("history");
+    console.log(dashboardDataHistory);
+
+    // Add the sum to each row and calculate points
+    dashboardDataHistory.forEach(row => {
+        row.sum = row.duties_count_history + row.active_duties_count_history + row.duties_count_thisyear + row.active_duties_count_thisyear - row.active_flying_days_history * 0.2;
+    });
+
+    // Sort the data by the sum (ascending)
+    dashboardDataHistory.sort((a, b) => a.sum - b.sum);
+
     const tbody = document.querySelector('#diensteHistory tbody');
     tbody.innerHTML = ''; // Clear the table body
 
@@ -90,9 +98,8 @@ function populateDashboardHistory() {
         const activeDutiesCell_thisSeason = `<td style="background-color: ${row.active_duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.active_duties_count_thisyear}</td>`;
         const activeFlyingDaysHistory = `<td style="background-color: ${row.active_flying_days_history === 0 ? 'green' : 'orange'}">${row.active_flying_days_history}</td>`;
 
-        // Calculate points (fixing activeFlyingDaysHistory usage)
-        const points = `<td style="background-color: ${row.duties_count_history + row.active_duties_count_history + row.duties_count_thisyear + row.active_duties_count_thisyear - row.active_flying_days_history * 0.2 <= 0 ? 'orange' : 'inherit'}">
-                        ${row.duties_count_history + row.active_duties_count_history + row.duties_count_thisyear + row.active_duties_count_thisyear - row.active_flying_days_history * 0.2}</td>`;
+        // Calculate points using the new sum
+        const points = `<td style="background-color: ${row.sum <= 0 ? 'orange' : 'inherit'}">${row.sum}</td>`;
 
         // Add cells to the row
         tr.innerHTML = firstnameCell + noDutiesCell_hist + activeDutiesCell_hist + noDutiesCell_thisSeason + activeDutiesCell_thisSeason + activeFlyingDaysHistory + points;
@@ -381,6 +388,7 @@ function saveDienste() {
                             data: dataObject
                         })
                             .done(data => {
+                                console.log('Dienste saved:', data);
 
                             })
                             .fail((xhr, status, error) => {

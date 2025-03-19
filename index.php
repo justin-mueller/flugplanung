@@ -41,13 +41,20 @@ if ($mitgliederData['vereinId'] === Helper::$configuration['clubId']) {
 }
 
 if ($mitgliederData['dienste_admin']) {
-    $tabs['dienste'] = [
-        'label' => 'Dienste',
-        'content' => $twig->render('dienste.twig.html')
+    $tabs['dienste_planung'] = [
+        'label' => 'Dienste Planung',
+        'content' => $twig->render('dienste_planung.twig.html')
     ];
     $tabs['flugtage'] = [
         'label' => 'Flugtage',
         'content' => $twig->render('flugtage.twig.html')
+    ];
+}
+
+if ($mitgliederData['vereinId'] === Helper::$configuration['clubId']) {
+    $tabs['dienste_uebersicht'] = [
+        'label' => 'Dienste',
+        'content' => $twig->render('dienste_uebersicht.twig.html')
     ];
 }
 
@@ -67,3 +74,4 @@ echo $twig->render(
         'tabs' => $tabs
     ]
 );
+
