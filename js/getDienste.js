@@ -9,7 +9,7 @@ function getDienste() {
         url: 'getDienste.php',
         type: 'GET',
         dataType: 'json',
-        data: { startDate: startDate, endDate: endDate }
+        data: { startDate: startDate, endDate: endDate, year: saisonJahr }
     })
         .then(function (data) {
 

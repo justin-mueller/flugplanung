@@ -9,12 +9,19 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
+if (!isset($_GET['year']) || !filter_var($_GET['year'], FILTER_VALIDATE_INT)) {
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Invalid year parameter'], JSON_THROW_ON_ERROR);
+    exit;
+}
+
+
 $allPilots = [['error']];
 
 // Check if startDate and endDate are provided
 $startDate = $_GET['startDate'] ?? null;
 $endDate = $_GET['endDate'] ?? null;
-
+$year = $_GET['year'] ?? null;
 $sql = "
 
 SELECT
@@ -41,6 +48,7 @@ LEFT JOIN
     dienste d ON m.pilot_id = d.pilot_id
 WHERE 
     m.verein = :clubId
+    AND YEAR(d.flugtag) = :year
 GROUP BY 
     d.flugtag
 ORDER BY 
@@ -52,6 +60,7 @@ ORDER BY
 if ($startDate && $endDate) {
     $sql .= ' AND (mf.datum BETWEEN :startDate AND :endDate)';
     $params = [
+        'year' => $_GET['year'],
         'startDate' => $startDate,
         'endDate' => $endDate,
         'clubId' => Helper::$configuration['clubId'],
