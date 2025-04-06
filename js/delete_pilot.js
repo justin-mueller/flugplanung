@@ -8,7 +8,7 @@ function delete_pilot() {
 		url: 'delete_pilot.php',
 		type: 'POST',
 		dataType: 'json',
-		data: { pilotid_delete: pilotid_delete },
+		data: { pilotid_delete: pilotid_delete, flugtag: flugtag_formatted },
 
 		success: function () {
 			getFlugtag(); // reload the data from the database
