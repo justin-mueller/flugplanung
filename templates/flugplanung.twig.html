@@ -42,12 +42,12 @@
 <div class="row" id="eintraege">
 	<div class="col-6 mb-3">
 		<button type="button" class="btn btn-primary ui-button d-none" data-bs-toggle="modal"
-			data-bs-target="#exampleModal" id="btn_enter">
+			data-bs-target="#enterModal" id="btn_enter">
 			Eintragen
 		</button>
 
 		<button type="button" class="btn btn-warning mb-3 ui-button d-none" data-bs-toggle="modal"
-			data-bs-target="#exampleModal" id="btn_update">
+			data-bs-target="#enterModal" id="btn_update">
 			Eintrag Ändern
 		</button>
 
@@ -149,7 +149,7 @@
 							</div>
 							<div class="form-outline">
 								<textarea class="form-control" id="chatboxMessage" rows="4" maxlength="255"></textarea>
-								<label class="form-label" for="textAreaExample">Nachricht</label>
+								<label class="form-label" for="chatboxMessage">Nachricht</label>
 							</div>
 							<button type="button" class="btn btn-outline-secondary ui-button mb-2" onclick="enterChatboxMessage(true)">
 								Senden
@@ -161,7 +161,7 @@
 		</div>
 
 		<div class="row mt-3 mb-3">
-			<div class="accordion" id="accordionExample">
+			<div class="accordion" id="helpAccordion">
 				<div class="accordion-item">
 					<h2 class="accordion-header" id="headingOne">
 						<button class="accordion-button" type="button" data-bs-toggle="collapse"
@@ -170,7 +170,7 @@
 						</button>
 					</h2>
 					<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
-						data-bs-parent="#accordionExample">
+						data-bs-parent="#helpAccordion">
 						<div class="accordion-body">
 							<strong>Willkommen zur neuen Flugplanung!</strong><br>Du hast ggf. noch einige Fragen. Im
 							Prinzip ist alles wie vorher.
@@ -194,11 +194,11 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="enterModal" tabindex="-1" aria-labelledby="enterModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="exampleModalLabel">Eintragen für Flugtag</h1>
+				<h1 class="modal-title fs-5" id="enterModalLabel">Eintragen für Flugtag</h1>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 
