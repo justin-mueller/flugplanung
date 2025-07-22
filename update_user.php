@@ -35,7 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $passwordString = '';
     }
 
-    $emailString = empty($_POST['email']) ? '' : ', email = :email';
+    $emailString = '';
+    if (!empty($_POST['email'])) {
+        $emailString = ', email = :email';
+        $params['email'] = $_POST['email'];
+    }
 
     $updateQuery = 'UPDATE mitglieder SET 
     firstname = :vorname ,
