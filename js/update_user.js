@@ -4,11 +4,11 @@ $(document).ready(function () {
     event.preventDefault();
 
     $("#update-error").addClass("d-none");
-    if( $("#password").val() !== '' && $("#password_conirm").val() !== $("#password").val()) {
+    if( $("#password").val() !== '' && $("#password_confirm").val() !== $("#password").val()) {
         $("#update-error").removeClass("d-none");
         $("#update-error").html("Die Passwörter stimmen nicht überein!");
         return;
-       }
+    }
 
     var formDataArray = $(this).serializeArray();
 
