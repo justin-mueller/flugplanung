@@ -17,12 +17,12 @@ function getWeekendDays() {
 }
 
 
-function loadFlugtage(init) {
+function loadFlugtage(init, fullYear = false) {
 
-	let startDate = formatDateString(saisonStartDate);
-	let endDate = formatDateString(saisonEndDate);
+	let startDate = fullYear ? saisonJahr + '-01-01' : formatDateString(saisonStartDate);
+	let endDate = fullYear ? saisonJahr + '-12-31' : formatDateString(saisonEndDate);
 
-	$.ajax({
+	$.ajax({	
 		url: 'fetch_flugtage.php',
 		type: 'GET',
 		data: { startDate: startDate, endDate: endDate },
@@ -36,6 +36,7 @@ function loadFlugtage(init) {
 
 			//Fill Datepicker
 			let highlightedDates = new Set(FlugtageRaw.map(item => new Date(item.datum).toDateString()));
+			debugger
 
 			$('.date').datepicker({
 				language: 'de',
@@ -79,7 +80,6 @@ function loadFlugtage(init) {
 			populateFlugtageTable(Flugtage);
 
 			if (init) {
-
 
 				let startFlugtag = new Date();
 				const checkTime = new Date();

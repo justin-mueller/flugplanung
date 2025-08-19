@@ -1,7 +1,7 @@
 $(document).ready(function () {
 
 
-	loadFlugtage(true);
+	loadFlugtage(true, true);
 
 
   $("#flugtag").on("change", function () {
