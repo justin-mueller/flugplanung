@@ -36,7 +36,6 @@ function loadFlugtage(init, fullYear = false) {
 
 			//Fill Datepicker
 			let highlightedDates = new Set(FlugtageRaw.map(item => new Date(item.datum).toDateString()));
-			debugger
 
 			$('.date').datepicker({
 				language: 'de',
@@ -157,7 +156,7 @@ function deleteFlugtage(datum) {
 
 function enterSingleFlugtag() {
 	let date = $('#additional_flugtag').val()
-	date = calc_flugtag_date(date)
+	date = dateToSQLFormat(parseDateStringWithGermanMonth(date))
 	insertFlugtag([date])
 }
 
