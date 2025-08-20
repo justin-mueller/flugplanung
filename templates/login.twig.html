@@ -103,13 +103,22 @@
                     Login
                   </button>
 
-                  <p class="small mb-5 pb-lg-2">
-                    <a class="text-muted" href="#!" onclick="forgotPassword()">Passwort vergessen?</a>
-                  </p>
                   {% if error %}
                   <div class="alert alert-danger" role="alert">{{ error }}</div>
                   {% endif %}
                 </form>
+
+                
+                <p class="small mb-5 pb-lg-2"><a class="text-muted" href="#!"
+
+                  onclick="forgotPassword()">Passwort vergessen?</a></p>
+
+                  <form action="send_password_reset_mail.php" method="post">
+                    <label for="email">Enter your email:</label>
+                    <input type="email" id="email" name="email" required>
+                    <button type="submit">Reset Password</button>
+                  </form>
+                  
 
                 <hr class="my-4" />
 
