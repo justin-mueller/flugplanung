@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($user) {
             $userId = $user['pilot_id'];
             $token  = bin2hex(random_bytes(50)); // secure random token
+            $tokenHash  = hash('sha256', $token); // store this in DB
 
             // Store the token in DB with expiration (30 min)
             $expires = date("Y-m-d H:i:s", time() + 1800);
@@ -34,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     VALUES (:pilot_id, :token, :expires)';
             Database::query($sql, [
                 'pilot_id' => $userId,
-                'token'    => $token,
+                'token'    => $tokenHash,
                 'expires'  => $expires
             ]);
 
@@ -56,9 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ->text("Click the link below to reset your password:\n\n" . $resetLink);
 
             $mailer->send($emailMessage);*/
-
-
-
 
             $emailsDir = __DIR__ . '/mails';
             if (!is_dir($emailsDir)) mkdir($emailsDir, 0777, true);
