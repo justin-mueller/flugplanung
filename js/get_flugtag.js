@@ -220,7 +220,20 @@ function getFlugtag() {
 
 			updateCountdown();
 
+			isFlugtag = FlugtageRaw.find((item) => item.datum === flugtag_formatted) ? true : false; 
 
+			if (isFlugtag) {
+
+				if( User_Information.vereinId == localClubId && (User_Information.pilot_id != startleiter_official || User_Information.pilot_id != windenfahrer_official )) {
+					$('#take_over_duty').removeClass('d-none');
+					$('#take_over_duty_text').html("Ich möchte den Dienst als " +  (User_Information.windenfahrer == 0 ? "Startleiter" : "Windenfahrer") + 	" für diesen Tag übernehmen:");
+				}
+				
+				$('#no_official_flugtag').addClass('d-none');
+			} else {
+				$('#take_over_duty').addClass('d-none');
+				$('#no_official_flugtag').removeClass('d-none');
+			}
 		},
 
 		error: function (xhr, status, error) {
@@ -252,6 +265,9 @@ function getFlugtag() {
 			if (Active_User_Is_Windenfahrer) {
 				$('#btn_enter').addClass('d-none');
 			}
+
+
+			
 		}
 	});
 }

@@ -16,6 +16,7 @@
 
 
 <div class="row">
+	<h1>Branch Take over Duty</h1>
 	<div class="col-12 mb-3">
 		<div class="table-responsive">
 			<table class="table table-hover table-bordered" id="tagesplanung">
@@ -55,6 +56,7 @@
 			Austragen
 		</button>
 	</div>
+
 </div>
 
 <div class="row  d-none" id="flugbetriebAusrufen">
@@ -247,6 +249,14 @@
 
 				</form>
 
+				<div id="take_over_duty" class="d-none">
+					<p id="take_over_duty_text"></p>
+					<button type="button"  class="btn btn-outline-warning ui-button mb-4" onclick="enterDienst()">Dienst übernehmen</button>
+				</div>
+
+				<div id="no_official_flugtag" class="alert alert-warning d-flex align-items-center mt-3 mb-3 d-none">
+					Dieser Flugtag ist noch nicht offiziell eingetragen!
+				</div>
 
 				<div class="modal-footer">
 					<button type="button" class="btn btn-outline-warning ui-button"
@@ -255,7 +265,9 @@
 						data-bs-dismiss="modal">Absenden</button>
 
 				</div>
+
 			</div>
 		</div>
 	</div>
 </div>
+
