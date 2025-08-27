@@ -91,17 +91,20 @@ function updateCountdown() {
     const timeDifference = flugtag_deadline - now;
 
     // Check if the countdown has finished
-    if (timeDifference < 0) {
-        clearInterval(intervalId); // Clear the interval using the interval ID
-        document.getElementById('countdown').innerHTML = "Warten auf Entscheidung vom Startleiter...";
-    } else {
-        // Calculate remaining time components
-        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+    const countdownElement = document.getElementById('countdown');
+    if (countdownElement) {
+        if (timeDifference < 0) {
+            clearInterval(intervalId); // Clear the interval using the interval ID
+            countdownElement.innerHTML = "Warten auf Entscheidung vom Startleiter...";
+        } else {
+            // Calculate remaining time components
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
-        // Display the remaining time
-		document.getElementById('countdown').innerHTML = `Zeit bis Entscheidung (20 Uhr Vortrag): <strong>${days} Tage, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</strong>`;
+            // Display the remaining time
+            countdownElement.innerHTML = `Zeit bis Entscheidung (20 Uhr Vortrag): <strong>${days} Tage, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</strong>`;
+        }
     }
 }

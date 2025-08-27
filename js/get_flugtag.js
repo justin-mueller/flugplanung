@@ -191,49 +191,59 @@ function getFlugtag() {
 
 			}
 
-			if (min_pilot_amount_reached) {
-
-
-				$('#minpilotreached').html(
-					'<div style="display: flex; align-items: center;">' +
-						'<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">' +
-							'<use xlink:href="img/warning.svg#warning-fill"/>' +
-						'</svg>' +
-						'<div style="margin-left: 5px;">Es ist Flugbetrieb möglich in: ' + possible_areas_sliced + '</div>' +
-					'</div>' +
-					'<div id="countdown"></div>'
-
-				);
-			} else {
-				$('#minpilotreached').html(
-					'<div style="display: flex; align-items: center;">' +
-						'<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:">' +
-							'<use xlink:href="img/warning.svg#warning-fill"/>' +
-						'</svg>' +
-						'<div style="margin-left: 5px;">Aktuell wird die Mindestanzahl von 3 Vereinsmitgliedern in keinem Fluggebiet erreicht!</div>' +
-					'</div>' +
-					'<div id="countdown"></div>'
-				);
-			}
-
-			if (FlugbetriebAbgesagt) $('#minpilotreached').addClass('d-none');
-
-			updateCountdown();
-
 			isFlugtag = FlugtageRaw.find((item) => item.datum === flugtag_formatted) ? true : false; 
-
+			
+			/*banner_aufbau
+			minpilotreached
+			no_official_flugtag
+			abgesagt
+			*/
 			if (isFlugtag) {
+
+				$('#no_official_flugtag').addClass('d-none');
+				$('#minpilotreached').removeClass('d-none');
+				
 
 				if( User_Information.vereinId == localClubId && (User_Information.pilot_id != startleiter_official || User_Information.pilot_id != windenfahrer_official )) {
 					$('#take_over_duty').removeClass('d-none');
 					$('#take_over_duty_text').html("Ich möchte den Dienst als " +  (User_Information.windenfahrer == 0 ? "Startleiter" : "Windenfahrer") + 	" für diesen Tag übernehmen:");
 				}
-				
-				$('#no_official_flugtag').addClass('d-none');
+			
+				if (min_pilot_amount_reached) {
+
+					
+
+					$('#minpilotreached').html(
+						'<div style="display: flex; align-items: center;">' +
+							'<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">' +
+								'<use xlink:href="img/warning.svg#warning-fill"/>' +
+							'</svg>' +
+							'<div style="margin-left: 5px;">Es ist Flugbetrieb möglich in: ' + possible_areas_sliced + '</div>' +
+						'</div>' +
+						'<div id="countdown"></div>'
+
+					);
+				} else {
+					$('#minpilotreached').html(
+						'<div style="display: flex; align-items: center;">' +
+							'<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:">' +
+								'<use xlink:href="img/warning.svg#warning-fill"/>' +
+							'</svg>' +
+							'<div style="margin-left: 5px;">Aktuell wird die Mindestanzahl von 3 Vereinsmitgliedern in keinem Fluggebiet erreicht!</div>' +
+						'</div>' +
+						'<div id="countdown"></div>'
+					);
+				}
+
+				if (FlugbetriebAbgesagt) $('#minpilotreached').addClass('d-none');
+
 			} else {
-				$('#take_over_duty').addClass('d-none');
 				$('#no_official_flugtag').removeClass('d-none');
+				$('#minpilotreached').addClass('d-none');
 			}
+
+			updateCountdown();
+	
 		},
 
 		error: function (xhr, status, error) {
