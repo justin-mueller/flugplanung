@@ -74,7 +74,8 @@ CREATE TABLE `mitglieder` (
   `dienste_admin` tinyint(1) DEFAULT 0,
   `password` varchar(64) DEFAULT NULL,
   `email` varchar(64) NOT NULL,
-  `avatar` smallint(6) NOT NULL DEFAULT 1
+  `avatar` smallint(6) NOT NULL DEFAULT 1,
+  `newsletter` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
