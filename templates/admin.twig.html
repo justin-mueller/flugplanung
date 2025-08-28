@@ -3,8 +3,18 @@
         <h5 class="card-title">Newsletter senden</h5>
     </div>
     <div class="card-body">
-        <p class="card-text">Gebe "ja ich bin mir sicher" ein, um den Newsletter (Datei: newsletter/newsletter.html) zu senden.</p>
-        <form action="sendNewsletter.php?key=dsfkjh33fdsdsdfd3fc32098fe" method="post">
+
+        <form action="sendNewsletter.php?key=dsfkjh33fdsdsdfd3fc32098fe&test=true" method="post">
+            <div class="input-group mb-3">
+                <div class="input-group-append">
+                    <p>Test geht nur an die Admin-Email</p>
+                    <button class="btn btn-primary" type="submit">Test Senden</button>
+                </div>
+            </div>
+        </form>
+
+        <p class="card-text">Gebe "ja ich bin mir sicher" ein, um den Newsletter (Datei: newsletter/newsletter.html) an alle User zu senden.</p>
+        <form action="sendNewsletter.php?key=dsfkjh33fdsdsdfd3fc32098fe&test=false" method="post">
             <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="ja ich bin mir sicher" aria-label="ja ich bin mir sicher" aria-describedby="basic-addon2" required
                     pattern="^ja ich bin mir sicher$"
@@ -14,6 +24,11 @@
                 </div>
             </div>
         </form>
+
+
+
     </div>
 </div>
+
+
 

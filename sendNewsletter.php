@@ -19,21 +19,26 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret) {
     exit("Forbidden");
 }
 
-
 Helper::loadConfiguration();
 Database::connect();
 
-
-// Configure transport (replace with your SMTP settings)
+// Configure transport
 $dsn = 'smtp://newsletter@hdgf.de:123456@s185.goserver.host:587';
 $transport = Transport::fromDsn($dsn);
 $mailer = new Mailer($transport);
 
-echo "Sending newsletter...\n";
 // Fetch newsletter subscribers
+$testing = $_GET['test'];
+
+echo "Sending newsletter with Test mode: " . ($testing ? "true" : "false");
+
 $sql = "SELECT email, firstname, lastname 
         FROM mitglieder 
-        WHERE newsletter = 1 AND email = 'register@simulux.de' ";
+        WHERE newsletter = 1";
+if ($testing) {
+    $sql .= " AND email = 'register@simulux.de' ";
+}
+
 $recipients = Database::query($sql, []);
 
 // Load newsletter file
@@ -55,7 +60,7 @@ foreach ($lines as $line) {
     }
 }
 
-// If .eml has headers + body separated by a blank line
+// If headers + body separated by a blank line
 $parts = preg_split("/\R\R/", $emailContent, 2);
 if (count($parts) === 2) {
     $body = $parts[1]; // just the body part
@@ -71,6 +76,12 @@ foreach ($recipients as $recipient) {
         $body
     );
 
+    $personalizedBody = str_replace(
+        '<p>Hallo!<br><br>',
+        "<p>Hallo {$recipient['firstname']}!<br><br>",
+        $personalizedBody
+    );
+
     $email = (new Email())
         ->from('Newsletter <newsletter@hdgf.de>')
         ->to($to)
@@ -84,3 +95,4 @@ foreach ($recipients as $recipient) {
         echo "Failed to send to {$to}: " . $e->getMessage() . "\n";
     }
 }
+
