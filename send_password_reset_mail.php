@@ -45,24 +45,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // --- MAILER SETUP ---
             // Save mails into local folder /mails for testing
             // (they will be .eml files you can open in any mail client)
-
-            /*
-            $transport = Transport::fromDsn('smtp://null'); // disables real sending
+            
+            $dsn = 'smtp://no-reply@hdgf.de:8uI43Oqqhjx1hvjA@s185.goserver.host:587';
+            $transport = Transport::fromDsn($dsn);
             $mailer = new Mailer($transport);
 
             $emailMessage = (new Email())
-                ->from('no-reply@hdgf.de.com')
+                ->from('no-reply@hdgf.de')
                 ->to($email)
                 ->subject('Password Reset Request')
-                ->text("Click the link below to reset your password:\n\n" . $resetLink);
+                ->text("Bitte auf diesen Link gehen, um das Passwort zurueckzusetzen:\n\n" . $resetLink);
 
-            $mailer->send($emailMessage);*/
+            $mailer->send($emailMessage);
 
             $emailsDir = __DIR__ . '/mails';
             if (!is_dir($emailsDir)) mkdir($emailsDir, 0777, true);
 
-            $emailFile = $emailsDir . '/' . time() . '-' . md5($email) . '.txt';
-            file_put_contents($emailFile, "To: $email\nSubject: Password Reset Request\nFrom: no-reply@hdgf.de.com\n\nClick the link to reset your password:\n$resetLink");
+            //$emailFile = $emailsDir . '/' . time() . '-' . md5($email) . '.txt';
+            //file_put_contents($emailFile, "To: $email\nSubject: Password Reset Request\nFrom: no-reply@hdgf.de.com\n\nClick the link to reset your password:\n$resetLink");
 
             echo "If this email is registered, a password reset link has been saved to $emailFile";
 
