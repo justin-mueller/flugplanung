@@ -49,7 +49,12 @@ if ($mitgliederData['dienste_admin']) {
         'label' => 'Flugtage',
         'content' => $twig->render('flugtage.twig.html')
     ];
+    $tabs['admin'] = [
+        'label' => 'Admin',
+        'content' => $twig->render('admin.twig.html')
+    ];
 }
+
 
 if ($mitgliederData['vereinId'] === Helper::$configuration['clubId']) {
     $tabs['dienste_uebersicht'] = [

@@ -31,6 +31,13 @@ $(document).ready(function () {
       value: windenfahrerCheckbox.is(":checked") ? 1 : 0,
     });
 
+    var newsletterCheckbox = $("#newsletter");
+    formDataArray.push({
+      name: newsletterCheckbox.attr("name"),
+      value: newsletterCheckbox.is(":checked") ? 1 : 0,
+    });
+
+
     var formData = $.param(formDataArray);
 
     $.ajax({
