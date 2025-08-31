@@ -95,8 +95,8 @@ function getFlugtag() {
 					let new_record = (timestamp >= oneHourBack && timestamp <= now) ? '<span class="badge bg-info">Neu vor ' + time_ago + ' min</span>' : '';
 					let local_club_member = row.VereinId === localClubId;
 					let row_not_local_club_member = local_club_member ? '' : 'class="tr_no_hgdf"';
-					let ist_startleiter = row.Pilot_ID == startleiter_official ? '<span class="badge bg-success">SL Offiziell</span>' : '';
-					let windenfahrer_official_info = row.Pilot_ID == windenfahrer_official ? '<span class="badge bg-success">WF Offiziell</span>' : '';
+					let ist_startleiter = row.Pilot_ID == startleiter_official ? '<span class="badge bg-warning">SL Offiziell</span>' : '';
+					let windenfahrer_official_info = row.Pilot_ID == windenfahrer_official ? '<span class="badge bg-warning">WF Offiziell</span>' : '';
 					let windenfahrer_info = (row.ist_windenfahrer == 1 && row.Pilot_ID != windenfahrer_official) ? '<span class="badge bg-primary">WF</span>' : '';
 					var newRow = $('<tr ' + row_not_local_club_member + '>');
 					let fluggerateIMG = row.fluggeraet.includes('G') ? replaceValueWithImage('G') : ''
@@ -139,7 +139,7 @@ function getFlugtag() {
 
 
 				var legendRow = $('<tr>');
-				legendRow.append('<td colspan="6" style="font-size: small">Abstimmung = <img src="img/stern_fav.svg" class="table-image"></strong> Relevant für die Entscheidung des Haupt-Fluggebiets<br>Piloten maximal = <img src="img/stern_fav.svg" class="table-image"> + <img src="img/stern.svg" class="table-image"> wenn Betrieb nur in diesem Fluggebiet stattfindet<br><span class="badge bg-success">SL Offiziell</span> = Offizieller Startleiter für den Tag<br><span class="badge bg-success">WF Offiziell</span> = Offizieller Windenfahrer für den Tag<br><span class="badge bg-primary">WF</span> = Hat einen Windenfahrerschein</td>');
+				legendRow.append('<td colspan="6" style="font-size: small">Abstimmung = <img src="img/stern_fav.svg" class="table-image"></strong> Relevant für die Entscheidung des Haupt-Fluggebiets<br>Piloten maximal = <img src="img/stern_fav.svg" class="table-image"> + <img src="img/stern.svg" class="table-image"> wenn Betrieb nur in diesem Fluggebiet stattfindet<br><span class="badge bg-warning">SL Offiziell</span> = Offizieller Startleiter für den Tag<br><span class="badge bg-warning">WF Offiziell</span> = Offizieller Windenfahrer für den Tag<br><span class="badge bg-primary">WF</span> = Hat einen Windenfahrerschein</td>');
 				$('#tagesplanung tbody').append(legendRow);
 
 				User_Information.record_present = data.some(pilot => pilot.Pilot_ID === User_Information.pilot_id && (pilot.startleiter_official == "0" || pilot.startleiter_official == "") && (pilot.windenfahrer_official == "0" || pilot.windenfahrer_official == ""));
@@ -377,14 +377,4 @@ document.addEventListener('DOMContentLoaded', function() {
 			showReparaturenModal(fluggebiet);
 		}
 	});
-	
-	// Add hover event listeners for desktop
-	if (window.innerWidth > 768) {
-		document.addEventListener('mouseover', function(e) {
-			if (e.target.classList.contains('reparaturen-badge')) {
-				const fluggebiet = e.target.getAttribute('data-fluggebiet');
-				showReparaturenModal(fluggebiet);
-			}
-		});
-	}
 });
