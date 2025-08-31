@@ -1,0 +1,75 @@
+<div class="container-fluid mt-3">
+    <div class="table-responsive">
+        <table class="table table-striped table-sm align-middle" id="reparaturen-table">
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Fluggebiet</th>
+                    <th>Text</th>
+                    <th>Level</th>
+                    <th>gelöst (Kommentar)</th>
+                    <th>Status</th>
+                    <th>Aktion</th>
+                </tr>
+            </thead>
+            <tbody id="reparaturen-body">
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>
+                        <span class="text-muted">auto</span>
+                    </td>
+                    <td>
+                        <select class="form-select form-select-sm" id="rep-fluggebiet">
+                            <option value="HRP">HRP</option>
+                            <option value="NGL">NGL</option>
+                            <option value="AMD">AMD</option>
+                        </select>
+                    </td>
+                    <td>
+                        <textarea class="form-control form-control-sm" id="rep-text" rows="1" placeholder="Beschreibung des Problems"></textarea>
+                    </td>
+                    <td>
+                        <select class="form-select form-select-sm" id="rep-level">
+                            <option value="0">Geringfügig</option>
+                            <option value="1">Flugbetrieb nicht möglich</option>
+                        </select>
+                    </td>
+                    <td>
+                        <span class="text-muted">–</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-warning text-dark">offen</span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" id="rep-add-btn">
+                            Hinzufügen
+                        </button>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!-- Modal zur Bestätigung des Lösendes -->
+<div class="modal fade" id="repSolveModal" tabindex="-1" aria-labelledby="repSolveModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="repSolveModalLabel">Reparatur als gelöst markieren</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">Möchtest du den Eintrag <span id="rep-solve-key" class="fw-bold"></span> als "gelöst" markieren?</div>
+        <label for="rep-solved-text" class="form-label">Lösung/Kommentar</label>
+        <textarea class="form-control" id="rep-solved-text" rows="3" placeholder="Was wurde gemacht?"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+        <button type="button" class="btn btn-success" id="rep-confirm-solve-btn">Bestätigen</button>
+      </div>
+    </div>
+  </div>
+</div>
+

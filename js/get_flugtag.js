@@ -252,6 +252,9 @@ function getFlugtag() {
 			if (Active_User_Is_Windenfahrer) {
 				$('#btn_enter').addClass('d-none');
 			}
+			
+			// Load reparaturen counts after flugplanung data is loaded
+			loadReparaturenCounts();
 		}
 	});
 }
@@ -267,3 +270,121 @@ function replaceValueWithImage(value) {
 
 	return '<img src="img/' + value + '.png" class="table-image aircraft">';
 }
+
+// Reparaturen functionality
+let reparaturenData = {};
+
+function loadReparaturenCounts() {
+	$.ajax({
+		url: 'getReparaturenCounts.php',
+		type: 'GET',
+		success: function (data) {
+			reparaturenData = data;
+			updateReparaturenBadges();
+		},
+		error: function (xhr) {
+			console.log('Reparaturen counts could not be loaded');
+			console.log(xhr);
+		}
+	});
+}
+
+function updateReparaturenBadges() {
+	const fluggebiete = ['ngl', 'hrp', 'amd'];
+	
+	fluggebiete.forEach(function(fluggebiet) {
+		const fluggebietUpper = fluggebiet.toUpperCase();
+		const elementId = 'reparaturen-' + fluggebiet;
+		const element = document.getElementById(elementId);
+		
+		if (element && reparaturenData[fluggebietUpper]) {
+			const level0Count = reparaturenData[fluggebietUpper].level0.count;
+			const level1Count = reparaturenData[fluggebietUpper].level1.count;
+			
+			let badgesHtml = '';
+			
+			if (level0Count > 0) {
+				badgesHtml += `<span class="badge bg-warning reparaturen-badge" 
+					data-fluggebiet="${fluggebietUpper}" 
+					data-level="0" 
+					style="cursor: pointer; margin-right: 2px;">${level0Count}</span>`;
+			}
+			
+			if (level1Count > 0) {
+				badgesHtml += `<span class="badge bg-danger reparaturen-badge" 
+					data-fluggebiet="${fluggebietUpper}" 
+					data-level="1" 
+					style="cursor: pointer;">${level1Count}</span>`;
+			}
+			
+			element.innerHTML = badgesHtml;
+		}
+	});
+}
+
+function showReparaturenModal(fluggebiet) {
+	if (!reparaturenData[fluggebiet]) return;
+	
+	const level0Data = reparaturenData[fluggebiet].level0;
+	const level1Data = reparaturenData[fluggebiet].level1;
+	
+	let modalContent = '';
+	
+	// Level 0 (Geringfügig)
+	if (level0Data.count > 0) {
+		modalContent += '<div class="mb-3">';
+		modalContent += '<h6><span class="badge bg-warning">Geringfügig</span> (' + level0Data.count + ' Problem' + (level0Data.count > 1 ? 'e' : '') + ')</h6>';
+		modalContent += '<ul class="list-group list-group-flush">';
+		level0Data.texts.forEach(function(text) {
+			modalContent += '<li class="list-group-item">' + text + '</li>';
+		});
+		modalContent += '</ul>';
+		modalContent += '</div>';
+	}
+	
+	// Level 1 (Flugbetrieb nicht möglich)
+	if (level1Data.count > 0) {
+		modalContent += '<div class="mb-3">';
+		modalContent += '<h6><span class="badge bg-danger">Flugbetrieb nicht möglich</span> (' + level1Data.count + ' Problem' + (level1Data.count > 1 ? 'e' : '') + ')</h6>';
+		modalContent += '<ul class="list-group list-group-flush">';
+		level1Data.texts.forEach(function(text) {
+			modalContent += '<li class="list-group-item">' + text + '</li>';
+		});
+		modalContent += '</ul>';
+		modalContent += '</div>';
+	}
+	
+	if (modalContent === '') {
+		modalContent = '<p class="text-muted">Keine offenen Reparaturen vorhanden.</p>';
+	}
+	
+	document.getElementById('modal-fluggebiet').textContent = fluggebiet;
+	document.getElementById('reparaturen-modal-content').innerHTML = modalContent;
+	
+	const modal = new bootstrap.Modal(document.getElementById('reparaturenModal'));
+	modal.show();
+}
+
+// Add event listeners for reparaturen badges
+document.addEventListener('DOMContentLoaded', function() {
+	// Load reparaturen counts when page loads
+	loadReparaturenCounts();
+	
+	// Add click event listeners for reparaturen badges
+	document.addEventListener('click', function(e) {
+		if (e.target.classList.contains('reparaturen-badge')) {
+			const fluggebiet = e.target.getAttribute('data-fluggebiet');
+			showReparaturenModal(fluggebiet);
+		}
+	});
+	
+	// Add hover event listeners for desktop
+	if (window.innerWidth > 768) {
+		document.addEventListener('mouseover', function(e) {
+			if (e.target.classList.contains('reparaturen-badge')) {
+				const fluggebiet = e.target.getAttribute('data-fluggebiet');
+				showReparaturenModal(fluggebiet);
+			}
+		});
+	}
+});

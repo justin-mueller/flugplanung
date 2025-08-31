@@ -20,12 +20,12 @@
 		<div class="table-responsive">
 			<table class="table table-hover table-bordered" id="tagesplanung">
 				<thead>
-					<tr>
+					<tr style="vertical-align: top;">
 						<th>Pilot</th>
 						<th>Verein</th>
-						<th>NGL</th>
-						<th>HRP</th>
-						<th>AMD</th>
+						<th>NGL<br><span id="reparaturen-ngl" class="reparaturen-badges"></span></th>
+						<th>HRP<br><span id="reparaturen-hrp" class="reparaturen-badges"></span></th>
+						<th>AMD<br><span id="reparaturen-amd" class="reparaturen-badges"></span></th>
 						<th>Kommentar</th>
 					</tr>
 				</thead>
@@ -256,4 +256,24 @@
 			</div>
 		</div>
 	</div>
+</div>
+
+<!-- Modal for Reparaturen Details -->
+<div class="modal fade" id="reparaturenModal" tabindex="-1" aria-labelledby="reparaturenModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reparaturenModalLabel">Reparaturen - <span id="modal-fluggebiet"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="reparaturen-modal-content">
+          <!-- Content will be populated by JavaScript -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+      </div>
+    </div>
+  </div>
 </div>
