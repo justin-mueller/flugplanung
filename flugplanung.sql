@@ -171,7 +171,11 @@ CREATE TABLE `reparaturen` (
   `text` longtext NOT NULL,
   `level` tinyint(1) NOT NULL DEFAULT 0,
   `closed` tinyint(1) NOT NULL DEFAULT 0,
-  `solvedText` longtext DEFAULT NULL
+  `solvedText` longtext DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `closed_by` int(11) DEFAULT NULL,
+  `closed_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

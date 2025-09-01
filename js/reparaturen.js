@@ -7,6 +7,16 @@ function renderReparaturRow(entry) {
     const statusBadge = entry.closed == 1 ? '<span class="badge bg-success">gelöst</span>' : '<span class="badge bg-warning text-dark">offen</span>';
     const actionBtn = entry.closed == 1 ? '' : '<button class="btn btn-sm btn-outline-success rep-solve-btn">Als gelöst markieren</button>';
 
+    // Format dates
+    const createdDate = new Date(entry.created_at).toLocaleDateString('de-DE');
+    const closedDate = entry.closed_at ? new Date(entry.closed_at).toLocaleDateString('de-DE') : null;
+    
+    // Build user info string
+    let userInfo = `Erstellt von ${entry.created_by_name} am ${createdDate}`;
+    if (entry.closed_by_name && closedDate) {
+        userInfo += ` - Geschlossen von ${entry.closed_by_name} am ${closedDate}`;
+    }
+
     tr.innerHTML = `
         <td>${entry.key}</td>
         <td>${entry.fluggebiet}</td>
@@ -14,6 +24,7 @@ function renderReparaturRow(entry) {
         <td>${levelBadge}</td>
         <td>${entry.solvedText ? entry.solvedText : ''}</td>
         <td>${statusBadge}</td>
+        <td>${userInfo}</td>
         <td>${actionBtn}</td>
     `;
 
