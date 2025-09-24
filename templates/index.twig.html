@@ -50,6 +50,9 @@
 	<script src="{% cache_busting 'js/dashboard.js' %}"></script>
 	<script src="{% cache_busting 'js/getDienste.js' %}"></script>
 	<script src="{% cache_busting 'js/flugtage.js' %}"></script>
+	{% if mitgliederData.vereinId == clubId %}
+	<script src="{% cache_busting 'js/reparaturen.js' %}"></script>
+	{% endif %}
 </head>
 
 <body>
