@@ -40,6 +40,8 @@ function getFlugtag() {
 
 		success: function (data) {
 
+			flugtagData = data;
+
 			if (typeof(data) === 'object') {
 				console.log('Planung für den ' + flugtag_formatted + ' erfolgreich geladen:');
 				console.log(data);
@@ -111,6 +113,7 @@ function getFlugtag() {
 					newRow.append('<td>' + row.Kommentar + '</td>');
 
 					$('#tagesplanung tbody').append(newRow);
+
 				});
 
 
@@ -152,7 +155,7 @@ function getFlugtag() {
 					let Active_Pilot_Flugtag_Data = (data.filter(o => o.Pilot_ID == User_Information.pilot_id))[0];
 
 					$("#kommentar").val(Active_Pilot_Flugtag_Data.Kommentar)
-
+					$("#flugtag-zeit").val(Active_Pilot_Flugtag_Data.zeit ? Active_Pilot_Flugtag_Data.zeit.substring(0,5) : "");
 					Active_Pilot_Choices[0] = Active_Pilot_Flugtag_Data.NGL;
 					Active_Pilot_Choices[1] = Active_Pilot_Flugtag_Data.HRP;
 					Active_Pilot_Choices[2] = Active_Pilot_Flugtag_Data.AMD;
@@ -180,6 +183,7 @@ function getFlugtag() {
 				} else {
 
 					$("[id=list_fist_choice_1]").addClass("active");
+					$("#flugtag-zeit").val("");
 				}
 
 

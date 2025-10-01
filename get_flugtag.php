@@ -21,7 +21,8 @@ $sql = "SELECT
             '' AS Kommentar,
             '' AS timestamp,
             d.windenfahrer as windenfahrer_official,
-            d.startleiter as startleiter_official
+            d.startleiter as startleiter_official,
+            '' AS zeit
         FROM dienste d
         INNER JOIN mitglieder m ON d.pilot_id = m.pilot_id
         WHERE d.flugtag = :flugtag AND (d.startleiter = '1' OR d.windenfahrer = '1')
@@ -40,7 +41,8 @@ $sql = "SELECT
             Kommentar,
             timestamp,
             '' as windenfahrer_official,
-            '' as startleiter_official
+            '' as startleiter_official,
+            t.zeit
         FROM tagesplanung t
         INNER JOIN mitglieder m ON t.pilot_id = m.pilot_id
         WHERE flugtag = :flugtag";
@@ -52,6 +54,17 @@ if ($result !== false && $result !== []) {
     foreach ($result as $row) {
         $row['VereinId'] = (int)$row['VereinId'];
         $row['Verein'] = Helper::$configuration['clubs'][$row['VereinId']]['shortName'] ?: Helper::$configuration['clubs'][$row['VereinId']]['name'];
+
+        // Round 'zeit' to the nearest half-hour if it exists
+        if (!empty($row['zeit'])) {
+            $timeParts = explode(':', $row['zeit']);
+            $hours = (int)$timeParts[0];
+            $minutes = (int)$timeParts[1];
+            $roundedMinutes = ($minutes < 15) ? 0 : (($minutes < 45) ? 30 : 0);
+            $hours += ($minutes >= 45) ? 1 : 0;
+            $row['zeit'] = sprintf('%02d:%02d', $hours, $roundedMinutes);
+        }
+
         $data[] = $row;
     }
 } else {

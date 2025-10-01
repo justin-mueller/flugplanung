@@ -101,12 +101,13 @@ CREATE TABLE `flugtage` (
 
 CREATE TABLE `tagesplanung` (
   `pilot_id` int(11) NOT NULL,
-  `Kommentar` varchar(128) NOT NULL,
-  `NGL` int(11) NOT NULL,
-  `HRP` int(11) NOT NULL,
-  `AMD` int(11) NOT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `flugtag` date NOT NULL
+    `Kommentar` varchar(128) NOT NULL,
+    `NGL` int(11) NOT NULL,
+    `HRP` int(11) NOT NULL,
+    `AMD` int(11) NOT NULL,
+    `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+    `flugtag` date NOT NULL,
+    `zeit` time NOT NULL DEFAULT '11:00:00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

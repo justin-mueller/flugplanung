@@ -1,5 +1,6 @@
 var windenfahrer_official = null;
 var startleiter_official = null;
+var flugtagData = null;
 var flugtag_formatted = null;
 var flugtag_unformatted = null;
 var flugtag_deadline = null;
