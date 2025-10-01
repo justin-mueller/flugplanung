@@ -64,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             //$emailFile = $emailsDir . '/' . time() . '-' . md5($email) . '.txt';
             //file_put_contents($emailFile, "To: $email\nSubject: Password Reset Request\nFrom: no-reply@hdgf.de.com\n\nClick the link to reset your password:\n$resetLink");
 
-            echo "If this email is registered, a password reset link has been saved to $emailFile";
+            echo "If this email is registered, a password reset link has been saved to $email";
 
 
         }
