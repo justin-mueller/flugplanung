@@ -1,0 +1,6 @@
+To: a@a.de
+Subject: Password Reset Request
+From: no-reply@hdgf.de.com
+
+Click the link to reset your password:
+http://localhost/flugplanung/reset_password.php?token=b9c750c42bab8d2fdb11120fef51c5e01ac7d536c9c3edbcc5df43e0aee4b847fcfe4f12914b8284027538f50fd4cd7492d5
