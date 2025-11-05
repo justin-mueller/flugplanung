@@ -45,6 +45,6 @@ function openRegisterForm() {
 }
 
 function forgotPassword() {
-	$('#forgot-password-form').removeClass('d-none');
+	alert('Funktion ist noch in Arbeit. Bitte bei Justin melden!');
 }
 
