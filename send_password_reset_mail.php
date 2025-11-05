@@ -5,11 +5,16 @@ ini_set('display_errors', 1);
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+use AdrianSuter\TwigCacheBusting\CacheBusters\QueryParamCacheBuster;
+use AdrianSuter\TwigCacheBusting\CacheBustingTwigExtension;
+use AdrianSuter\TwigCacheBusting\HashGenerators\FileMD5HashGenerator;
 use JustinMueller\Flugplanung\Database;
 use JustinMueller\Flugplanung\Helper;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 // Load app configuration
 Helper::loadConfiguration();
@@ -40,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ]);
 
             // Build reset link (adjust domain!)
-            $resetLink = "http://localhost/flugplanung/reset_password.php?token=" . urlencode($token);
+            $resetLink = "http://www.hdgf.de/flugplanung/reset_password.php?token=" . urlencode($token);
 
             // --- MAILER SETUP ---
             // Save mails into local folder /mails for testing
@@ -53,8 +58,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $emailMessage = (new Email())
                 ->from('no-reply@hdgf.de')
                 ->to($email)
-                ->subject('Password Reset Request')
-                ->text("Bitte auf diesen Link gehen, um das Passwort zurueckzusetzen:\n\n" . $resetLink);
+                ->subject('Passwort zurücksetzen')
+                ->text("Bitte klicken Sie auf folgenden Link, um Ihr Passwort zurückzusetzen:\n\n" . $resetLink);
 
             $mailer->send($emailMessage);
 
@@ -63,15 +68,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             //$emailFile = $emailsDir . '/' . time() . '-' . md5($email) . '.txt';
             //file_put_contents($emailFile, "To: $email\nSubject: Password Reset Request\nFrom: no-reply@hdgf.de.com\n\nClick the link to reset your password:\n$resetLink");
-
-            echo "If this email is registered, a password reset link has been saved to $email! ";
-
-
         }
     }
 
+    // Set up Twig
+    $loader = new FilesystemLoader(__DIR__ . '/templates');
+    $twig = new Environment($loader);
+    $twig->addExtension(
+        CacheBustingTwigExtension::create(
+            new QueryParamCacheBuster(__DIR__, new FileMD5HashGenerator()),
+            Helper::$configuration['basePath']
+        )
+    );
+
     // Always same response (no email enumeration)
-    echo "If this email is registered, a password reset link has been sent.";
+    echo $twig->render('password_reset_sent.twig.html');
+    exit;
 }
 
 

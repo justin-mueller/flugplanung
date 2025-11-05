@@ -19,6 +19,8 @@ $token = urldecode($token = $_POST['token'] ?? $_GET['token'] ?? '');
 $tokenHash  = hash('sha256', $token);
 
 $tokenValid = false;
+$successMessage = null;
+$errorMessage = null;
 
 if ($token) {
     // Check if the token is valid and not expired
@@ -30,19 +32,24 @@ if ($token) {
     if ($tokenValid) {
         // Token is valid, the user can proceed to reset password
         $userId = $reset['pilot_id'];
-    } else {
-        echo 'Ungültiger oder abgelaufener Link.';
     }
-} else {
-    echo 'Kein Link angegeben.';
-} 
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tokenValid) {
 
+    $email = $_POST['email'] ?? '';
     $newPassword = $_POST['password'];
     $confirmPassword = $_POST['confirm_password'];
 
-    if ($newPassword === $confirmPassword) {
+    // Verify that the email matches the pilot_id from the token
+    $sql = 'SELECT email FROM mitglieder WHERE pilot_id = :pilot_id';
+    $user = current(Database::query($sql, ['pilot_id' => $userId]));
+
+    if (!$user || strtolower(trim($user['email'])) !== strtolower(trim($email))) {
+        $errorMessage = 'Die eingegebene E-Mail-Adresse stimmt nicht mit dem Zurücksetzungslink überein.';
+    } elseif ($newPassword !== $confirmPassword) {
+        $errorMessage = 'Passwörter stimmen nicht überein.';
+    } else {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
         // Update the user's password
@@ -51,11 +58,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tokenValid) {
 
         // Delete the reset token
         $sql = 'DELETE FROM password_resets WHERE token = :token';
-        Database::query($sql, ['token' => $token]);
+        Database::query($sql, ['token' => $tokenHash]);
 
-        echo "Ihr Passwort wurde erfolgreich zurückgesetzt.";
-    } else {
-        echo "Passwörter stimmen nicht überein.";
+        $successMessage = 'Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich jetzt mit Ihrem neuen Passwort anmelden.';
+        $tokenValid = false; // Hide the form after success
     }
 }
 
@@ -73,7 +79,9 @@ $twig->addExtension(
 // Render the form template with Twig, passing the token status
 echo $twig->render('reset_password.twig.html', [
     'tokenValid' => $tokenValid,
-    'token' => htmlspecialchars($token)
+    'token' => htmlspecialchars($token),
+    'successMessage' => $successMessage,
+    'errorMessage' => $errorMessage
 ]);
 
 ?>
