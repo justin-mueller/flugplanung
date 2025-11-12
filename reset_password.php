@@ -8,7 +8,6 @@ use JustinMueller\Flugplanung\Helper;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
-
 require_once __DIR__ . '/vendor/autoload.php';
 
 Helper::loadConfiguration();
@@ -23,9 +22,8 @@ $errorMessage = null;
 
 if ($token) {
     // Check if the token is valid and not expired
-
     $sql = 'SELECT * FROM password_resets WHERE token = :token AND expires >= :now';
-    $reset = current(Database::query($sql, ['token' => $tokenHash, 'now' => date("Y-m-d H:i:s")]));
+    $reset = current(Database::query($sql, ['token' => $tokenHash, 'now' => date('Y-m-d H:i:s')]));
 
     $tokenValid = !empty($reset);
     if ($tokenValid) {
@@ -35,7 +33,6 @@ if ($token) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tokenValid) {
-
     $email = $_POST['email'] ?? '';
     $newPassword = $_POST['password'];
     $confirmPassword = $_POST['confirm_password'];
@@ -73,7 +70,6 @@ $twig->addExtension(
         Helper::$configuration['basePath']
     )
 );
-
 
 // Render the form template with Twig, passing the token status
 echo $twig->render('reset_password.twig.html', [

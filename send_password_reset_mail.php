@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
-
 use AdrianSuter\TwigCacheBusting\CacheBusters\QueryParamCacheBuster;
 use AdrianSuter\TwigCacheBusting\CacheBustingTwigExtension;
 use AdrianSuter\TwigCacheBusting\HashGenerators\FileMD5HashGenerator;
@@ -13,10 +11,12 @@ use Symfony\Component\Mime\Email;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 // Load app configuration
 Helper::loadConfiguration();
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     Database::connect();
     $email = $_POST['email'] ?? null;
@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $tokenHash  = hash('sha256', $token); // store this in DB
 
             // Store the token in DB with expiration (30 min)
-            $expires = date("Y-m-d H:i:s", time() + 1800);
+            $expires = date('Y-m-d H:i:s', time() + 1800);
             $sql = 'INSERT INTO password_resets (pilot_id, token, expires) 
                     VALUES (:pilot_id, :token, :expires)';
             Database::query($sql, [
