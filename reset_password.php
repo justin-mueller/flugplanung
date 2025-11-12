@@ -13,7 +13,6 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 Helper::loadConfiguration();
 Database::connect();
-//session_start();
 
 $token = urldecode($token = $_POST['token'] ?? $_GET['token'] ?? '');
 $tokenHash  = hash('sha256', $token);
@@ -83,6 +82,3 @@ echo $twig->render('reset_password.twig.html', [
     'successMessage' => $successMessage,
     'errorMessage' => $errorMessage
 ]);
-
-?>
-

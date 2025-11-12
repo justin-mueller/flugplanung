@@ -1,7 +1,4 @@
 <?php
-// --- DEV ONLY: show PHP errors (remove in production) ---
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -48,9 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $resetLink = "http://www.hdgf.de/flugplanung/reset_password.php?token=" . urlencode($token);
 
             // --- MAILER SETUP ---
-            // Save mails into local folder /mails for testing
-            // (they will be .eml files you can open in any mail client)
-            
             $dsn = 'smtp://no-reply@hdgf.de:8uI43Oqqhjx1hvjA@s185.goserver.host:587';
             $transport = Transport::fromDsn($dsn);
             $mailer = new Mailer($transport);
@@ -62,12 +56,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ->text("Bitte klicke auf folgenden Link, um Dein Passwort zurückzusetzen:\n\n" . $resetLink);
 
             $mailer->send($emailMessage);
-
-            $emailsDir = __DIR__ . '/mails';
-            if (!is_dir($emailsDir)) mkdir($emailsDir, 0777, true);
-
-            //$emailFile = $emailsDir . '/' . time() . '-' . md5($email) . '.txt';
-            //file_put_contents($emailFile, "To: $email\nSubject: Password Reset Request\nFrom: no-reply@hdgf.de.com\n\nClick the link to reset your password:\n$resetLink");
         }
     }
 
@@ -83,7 +71,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Always same response (no email enumeration)
     echo $twig->render('password_reset_sent.twig.html');
-    exit;
 }
-
-
