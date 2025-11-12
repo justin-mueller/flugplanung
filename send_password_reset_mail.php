@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ->from('no-reply@hdgf.de')
                 ->to($email)
                 ->subject('Passwort zurücksetzen')
-                ->text("Bitte klicken Sie auf folgenden Link, um Ihr Passwort zurückzusetzen:\n\n" . $resetLink);
+                ->text("Bitte klicke auf folgenden Link, um Dein Passwort zurückzusetzen:\n\n" . $resetLink);
 
             $mailer->send($emailMessage);
 

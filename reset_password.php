@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tokenValid) {
         $sql = 'DELETE FROM password_resets WHERE token = :token';
         Database::query($sql, ['token' => $tokenHash]);
 
-        $successMessage = 'Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich jetzt mit Ihrem neuen Passwort anmelden.';
+        $successMessage = 'Dein Passwort wurde erfolgreich zurückgesetzt. Du kannst dich jetzt mit Deinem neuen Passwort anmelden.';
         $tokenValid = false; // Hide the form after success
     }
 }
