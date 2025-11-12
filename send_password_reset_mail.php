@@ -1,9 +1,4 @@
 <?php
-// --- DEV ONLY: show PHP errors (remove in production) ---
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-require_once __DIR__ . '/vendor/autoload.php';
 
 use AdrianSuter\TwigCacheBusting\CacheBusters\QueryParamCacheBuster;
 use AdrianSuter\TwigCacheBusting\CacheBustingTwigExtension;
@@ -16,10 +11,12 @@ use Symfony\Component\Mime\Email;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 // Load app configuration
 Helper::loadConfiguration();
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     Database::connect();
     $email = $_POST['email'] ?? null;
@@ -35,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $tokenHash  = hash('sha256', $token); // store this in DB
 
             // Store the token in DB with expiration (30 min)
-            $expires = date("Y-m-d H:i:s", time() + 1800);
+            $expires = date('Y-m-d H:i:s', time() + 1800);
             $sql = 'INSERT INTO password_resets (pilot_id, token, expires) 
                     VALUES (:pilot_id, :token, :expires)';
             Database::query($sql, [
@@ -44,30 +41,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 'expires'  => $expires
             ]);
 
-            // Build reset link (adjust domain!)
-            $resetLink = "http://www.hdgf.de/flugplanung/reset_password.php?token=" . urlencode($token);
+            // Build reset link
+            $resetLink = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . '/' . Helper::$configuration['basePath'] . '/reset_password.php?token=' . $token;
 
             // --- MAILER SETUP ---
-            // Save mails into local folder /mails for testing
-            // (they will be .eml files you can open in any mail client)
-            
-            $dsn = 'smtp://no-reply@hdgf.de:8uI43Oqqhjx1hvjA@s185.goserver.host:587';
-            $transport = Transport::fromDsn($dsn);
+            $transport = Transport::fromDsn(Helper::$configuration['email']['dsn']);
             $mailer = new Mailer($transport);
 
             $emailMessage = (new Email())
-                ->from('no-reply@hdgf.de')
+                ->from(Helper::$configuration['email']['from'])
                 ->to($email)
                 ->subject('Passwort zurücksetzen')
-                ->text("Bitte klicken Sie auf folgenden Link, um Ihr Passwort zurückzusetzen:\n\n" . $resetLink);
+                ->text("Bitte klicke auf folgenden Link, um Dein Passwort zurückzusetzen:\n\n" . $resetLink);
 
             $mailer->send($emailMessage);
-
-            $emailsDir = __DIR__ . '/mails';
-            if (!is_dir($emailsDir)) mkdir($emailsDir, 0777, true);
-
-            //$emailFile = $emailsDir . '/' . time() . '-' . md5($email) . '.txt';
-            //file_put_contents($emailFile, "To: $email\nSubject: Password Reset Request\nFrom: no-reply@hdgf.de.com\n\nClick the link to reset your password:\n$resetLink");
         }
     }
 
@@ -83,7 +70,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Always same response (no email enumeration)
     echo $twig->render('password_reset_sent.twig.html');
-    exit;
 }
-
-

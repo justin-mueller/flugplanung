@@ -12,13 +12,16 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 Helper::loadConfiguration();
 Helper::checkLogin();
+Database::connect();
 
 $error = '';
 
+// Delete expired password reset tokens
+$sql = 'DELETE FROM password_resets WHERE expires < :now';
+Database::query($sql, ['now' => date('Y-m-d H:i:s')]);
+
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    Database::connect();
-
     $email = $_POST['email'];
     $password = $_POST['password'];
 

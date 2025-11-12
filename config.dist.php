@@ -15,6 +15,11 @@ return [
         'port' => $_SERVER['DATABASE_PORT'] ?? 3306,
     ],
 
+    'email' => [
+        'dsn' => $_SERVER['EMAIL_DSN'] ?? 'smtp://user:password@smtp.example.com:587',
+        'from' => $_SERVER['EMAIL_FROM'] ?? 'no-reply@nothing.invalid'
+    ],
+
     'clubs' => [
         0 => ['name' => 'Kein Verein', 'shortName' => ''],
         1 => ['name' => '08/15 Parajumpers e.V.', 'shortName' => ''],
