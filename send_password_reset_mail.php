@@ -41,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'expires'  => $expires
             ]);
 
-            // Build reset link (adjust domain!)
-            $resetLink = "http://www.hdgf.de/flugplanung/reset_password.php?token=" . urlencode($token);
+            // Build reset link
+            $resetLink = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . '/' . Helper::$configuration['basePath'] . '/reset_password.php?token=' . urlencode($token);
 
             // --- MAILER SETUP ---
             $dsn = 'smtp://no-reply@hdgf.de:8uI43Oqqhjx1hvjA@s185.goserver.host:587';
