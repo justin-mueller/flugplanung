@@ -108,27 +108,27 @@
                   {% endif %}
                 </form>
 
-                <p class="small mb-5 pb-lg-2"><a class="text-muted" href="#!"
-                  onclick="forgotPassword()">Passwort vergessen?</a></p>
+                <div class="small mb-5 pb-lg-2">
+                    <a class="text-muted" href="#" onclick="forgotPassword()">Passwort vergessen?</a>
 
-                <form action="send_password_reset_mail.php" method="post" class="d-none" id="forgot-password-form">
-                  <div class="form-outline mb-4">
-                    <label for="email">E-Mail angeben:</label>
-                    <input type="email" id="email" name="email" required>
-                  </div>
+                    <form action="send_password_reset_mail.php" method="post" class="d-none" id="forgot-password-form">
+                      <div class="form-outline mb-4">
+                        <input class="form-control form-control-lg" type="email" id="email" name="email" required placeholder="E-Mail" aria-label="E-Mail">
+                      </div>
 
-                  <button type="submit" class="btn btn-primary btn-lg btn-block mb-4 ui-button">
-                    Reset-Link senden
-                  </button>
-                </form>
+                      <button type="submit" class="btn btn-primary btn-md btn-block mb-4 ui-button">
+                        Reset-Link senden
+                      </button>
+                    </form>
+                </div>
 
                 <hr class="my-4" />
 
-                <p class="small mb-5 pb-lg-2">
+                <p class="small pb-lg-2">
                   Noch keinen Account?<br>
                   <button
                     type="button"
-                    class="btn btn-danger mb-5 btn-md ui-button"
+                    class="btn btn-danger btn-md ui-button"
                     onclick="openRegisterForm()"
                   >
                   Hier registrieren!
