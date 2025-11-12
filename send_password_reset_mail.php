@@ -45,12 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $resetLink = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . '/' . Helper::$configuration['basePath'] . '/reset_password.php?token=' . urlencode($token);
 
             // --- MAILER SETUP ---
-            $dsn = 'smtp://no-reply@hdgf.de:8uI43Oqqhjx1hvjA@s185.goserver.host:587';
-            $transport = Transport::fromDsn($dsn);
+            $transport = Transport::fromDsn(Helper::$configuration['email']['dsn']);
             $mailer = new Mailer($transport);
 
             $emailMessage = (new Email())
-                ->from('no-reply@hdgf.de')
+                ->from(Helper::$configuration['email']['from'])
                 ->to($email)
                 ->subject('Passwort zurücksetzen')
                 ->text("Bitte klicke auf folgenden Link, um Dein Passwort zurückzusetzen:\n\n" . $resetLink);
