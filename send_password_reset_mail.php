@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
             // Build reset link
-            $resetLink = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . '/' . Helper::$configuration['basePath'] . '/reset_password.php?token=' . urlencode($token);
+            $resetLink = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . '/' . Helper::$configuration['basePath'] . '/reset_password.php?token=' . $token;
 
             // --- MAILER SETUP ---
             $transport = Transport::fromDsn(Helper::$configuration['email']['dsn']);
