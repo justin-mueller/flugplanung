@@ -20,17 +20,16 @@ Nach einem Update ebenfalls `composer install`, um ggf. neue Dependencies zu ins
 
 ### Konfiguration
 
-- In `config.php` die Default-Settings überschreiben.
-
 Die Default-Settings stehen in`config.dist.php`:
 
 - die `clubId` (`198` , d.h. HDGF)
 - die Fluggebiete (`sites = ['Neustadt-Glewe', 'Hörpel', 'Altenmedingen']`, für den HDGF)
 - In `db` die DB-Zugangsdaten (`servername`, `username`, `password`, `dbname`, `port`)
+- In `email` die SMTP-Zugangsdaten für den Mail-Versand
 - Der `basePath` für die Asset-URLs (`flugplanung`, für den HDGF)
 - die verfügbaren Vereine
 
-Die DB-Zugangsdaten weren aus Environment-Variablen gelesen, wenn gesetzt:
+Die DB-Zugangsdaten werden aus Environment-Variablen gelesen, wenn gesetzt:
 
 - `DATABASE_HOST`
 - `DATABASE_USER`
@@ -44,11 +43,18 @@ Wenn die nicht gesetzt sind, gilt
 - `flugplanung` als Datenbank,
 - `3306` als Port.
 
-Eine optionale Datei `config.php` wird ebenfalls gelesen und überschreibt die Default-Konfiguration aus `config.dist.php`. Die `config.php` wird in `.gitingore` ignoriert und kann die Konfiguration für eine spezifische Instanz anpassen.
+Die SMTP-Zugangsdaten werden aus Environment-Variablen gelesen, wenn gesetzt:
+
+- `EMAIL_DSN` – in der Form `smtp://user:password@smtp.example.com:587`
+- `EMAIL_FROM` – die Absender-E-Mail-Adresse
+
+Achtung: Enthalten `user` oder `password` nicht nur "normale" Zeichen, so müssen die URL-kodiert werden.
 
 Über `basePath` kann bei Betrieb in einem Verzeichnis unterhalb des Webserver-Root das Laden der Assets ermöglicht werden.
 
-Nun kann die Flugplanung aufgerufen werden und die Registrierung von Nutzern ist möglich.
+#### Lokale Konfiguration
+
+Eine optionale Datei `config.php` wird ebenfalls gelesen und überschreibt die Default-Konfiguration aus `config.dist.php`. Die `config.php` wird in `.gitingore` ignoriert und kann die Konfiguration für eine spezifische Instanz anpassen.
 
 ### Administratoren einrichten
 
