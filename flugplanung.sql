@@ -172,6 +172,37 @@ ALTER TABLE `tagesplanung`
 --
 ALTER TABLE `mitglieder`
   MODIFY `pilot_id` int(11) NOT NULL AUTO_INCREMENT;
+ 
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `reparaturen`
+--
+
+CREATE TABLE `reparaturen` (
+  `key` int(11) NOT NULL,
+  `fluggebiet` enum('HRP','NGL','AMD') NOT NULL,
+  `text` longtext NOT NULL,
+  `level` tinyint(1) NOT NULL DEFAULT 0,
+  `closed` tinyint(1) NOT NULL DEFAULT 0,
+  `solvedText` longtext DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `closed_by` int(11) DEFAULT NULL,
+  `closed_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Indizes für die Tabelle `reparaturen`
+--
+ALTER TABLE `reparaturen`
+  ADD PRIMARY KEY (`key`);
+
+--
+-- AUTO_INCREMENT für Tabelle `reparaturen`
+--
+ALTER TABLE `reparaturen`
+  MODIFY `key` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

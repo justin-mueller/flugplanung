@@ -270,10 +270,6 @@ form {
 	--bs-alert-link-color: blue;
 }
 
-.bg-success {
-	background-color: #ff890b !important;
-}
-
 .accordion-button,
 .accordion-button:not(.collapsed) {
 	color: var(--bs-table-color);
@@ -386,4 +382,26 @@ img.table-image.aircraft {
 
 img.table-image.vote {
     height: 20px;
+}
+
+/* Reparaturen badges styling */
+.reparaturen-badges {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.reparaturen-badge {
+    font-size: 0.75em;
+    padding: 0.25em 0.5em;
+    transition: all 0.2s ease;
+}
+
+.reparaturen-badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Table header styling for reparaturen badges */
+#tagesplanung th {
+    position: relative;
 }
