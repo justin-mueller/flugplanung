@@ -336,52 +336,15 @@ function populatePilotOptions(cell_option, cell_dienst, pilotOptions, date, dien
             pilotDiv.classList.add('pilot-div-entered');
         }
 
-        if (pilotId.name.includes('-')) {
+        if (pilotId.name.endsWith('-')) {
             pilotDiv.classList.add('pilot-div-not-available');
-        } else if (pilotId.name.includes('+')) {
+        } else if (pilotId.name.endsWith('+')) {
             pilotDiv.classList.add('pilot-div-wish');
         }
 
         destination_cell.appendChild(pilotDiv);
     });
 }
-
-
-/*
-function populatePilotOptions2(cell_option, cell_dienst, pilotOptions, date, dienst, entered) {
-
-    pilotOptions.forEach(pilotId => {
-
-        var pilotEntered = [];
-
-        if (typeof (diensteJahr) === 'object') {
-            pilotEntered = diensteJahr.filter(function (pilot2) {
-                return pilot2.pilot_id == pilotId.id && pilot2.flugtag == date;
-            });
-        }
-
-        var destination_cell = cell_option;
-
-        if (pilotEntered.length > 0) {
-            destination_cell = cell_dienst;
-            enteredDienste.push({ pilot_id: pilotId.id, name: pilotId.name.replace("+", "").replace("-", ""), date: date, dienst: dienst });
-        }
-
-
-        const pilotDiv = document.createElement('div');
-        pilotDiv.textContent = `${pilotId.name}`;
-        pilotDiv.setAttribute('data-pilot-id', `${pilotId.id}`);
-        pilotDiv.classList.add('pilot-div');
-        if (pilotId.name.includes('-')) {
-            pilotDiv.classList.add('pilot-div-not-available');
-        } else if (pilotId.name.includes('+')) {
-            pilotDiv.classList.add('pilot-div-wish');
-        }
-        destination_cell.appendChild(pilotDiv);
-
-    });
-
-}*/
 
 
 function populatePilotTable() {}
