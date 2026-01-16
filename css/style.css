@@ -76,6 +76,12 @@ a {
 	color: white;
 }
 
+#flugtag:hover,
+#additional_flugtag:hover,
+.date-picker:hover {
+	cursor: pointer;
+}
+
 .fpbanner {
 	flex-direction: column;
 }
