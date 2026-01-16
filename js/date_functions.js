@@ -30,15 +30,37 @@ function parseDateStringWithGermanMonth(dateString) {
         September: '09', Oktober: '10', November: '11', Dezember: '12'
     };
 
-    const match = dateString.match(/(\d+)\. (\D+) (\d+)/);
+    // Try to match format with weekday prefix first (e.g., "Freitag, 15. März 2024")
+    let match = dateString.match(/\d+\. \D+ \d+/);
+    if (match) {
+        // Extract just the date part without weekday
+        const datePart = match[0];
+        const innerMatch = datePart.match(/(\d+)\. (\D+) (\d+)/);
+
+        if (innerMatch) {
+            const [, day, month, year] = innerMatch;
+            const numericMonth = germanMonths[month];
+            if (numericMonth) {
+                const numericDateString = `${year}-${numericMonth}-${day.padStart(2, '0')}`;
+                return new Date(numericDateString);
+            }
+        }
+    }
+
+    // Fallback to original regex for formats without weekday
+    match = dateString.match(/(\d+)\. (\D+) (\d+)/);
 
     if (!match) {
-        throw new Error('Invalid date string format');
+        throw new Error('Invalid date string format: ' + dateString);
     }
 
     const [, day, month, year] = match;
 
     const numericMonth = germanMonths[month];
+    if (!numericMonth) {
+        throw new Error('Unknown month: ' + month);
+    }
+
     const numericDateString = `${year}-${numericMonth}-${day.padStart(2, '0')}`;
     return new Date(numericDateString);
 }

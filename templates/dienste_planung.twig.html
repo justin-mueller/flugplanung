@@ -1,17 +1,47 @@
 {% include('partials/saison.twig.html') %}
 
+<style>
+	#diensteHistory {
+		table-layout: fixed;
+		width: 100%;
+	}
+	#diensteHistory tbody td {
+		white-space: nowrap;
+		vertical-align: middle;
+	}
+	#diensteHistory th:first-child,
+	#diensteHistory td:first-child {
+		width: 30%;
+	}
+	#diensteHistory .dienste-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+</style>
+
 <div class="row">
-	<div class="col-md-6">
+	<div class="col-lg-6 col-12 mb-3">
+		<div class="d-flex flex-wrap align-items-end gap-2 mb-2">
+			<div>
+				<label for="historyStartDate" class="form-label mb-0">Start</label>
+				<input type="date" id="historyStartDate" class="form-control">
+			</div>
+			<div>
+				<label for="historyEndDate" class="form-label mb-0">Ende</label>
+				<input type="date" id="historyEndDate" class="form-control">
+			</div>
+			<button class="btn btn-secondary" id="historyRangeApply">Zeitraum anwenden</button>
+		</div>
 		<div class="accordion">
 			<table id="diensteHistory" class="table table-striped">
 				<thead>
 					<tr>
 						<th>Name</th>
-						<th>Dienste<br>eingetragen<br>&lt;2025</th>
-						<th>Davon an Flugtagen<br>mit Betrieb<br>&lt;2025</th>
-						<th>Dienste<br>eingetragen<br>2025</th>
-						<th>Davon an Flugtagen<br>mit Betrieb<br>2025</th>
-						<th>Geflogen an Flugtagen<br>mit Betrieb<br>vor 2025<br>(Faktor -0.2)</th>
+						<th>Dienste<br>eingetragen<br><span class="history-range-before-label"></span></th>
+						<th>Davon an Flugtagen<br>mit Betrieb<br><span class="history-range-before-label"></span></th>
+						<th>Dienste<br>eingetragen<br><span class="history-range-label"></span></th>
+						<th>Davon an Flugtagen<br>mit Betrieb<br><span class="history-range-label"></span></th>
+						<th>Geflogen an Flugtagen<br>mit Betrieb<br><span class="history-range-before-label"></span><br>(Faktor -0.2)</th>
 						<th>Gesamtpunkte</th>
 					</tr>
 				</thead>
@@ -20,7 +50,7 @@
 		</div>
 	</div>
 
-	<div class="col-md-6">
+	<div class="col-lg-6 col-12">
 		<table class="table">
 			<thead>
 				<tr>

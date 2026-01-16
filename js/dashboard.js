@@ -1,7 +1,92 @@
+function getDefaultHistoryRange() {
+    const previousYear = new Date().getFullYear() - 1;
+    return {
+        startDate: new Date(previousYear, 0, 1, 12, 0, 0),
+        endDate: new Date(previousYear, 11, 31, 12, 0, 0),
+    };
+}
+
+function formatShortGermanDate(dateString) {
+    const date = new Date(`${dateString}T00:00:00`);
+    return date.toLocaleDateString('de-DE');
+}
+
+function updateHistoryRangeLabels(startDateString, endDateString) {
+    const beforeLabel = `vor ${formatShortGermanDate(startDateString)}`;
+    const rangeLabel = `${formatShortGermanDate(startDateString)} - ${formatShortGermanDate(endDateString)}`;
+
+    document.querySelectorAll('.history-range-before-label').forEach(label => {
+        label.textContent = beforeLabel;
+    });
+    document.querySelectorAll('.history-range-label').forEach(label => {
+        label.textContent = rangeLabel;
+    });
+}
+
+function getHistoryRangeValues() {
+    const defaults = getDefaultHistoryRange();
+    const startInput = document.getElementById('historyStartDate');
+    const endInput = document.getElementById('historyEndDate');
+
+    let startDate = defaults.startDate;
+    let endDate = defaults.endDate;
+
+    if (startInput && startInput.value) {
+        startDate = new Date(`${startInput.value}T12:00:00`);
+    }
+    if (endInput && endInput.value) {
+        endDate = new Date(`${endInput.value}T12:00:00`);
+    }
+
+    if (endDate < startDate) {
+        endDate = new Date(startDate.getTime());
+    }
+
+    if (startInput && !startInput.value) {
+        startInput.value = formatDateString(startDate);
+    }
+    if (endInput && !endInput.value) {
+        endInput.value = formatDateString(endDate);
+    }
+
+    return {
+        startDate: formatDateString(startDate),
+        endDate: formatDateString(endDate),
+    };
+}
+
+function initHistoryRange() {
+    const startInput = document.getElementById('historyStartDate');
+    const endInput = document.getElementById('historyEndDate');
+    const applyButton = document.getElementById('historyRangeApply');
+
+    if (!startInput || !endInput) {
+        return;
+    }
+
+    const { startDate, endDate } = getHistoryRangeValues();
+    updateHistoryRangeLabels(startDate, endDate);
+
+    const applyRange = () => {
+        const range = getHistoryRangeValues();
+        updateHistoryRangeLabels(range.startDate, range.endDate);
+        getDashboardData();
+    };
+
+    if (applyButton) {
+        applyButton.addEventListener('click', applyRange);
+    }
+
+    startInput.addEventListener('change', () => updateHistoryRangeLabels(getHistoryRangeValues().startDate, getHistoryRangeValues().endDate));
+    endInput.addEventListener('change', () => updateHistoryRangeLabels(getHistoryRangeValues().startDate, getHistoryRangeValues().endDate));
+}
+
 function getDashboardData() {
 
     let startDate = formatDateString(saisonStartDate);
     let endDate = formatDateString(saisonEndDate);
+    const historyRange = getHistoryRangeValues();
+    updateHistoryRangeLabels(historyRange.startDate, historyRange.endDate);
 
     enteredDienste = [];
 
@@ -16,7 +101,7 @@ function getDashboardData() {
             url: 'getDashboardDataHistory.php',
             type: 'GET',
             dataType: 'json',
-            data: { startDate: startDate, endDate: endDate }
+            data: { startDate: historyRange.startDate, endDate: historyRange.endDate }
         }),
     ];
 
@@ -89,7 +174,11 @@ function populateDashboardHistory() {
         const tr = document.createElement('tr');
 
         // Create cells
-        const firstnameCell = `<td>${row.firstname + ' ' + row.lastname}</td>`;
+        const fullName = `${row.firstname} ${row.lastname}`.trim();
+        const nameCell = document.createElement('td');
+        nameCell.classList.add('dienste-name');
+        nameCell.textContent = fullName;
+        nameCell.title = fullName;
         
         // Conditionally format the last two columns
         const noDutiesCell_hist = `<td style="background-color: ${row.duties_count_history === 0 ? 'orange' : 'inherit'}">${row.duties_count_history}</td>`;
@@ -98,11 +187,16 @@ function populateDashboardHistory() {
         const activeDutiesCell_thisSeason = `<td style="background-color: ${row.active_duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.active_duties_count_thisyear}</td>`;
         const activeFlyingDaysHistory = `<td style="background-color: ${row.active_flying_days_history === 0 ? 'green' : 'orange'}">${row.active_flying_days_history}</td>`;
 
-        // Calculate points using the new sum
-        const points = `<td style="background-color: ${row.sum <= 0 ? 'orange' : 'inherit'}">${row.sum}</td>`;
+        // Calculate points using the new sum, rounded to 1 decimal place
+        const roundedSum = parseFloat(row.sum.toFixed(1));
+        const points = `<td style="background-color: ${row.sum <= 0 ? 'orange' : 'inherit'}">${roundedSum}</td>`;
 
         // Add cells to the row
-        tr.innerHTML = firstnameCell + noDutiesCell_hist + activeDutiesCell_hist + noDutiesCell_thisSeason + activeDutiesCell_thisSeason + activeFlyingDaysHistory + points;
+        tr.appendChild(nameCell);
+        tr.insertAdjacentHTML(
+            'beforeend',
+            noDutiesCell_hist + activeDutiesCell_hist + noDutiesCell_thisSeason + activeDutiesCell_thisSeason + activeFlyingDaysHistory + points
+        );
         tbody.appendChild(tr);
     });
 }
