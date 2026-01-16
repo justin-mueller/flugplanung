@@ -127,17 +127,22 @@ $(document).ready(function () {
           }
 
           if (isAssigning) {
-            // Add the entry to enteredDienste
-            enteredDienste.push({
-              pilot_id: pilot_id,
-              name: name,
-              date: flugtag,
-              dienst: dienst,
-            });
+            // Add the entry to enteredDienste only if it doesn't already exist
+            const alreadyExists = enteredDienste.some(
+              (item) => item.pilot_id === pilot_id && item.date === flugtag && item.dienst === dienst
+            );
+            if (!alreadyExists) {
+              enteredDienste.push({
+                pilot_id: pilot_id,
+                name: name,
+                date: flugtag,
+                dienst: dienst,
+              });
+            }
           } else {
-            // Remove the entry from enteredDienste
+            // Remove the entry from enteredDienste (matching pilot_id, date, AND dienst)
             enteredDienste = enteredDienste.filter(
-              (item) => !(item.pilot_id === pilot_id && item.date === flugtag)
+              (item) => !(item.pilot_id === pilot_id && item.date === flugtag && item.dienst === dienst)
             );
           }
 

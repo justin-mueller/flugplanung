@@ -318,7 +318,13 @@ function populatePilotOptions(cell_option, cell_dienst, pilotOptions, date, dien
 
         if (pilotEntered) {
             destination_cell = cell_dienst;
-            enteredDienste.push({ pilot_id: pilotId.id, name: pilotId.name.replace("+", "").replace("-", ""), date: date, dienst: dienst });
+            // Only add if not already in enteredDienste (prevent duplicates)
+            const alreadyExists = enteredDienste.some(
+                (item) => item.pilot_id === pilotId.id && item.date === date && item.dienst === dienst
+            );
+            if (!alreadyExists) {
+                enteredDienste.push({ pilot_id: pilotId.id, name: pilotId.name.replace("+", "").replace("-", ""), date: date, dienst: dienst });
+            }
         }
 
         const pilotDiv = document.createElement('div');
