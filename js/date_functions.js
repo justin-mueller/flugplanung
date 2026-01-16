@@ -67,17 +67,30 @@ function parseDateStringWithGermanMonth(dateString) {
 
 
 function dateToSQLFormat(date) {
-    return date.toISOString().split('T')[0];
+    // Use local date components to avoid timezone conversion issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 function formatDateString(date) {
-    return date.toISOString().slice(0, 10);
+    // Use local date components to avoid timezone conversion issues
+    // toISOString() converts to UTC which can shift dates by ±1 day
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 function formatDateStringA(date) {
     const formattedDate = new Date(date);
     formattedDate.setHours(0, 0, 0, 0);
-    return formattedDate.toISOString().slice(0, 10);
+    // Use local date components to avoid timezone conversion issues
+    const year = formattedDate.getFullYear();
+    const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(formattedDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 

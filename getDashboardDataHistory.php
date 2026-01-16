@@ -23,49 +23,49 @@ $sql = "SELECT
 m.pilot_id,
 m.firstname,
 m.lastname,
--- Historical Counts
+
+-- Historical Counts (before startDate)
+-- Count dienste with active betrieb (uses INNER JOIN since betrieb check requires flugtage)
 (SELECT COUNT(d.pilot_id)
  FROM dienste d
- LEFT JOIN flugtage mf ON mf.datum = d.flugtag
+ INNER JOIN flugtage mf ON mf.datum = d.flugtag
  WHERE d.pilot_id = m.pilot_id
-  AND mf.datum < :startDate
+   AND d.flugtag < :startDate
    AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
 ) AS active_duties_count_history,
 
-(SELECT COUNT( d.pilot_id)
+-- Count ALL dienste before startDate (no join needed - use dienste.flugtag directly)
+(SELECT COUNT(d.pilot_id)
  FROM dienste d
- LEFT JOIN flugtage mf ON mf.datum = d.flugtag
  WHERE d.pilot_id = m.pilot_id
-  AND mf.datum < :startDate
+   AND d.flugtag < :startDate
 ) AS duties_count_history,
 
--- Current Year Counts
-(SELECT COUNT( d.pilot_id)
+-- Current Range Counts (between startDate and endDate)
+-- Count dienste with active betrieb in the selected range
+(SELECT COUNT(d.pilot_id)
  FROM dienste d
- LEFT JOIN flugtage mf ON mf.datum = d.flugtag
+ INNER JOIN flugtage mf ON mf.datum = d.flugtag
  WHERE d.pilot_id = m.pilot_id
-  AND mf.datum BETWEEN :startDate AND :endDate
+   AND d.flugtag BETWEEN :startDate AND :endDate
    AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
 ) AS active_duties_count_thisyear,
 
-(SELECT COUNT( d.pilot_id)
+-- Count ALL dienste in the selected range (no join needed)
+(SELECT COUNT(d.pilot_id)
  FROM dienste d
- LEFT JOIN flugtage mf ON mf.datum = d.flugtag
  WHERE d.pilot_id = m.pilot_id
-  AND mf.datum BETWEEN :startDate AND :endDate
+   AND d.flugtag BETWEEN :startDate AND :endDate
 ) AS duties_count_thisyear,
 
--- Active Flying Days History
--- Active Flying Days History
+-- Active Flying Days History (pilot flew on days with active betrieb before startDate)
 (SELECT COUNT(tp.pilot_id)
-FROM tagesplanung tp
-LEFT JOIN flugtage mf ON mf.datum = tp.flugtag
-WHERE tp.pilot_id = m.pilot_id
-AND tp.flugtag < :startDate
-AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
-AND (tp.flugtag = mf.datum OR tp.flugtag IS NULL)
+ FROM tagesplanung tp
+ INNER JOIN flugtage mf ON mf.datum = tp.flugtag
+ WHERE tp.pilot_id = m.pilot_id
+   AND tp.flugtag < :startDate
+   AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
 ) AS active_flying_days_history
-
 
 FROM
 mitglieder m
