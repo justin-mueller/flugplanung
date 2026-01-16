@@ -114,8 +114,8 @@ function getDashboardData() {
         // Clean data, weil SQL code nicht richtig funktioniert!
 
         data.forEach(entry => {
-            const startleiterWithPlus = new Set(entry.startleiterOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id) })));
-            const windenfahrerWithPlus = new Set(entry.windenfahrerOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id) })));
+            const startleiterWithPlus = new Set(entry.startleiterOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id), max_dienste_halbjahr: pilot.max_dienste_halbjahr })));
+            const windenfahrerWithPlus = new Set(entry.windenfahrerOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id), max_dienste_halbjahr: pilot.max_dienste_halbjahr })));
 
             const deleteId = (pilotSet, pilotWithoutPlus) => {
                 const indexToDelete = [...pilotSet].findIndex(pilot => pilot.name === pilotWithoutPlus);
@@ -323,13 +323,27 @@ function populatePilotOptions(cell_option, cell_dienst, pilotOptions, date, dien
                 (item) => item.pilot_id === pilotId.id && item.date === date && item.dienst === dienst
             );
             if (!alreadyExists) {
-                enteredDienste.push({ pilot_id: pilotId.id, name: pilotId.name.replace("+", "").replace("-", ""), date: date, dienst: dienst });
+                enteredDienste.push({ 
+                    pilot_id: pilotId.id, 
+                    name: pilotId.name.replace("+", "").replace("-", ""), 
+                    date: date, 
+                    dienst: dienst,
+                    max_dienste_halbjahr: pilotId.max_dienste_halbjahr
+                });
             }
         }
 
         const pilotDiv = document.createElement('div');
-        pilotDiv.textContent = `${pilotId.name}`;
+        
+        // Build display name with max dienste indicator
+        let displayName = pilotId.name;
+        if (pilotId.max_dienste_halbjahr !== null && pilotId.max_dienste_halbjahr !== undefined) {
+            displayName += ` {${pilotId.max_dienste_halbjahr}}`;
+        }
+        pilotDiv.textContent = displayName;
+        
         pilotDiv.setAttribute('data-pilot-id', `${pilotId.id}`);
+        pilotDiv.setAttribute('data-max-dienste', pilotId.max_dienste_halbjahr !== null ? pilotId.max_dienste_halbjahr : '');
         pilotDiv.classList.add('pilot-div');
 
         if (pilotEntered) {
@@ -410,8 +424,61 @@ function populatePilotTable() {
     }
 }*/
 
+// Check if any pilot exceeds their max dienste limit and show warning
+function checkMaxDiensteExceeded() {
+    const pilotCounts = {};
+    const pilotMaxLimits = {};
+    const pilotNames = {};
+    
+    // Count duties per pilot and collect max limits
+    enteredDienste.forEach(entry => {
+        const pilotId = entry.pilot_id;
+        pilotCounts[pilotId] = (pilotCounts[pilotId] || 0) + 1;
+        
+        // Store the max limit and name (only needs to be set once per pilot)
+        if (entry.max_dienste_halbjahr !== null && entry.max_dienste_halbjahr !== undefined) {
+            pilotMaxLimits[pilotId] = entry.max_dienste_halbjahr;
+        }
+        if (entry.name) {
+            pilotNames[pilotId] = entry.name;
+        }
+    });
+    
+    // Check for exceeded limits
+    const exceededPilots = [];
+    for (const pilotId in pilotCounts) {
+        const count = pilotCounts[pilotId];
+        const maxLimit = pilotMaxLimits[pilotId];
+        
+        if (maxLimit !== undefined && count > maxLimit) {
+            exceededPilots.push({
+                name: pilotNames[pilotId] || `Pilot ${pilotId}`,
+                count: count,
+                max: maxLimit
+            });
+        }
+    }
+    
+    return exceededPilots;
+}
+
 //Error Handling ist hier etwas schlecht
 function saveDienste() {
+    
+    // Check for pilots exceeding their max dienste limit
+    const exceededPilots = checkMaxDiensteExceeded();
+    if (exceededPilots.length > 0) {
+        const warningMessages = exceededPilots.map(p => 
+            `${p.name}: ${p.count} Dienste (max. ${p.max})`
+        ).join(', ');
+        
+        showToast(
+            'Achtung!', 
+            'Maximale Dienste überschritten', 
+            `Folgende Piloten haben mehr Dienste als gewünscht: ${warningMessages}`, 
+            'warning'
+        );
+    }
 
     $.ajax({
         url: `deleteDienste.php?year=${saisonJahr}`,

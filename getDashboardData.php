@@ -21,7 +21,7 @@ $flugtageResult = Database::query(
 
 // Step 2: Get all members for this club
 $membersResult = Database::query(
-    "SELECT pilot_id, firstname, lastname, windenfahrer FROM mitglieder WHERE verein = :clubId",
+    "SELECT pilot_id, firstname, lastname, windenfahrer, max_dienste_halbjahr FROM mitglieder WHERE verein = :clubId",
     ['clubId' => $clubId]
 );
 
@@ -50,7 +50,8 @@ foreach ($membersResult as $member) {
         'pilot_id' => (int)$member['pilot_id'],
         'firstname' => $member['firstname'],
         'lastname' => $member['lastname'],
-        'windenfahrer' => (int)$member['windenfahrer']
+        'windenfahrer' => (int)$member['windenfahrer'],
+        'max_dienste_halbjahr' => $member['max_dienste_halbjahr'] !== null ? (int)$member['max_dienste_halbjahr'] : null
     ];
 }
 
@@ -102,7 +103,8 @@ foreach ($flugtageResult as $flugtag) {
         
         $pilotOption = [
             'name' => $fullName . $wishSuffix,
-            'id' => (string)$pilotId
+            'id' => (string)$pilotId,
+            'max_dienste_halbjahr' => $member['max_dienste_halbjahr']
         ];
         
         // windenfahrer = 0 means this member is a Startleiter candidate
