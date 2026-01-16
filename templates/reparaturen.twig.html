@@ -7,7 +7,7 @@
                     <th>Fluggebiet</th>
                     <th>Text</th>
                     <th>Level</th>
-                    <th>gelöst (Kommentar)</th>
+                    <th>Gelöst Nachricht</th>
                     <th>Status</th>
                     <th>Benutzer</th>
                     <th>Aktion</th>
@@ -16,36 +16,41 @@
             <tbody id="reparaturen-body">
             </tbody>
             <tfoot>
-                <tr>
-                    <td>
+                <tr class="bg-light border-top border-1">
+                    <td colspan="8" class="text-center py-2">
+                        <strong class="text-primary">Neuer Eintrag</strong>
+                    </td>
+                </tr>
+                <tr class="bg-light">
+                    <td class="py-4">
                         <span class="text-muted">auto</span>
                     </td>
-                    <td>
-                        <select class="form-select form-select-sm" id="rep-fluggebiet">
+                    <td class="py-4">
+                        <select class="form-select form-select bg-light" id="rep-fluggebiet" style="background-color: #f8fff8 !important;">
                             <option value="HRP">HRP</option>
                             <option value="NGL">NGL</option>
                             <option value="AMD">AMD</option>
                         </select>
                     </td>
-                    <td>
-                        <textarea class="form-control form-control-sm" id="rep-text" rows="1" placeholder="Beschreibung des Problems"></textarea>
+                    <td class="py-4">
+                        <textarea class="form-control form-control bg-light" id="rep-text" rows="1" placeholder="Beschreibung" style="background-color: #f8fff8 !important;"></textarea>
                     </td>
-                    <td>
-                        <select class="form-select form-select-sm" id="rep-level">
+                    <td class="py-4">
+                        <select class="form-select form-select bg-light" id="rep-level" style="background-color: #f8fff8 !important;">
                             <option value="0">Geringfügig</option>
                             <option value="1">Flugbetrieb nicht möglich</option>
                         </select>
                     </td>
-                    <td>
+                    <td class="py-4">
                         <span class="text-muted">-</span>
                     </td>
-                    <td>
+                    <td class="py-4">
                         <span class="badge bg-warning text-dark">offen</span>
                     </td>
-                    <td>
+                    <td class="py-4">
                         <span class="text-muted">-</span>
                     </td>
-                    <td>
+                    <td class="">
                         <button class="btn btn-sm btn-primary" id="rep-add-btn">
                             Hinzufügen
                         </button>
