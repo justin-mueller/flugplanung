@@ -51,7 +51,9 @@ if ($mitgliederData['dienste_admin']) {
     ];
     $tabs['admin'] = [
         'label' => 'Admin',
-        'content' => $twig->render('admin.twig.html')
+        'content' => $twig->render('admin.twig.html', [
+            'newsletterSecret' => Helper::$configuration['newsletterSecret']
+        ])
     ];
 }
 

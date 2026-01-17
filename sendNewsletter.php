@@ -6,9 +6,9 @@ require_once __DIR__ . '/vendor/autoload.php';
 set_time_limit(600);
 ini_set('max_execution_time', 600);
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(0);
 
 // Flush output immediately
 ini_set('output_buffering', 'off');
@@ -22,18 +22,18 @@ use Symfony\Component\Mime\Email;
 use JustinMueller\Flugplanung\Database;
 use JustinMueller\Flugplanung\Helper;
 
-$secret = "dsfkjh33fdsdsdfd3fc32098fe";
+Helper::loadConfiguration();
+
+$secret = Helper::$configuration['newsletterSecret'];
 
 if (!isset($_GET['key']) || $_GET['key'] !== $secret) {
     http_response_code(403);
     exit("Forbidden");
 }
-
-Helper::loadConfiguration();
 Database::connect();
 
 // Configure transport
-$dsn = 'smtp://newsletter@hdgf.de:123456@s185.goserver.host:587';
+$dsn = Helper::$configuration['smtpDsn'];
 $transport = Transport::fromDsn($dsn);
 $mailer = new Mailer($transport);
 
@@ -114,14 +114,8 @@ foreach ($recipients as $recipient) {
         $body
     );
 
-    $personalizedBody = str_replace(
-        '<p>Hallo!<br><br>',
-        "<p>Hallo {$recipient['firstname']}!<br><br>",
-        $personalizedBody
-    );
-
     $email = (new Email())
-        ->from('Newsletter <newsletter@hdgf.de>')
+        ->from(Helper::$configuration['newsletterFrom'])
         ->to($to)
         ->subject($subject)
         ->html($personalizedBody);
