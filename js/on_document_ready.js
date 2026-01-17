@@ -48,6 +48,12 @@ $(document).ready(function () {
   });
   $("#table-body-dashboard").on("click", ".pilot-div", function () {
     const clickedDiv = $(this);
+    
+    // Ignore clicks on disabled cards
+    if (clickedDiv.hasClass('pilot-div-disabled')) {
+      return;
+    }
+    
     const sourceColumn = clickedDiv.parent().attr("id");
     const dienst = sourceColumn.includes("windenfahrer")
       ? "windenfahrer"
@@ -136,6 +142,15 @@ $(document).ready(function () {
           clickedDiv.data("column", destinationColumn);
 
           if (isAssigning) {
+            // Add visual effects for assignment
+            clickedDiv.addClass('pilot-div-entered assigning');
+            spawnConfetti(clickedDiv[0]);
+            
+            // Remove animation class after it completes
+            setTimeout(() => {
+              clickedDiv.removeClass('assigning');
+            }, 500);
+            
             // Add the entry to enteredDienste only if it doesn't already exist
             const alreadyExists = enteredDienste.some(
               (item) => item.pilot_id === pilot_id && item.date === flugtag && item.dienst === dienst
@@ -150,12 +165,24 @@ $(document).ready(function () {
               });
             }
           } else {
+            // Add visual effects for unassignment
+            clickedDiv.addClass('unassigning');
+            clickedDiv.removeClass('pilot-div-entered');
+            
+            // Remove animation class after it completes
+            setTimeout(() => {
+              clickedDiv.removeClass('unassigning');
+            }, 300);
+            
             // Remove the entry from enteredDienste (matching pilot_id, date, AND dienst)
             enteredDienste = enteredDienste.filter(
               (item) => !(item.pilot_id === pilot_id && item.date === flugtag && item.dienst === dienst)
             );
           }
 
+          // Update disabled states for option cards
+          updateDisabledStates();
+          
           // Refresh history table from backend to ensure accurate counts
           refreshDashboardHistory();
         })
@@ -260,3 +287,112 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 });
+
+// Fun confetti effect when assigning a pilot to duty
+function spawnConfetti(element) {
+  const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#95e1d3', '#f38181', '#aa96da', '#fcbad3', '#a8d8ea'];
+  const rect = element.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  
+  // Create confetti container
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  container.style.position = 'fixed';
+  container.style.left = centerX + 'px';
+  container.style.top = centerY + 'px';
+  document.body.appendChild(container);
+  
+  // Spawn confetti particles
+  const particleCount = 12;
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'confetti';
+    
+    // Random color
+    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    
+    // Random direction (full 360 degrees)
+    const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+    const distance = 30 + Math.random() * 40;
+    const tx = Math.cos(angle) * distance;
+    const ty = Math.sin(angle) * distance;
+    const rotation = Math.random() * 720 - 360;
+    
+    particle.style.setProperty('--tx', tx + 'px');
+    particle.style.setProperty('--ty', ty + 'px');
+    particle.style.setProperty('--rot', rotation + 'deg');
+    
+    // Random size
+    const size = 5 + Math.random() * 6;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    
+    // Random shape (some squares, some circles)
+    if (Math.random() > 0.5) {
+      particle.style.borderRadius = '50%';
+    }
+    
+    // Stagger animation slightly
+    particle.style.animationDelay = (Math.random() * 0.1) + 's';
+    
+    container.appendChild(particle);
+  }
+  
+  // Add sparkles
+  for (let i = 0; i < 6; i++) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle';
+    
+    const angle = (Math.PI * 2 * i) / 6;
+    const distance = 20 + Math.random() * 25;
+    const tx = Math.cos(angle) * distance;
+    const ty = Math.sin(angle) * distance;
+    
+    sparkle.style.setProperty('--tx', tx + 'px');
+    sparkle.style.setProperty('--ty', ty + 'px');
+    sparkle.style.animationDelay = (Math.random() * 0.15) + 's';
+    
+    container.appendChild(sparkle);
+  }
+  
+  // Clean up after animation
+  setTimeout(() => {
+    container.remove();
+  }, 1000);
+}
+
+// Update disabled state for pilot option cards based on whether role is already filled
+function updateDisabledStates() {
+  // Find all date tables in the dashboard
+  $('#table-body-dashboard .date-table').each(function() {
+    const dateTable = $(this);
+    
+    // Find cells by looking at IDs
+    dateTable.find('td[id^="startleiter_"], td[id^="windenfahrer_"]').each(function() {
+      const cell = $(this);
+      const cellId = cell.attr('id');
+      
+      // Skip if this is an Optionen cell
+      if (cellId.startsWith('Optionen_')) return;
+      
+      // Determine the role and get the corresponding Optionen cell
+      const optionenCellId = 'Optionen_' + cellId;
+      const optionenCell = $(`#${optionenCellId}`);
+      
+      if (optionenCell.length) {
+        // Check if the main cell has any assigned pilots
+        const hasAssignedPilot = cell.find('.pilot-div').length > 0;
+        
+        // Enable or disable all cards in the Optionen cell
+        optionenCell.find('.pilot-div').each(function() {
+          if (hasAssignedPilot) {
+            $(this).addClass('pilot-div-disabled');
+          } else {
+            $(this).removeClass('pilot-div-disabled');
+          }
+        });
+      }
+    });
+  });
+}
