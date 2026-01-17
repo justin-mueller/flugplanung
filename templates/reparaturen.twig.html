@@ -1,3 +1,23 @@
+<style>
+    #reparaturen-table th,
+    #reparaturen-table td {
+        font-size: 0.85rem;
+    }
+    #reparaturen-table .form-select,
+    #reparaturen-table .form-control,
+    #reparaturen-table .btn {
+        font-size: 0.85rem;
+    }
+    #reparaturen-table .badge {
+        font-size: 0.75rem;
+    }
+    #repSolveModal .modal-body,
+    #repSolveModal .form-label,
+    #repSolveModal .form-control,
+    #repSolveModal .btn {
+        font-size: 0.85rem;
+    }
+</style>
 <div class="container-fluid mt-3">
     <div class="table-responsive">
         <table class="table table-striped table-sm align-middle" id="reparaturen-table">
@@ -7,7 +27,7 @@
                     <th>Fluggebiet</th>
                     <th>Text</th>
                     <th>Level</th>
-                    <th>Gelöst Nachricht</th>
+                    <th>Gelöst<br>Kommentar</th>
                     <th>Status</th>
                     <th>Benutzer</th>
                     <th>Aktion</th>
@@ -16,14 +36,9 @@
             <tbody id="reparaturen-body">
             </tbody>
             <tfoot>
-                <tr class="bg-light border-top border-1">
-                    <td colspan="8" class="text-center py-2">
-                        <strong class="text-primary">Neuer Eintrag</strong>
-                    </td>
-                </tr>
-                <tr class="bg-light">
-                    <td class="py-4">
-                        <span class="text-muted">auto</span>
+                <tr class="bg-light border-top border-2 border-primary">
+                    <td class="py-3">
+                        <strong class="text-primary">Neuer<br>Eintrag</strong>
                     </td>
                     <td class="py-4">
                         <select class="form-select form-select bg-light" id="rep-fluggebiet" style="background-color: #f8fff8 !important;">

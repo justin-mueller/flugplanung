@@ -281,6 +281,10 @@ function loadReparaturenCounts() {
 		success: function (data) {
 			reparaturenData = data;
 			updateReparaturenBadges();
+			// Update modal warnings if modal is open
+			if (document.getElementById('enterModal').classList.contains('show')) {
+				updateEnterModalReparaturenWarnings();
+			}
 		},
 		error: function (xhr) {
 			console.log('Reparaturen counts could not be loaded');
@@ -365,6 +369,66 @@ function showReparaturenModal(fluggebiet) {
 	modal.show();
 }
 
+// Function to update reparaturen warnings in the enter modal
+function updateEnterModalReparaturenWarnings() {
+	const container = document.getElementById('reparaturen-warnings-container');
+	if (!container) return;
+	
+	let warningsHtml = '';
+	const fluggebiete = ['NGL', 'HRP', 'AMD'];
+	const fluggebietNames = {
+		'NGL': 'Neustadt-Glewe',
+		'HRP': 'Hörpel',
+		'AMD': 'Altenmedingen'
+	};
+	
+	// Check each Fluggebiet for open repairs
+	fluggebiete.forEach(function(fluggebiet) {
+		if (reparaturenData[fluggebiet]) {
+			const level0Count = reparaturenData[fluggebiet].level0.count;
+			const level1Count = reparaturenData[fluggebiet].level1.count;
+			const level0Texts = reparaturenData[fluggebiet].level0.texts;
+			const level1Texts = reparaturenData[fluggebiet].level1.texts;
+			
+			// Show critical (level 1) repairs in red
+			if (level1Count > 0) {
+				warningsHtml += `<div class="alert alert-danger d-flex align-items-start mb-2" role="alert">
+					<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+						<use xlink:href="img/warning.svg#warning-fill"/>
+					</svg>
+					<div class="w-100">
+						<strong>${fluggebietNames[fluggebiet]}: Flugbetrieb nicht möglich!</strong>
+						<ul class="mb-0 mt-1 small">`;
+				level1Texts.forEach(function(text) {
+					warningsHtml += `<li>${text}</li>`;
+				});
+				warningsHtml += `</ul>
+					</div>
+				</div>`;
+			}
+			
+			// Show minor (level 0) repairs in yellow
+			if (level0Count > 0) {
+				warningsHtml += `<div class="alert alert-warning d-flex align-items-start mb-2" role="alert">
+					<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:">
+						<use xlink:href="img/warning.svg#warning-fill"/>
+					</svg>
+					<div class="w-100">
+						<strong>${fluggebietNames[fluggebiet]}: Geringfügige Probleme</strong>
+						<ul class="mb-0 mt-1 small">`;
+				level0Texts.forEach(function(text) {
+					warningsHtml += `<li>${text}</li>`;
+				});
+				warningsHtml += `</ul>
+					</div>
+				</div>`;
+			}
+		}
+	});
+	
+	container.innerHTML = warningsHtml;
+}
+
 // Add event listeners for reparaturen badges
 document.addEventListener('DOMContentLoaded', function() {
 	// Load reparaturen counts when page loads
@@ -377,4 +441,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			showReparaturenModal(fluggebiet);
 		}
 	});
+	
+	// Update reparaturen warnings when enter modal is shown
+	const enterModal = document.getElementById('enterModal');
+	if (enterModal) {
+		enterModal.addEventListener('show.bs.modal', function() {
+			updateEnterModalReparaturenWarnings();
+		});
+	}
 });
