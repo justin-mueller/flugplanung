@@ -21,8 +21,12 @@ function getDienste() {
 
             data.forEach(entry => {
 
-                const isMatch = (entry.Windenfahrer_ids && entry.Windenfahrer_ids.includes(User_Information.pilot_id)) ||
-                    (entry.Startleiter_ids && entry.Startleiter_ids.includes(User_Information.pilot_id));
+                // Convert comma-separated ID strings to arrays for proper matching
+                const windenfahrerIdArray = entry.Windenfahrer_ids ? entry.Windenfahrer_ids.split(',').map(id => id.trim()) : [];
+                const startleiterIdArray = entry.Startleiter_ids ? entry.Startleiter_ids.split(',').map(id => id.trim()) : [];
+                const userPilotId = String(User_Information.pilot_id);
+                
+                const isMatch = windenfahrerIdArray.includes(userPilotId) || startleiterIdArray.includes(userPilotId);
 
                 // Only create a row if 'flugtag' is not null
                 if (entry.flugtag !== null) {
@@ -40,7 +44,7 @@ function getDienste() {
                     }
 
                     // Assign values, use '/' as default if null
-                    cell1.textContent = entry.flugtag;
+                    cell1.textContent = getFormattedGermanDate(entry.flugtag);
                     cell2.textContent = entry.Windenfahrer || '/';  // Use '/' if Windenfahrer is null
                     cell3.textContent = entry.Startleiter || '/';  // Use '/' if Startleiter is null
                 }

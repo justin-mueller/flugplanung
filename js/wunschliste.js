@@ -1,3 +1,35 @@
+function initMaxDiensteField() {
+    // Only show for windenfahrer
+    if (User_Information.windenfahrer == 1) {
+        $('#maxDiensteContainer').removeClass('d-none');
+        
+        // Set current value if available
+        if (User_Information.max_dienste_halbjahr !== null && User_Information.max_dienste_halbjahr !== undefined) {
+            $('#maxDiensteHalbjahr').val(User_Information.max_dienste_halbjahr);
+        }
+    }
+}
+
+function saveMaxDienste() {
+    if (User_Information.windenfahrer != 1) {
+        return Promise.resolve();
+    }
+
+    const maxDienste = $('#maxDiensteHalbjahr').val();
+    
+    return $.ajax({
+        url: 'saveMaxDienste.php',
+        type: 'POST',
+        data: { 
+            pilot_id: User_Information.pilot_id, 
+            max_dienste_halbjahr: maxDienste === '' ? null : parseInt(maxDienste)
+        }
+    }).then(function(response) {
+        // Update the User_Information object with the new value
+        User_Information.max_dienste_halbjahr = maxDienste === '' ? null : parseInt(maxDienste);
+    });
+}
+
 function createTableRow(date, defaultValue) {
     const row = document.createElement('tr');
     const dateCell = document.createElement('td');
@@ -90,6 +122,24 @@ function saveWuensche() {
     const tableRows = document.querySelectorAll('#table-body tr');
     var enteredCount = 0;
     var failedCount = 0;
+    var totalExpected = tableRows.length;
+    
+    // First save the max dienste if user is windenfahrer
+    if (User_Information.windenfahrer == 1) {
+        totalExpected++; // Add one more for max dienste save
+        saveMaxDienste()
+            .done(function() {
+                enteredCount++;
+                if (enteredCount == totalExpected) {
+                    showToast('Juhu!', 'Das hat geklappt', 'Deine Wünsche wurden gespeichert!', 'success');
+                }
+            })
+            .fail(function(xhr, status, error) {
+                failedCount++;
+                console.log(xhr.responseText);
+            });
+    }
+    
     tableRows.forEach(row => {
         const dateCell = row.querySelector('td:first-child');
         const germanDateString = dateCell.textContent;
@@ -110,7 +160,7 @@ function saveWuensche() {
 
             success: function () {
                 enteredCount++;
-                if (enteredCount == tableRows.length) {
+                if (enteredCount == totalExpected) {
                     showToast('Juhu!', 'Das hat geklappt', 'Deine Wünsche wurden gespeichert!', 'success');
                 }
             },

@@ -9,83 +9,134 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$allPilots = [['error']];
-
 $startDate = $_GET['startDate'];
 $endDate = $_GET['endDate'];
+$clubId = Helper::$configuration['clubId'];
 
+// Step 1: Get all flugtage in the date range
+$flugtageResult = Database::query(
+    "SELECT datum FROM flugtage WHERE datum BETWEEN :startDate AND :endDate ORDER BY datum",
+    ['startDate' => $startDate, 'endDate' => $endDate]
+);
 
-$sql = "
-SELECT
-    mf.datum,
-    IFNULL(GROUP_CONCAT(DISTINCT CASE WHEN m.windenfahrer = '0' THEN CONCAT(m.firstname, ' ', m.lastname, IF(dw.pilot_id IS NOT NULL AND dw.pilot_id = m.pilot_id, IF(dw.wunsch = '1', '+', '-'), '')) END), 'Keine SL in Datenbank') AS startleiterOptionen,
-    IFNULL(GROUP_CONCAT(DISTINCT CASE WHEN m.windenfahrer = '1' THEN CONCAT(m.firstname, ' ', m.lastname, IF(dw.pilot_id IS NOT NULL AND dw.pilot_id = m.pilot_id, IF(dw.wunsch = '1', '+', '-'), '')) END), 'Keine WF in Datenbank') AS windenfahrerOptionen,
-    IFNULL(GROUP_CONCAT(DISTINCT CASE WHEN m.windenfahrer = '0' THEN CONCAT(m.firstname, '_', m.lastname, '_', m.pilot_id, IF(dw.pilot_id IS NOT NULL AND dw.pilot_id = m.pilot_id, IF(dw.wunsch = '1', '+', '-'), '')) END), '') AS startleiterOptionen_ID,
-    IFNULL(GROUP_CONCAT(DISTINCT CASE WHEN m.windenfahrer = '1' THEN CONCAT(m.firstname, '_', m.lastname, '_', m.pilot_id, IF(dw.pilot_id IS NOT NULL AND dw.pilot_id = m.pilot_id, IF(dw.wunsch = '1', '+', '-'), '')) END), '') AS windenfahrerOptionen_ID,
-    IFNULL(GROUP_CONCAT(DISTINCT CASE WHEN m.windenfahrer = '0' THEN CONCAT(m.firstname, ' ', m.lastname, IF(dw.pilot_id IS NOT NULL AND dw.pilot_id = m.pilot_id, IF(dw.wunsch = '1', '+', '-'), '')) END), 'Keine SL in Datenbank') AS startleiter,
-    IFNULL(GROUP_CONCAT(DISTINCT CASE WHEN m.windenfahrer = '1' THEN CONCAT(m.firstname, ' ', m.lastname, IF(dw.pilot_id IS NOT NULL AND dw.pilot_id = m.pilot_id, IF(dw.wunsch = '1', '+', '-'), '')) END), 'Keine WF in Datenbank') AS windenfahrer,
-    IFNULL(GROUP_CONCAT(DISTINCT CASE WHEN d.windenfahrer = '0' THEN d.pilot_id END), 'Kein SL') AS startleiter,
-    IFNULL(GROUP_CONCAT(DISTINCT CASE WHEN d.windenfahrer = '1' THEN d.pilot_id END), 'Kein WF') AS windenfahrer
-FROM
-    flugtage mf
-LEFT JOIN
-    dienste_wuensche dw ON mf.datum = dw.datum
-LEFT JOIN
-    mitglieder m ON 1 = 1
-LEFT JOIN
-    dienste d ON mf.datum = d.flugtag AND m.pilot_id = d.pilot_id
-WHERE
-    (mf.datum BETWEEN :startDate AND :endDate)
-    AND
-    (m.verein = :clubId)
-GROUP BY
-    mf.datum;
-";
+// Step 2: Get all members for this club
+$membersResult = Database::query(
+    "SELECT pilot_id, firstname, lastname, windenfahrer, max_dienste_halbjahr FROM mitglieder WHERE verein = :clubId",
+    ['clubId' => $clubId]
+);
 
-$result = Database::query($sql, [
-    'startDate' => $startDate,
-    'endDate' => $endDate,
-    'clubId' => Helper::$configuration['clubId']
-]);
+// Step 3: Get all wishes in the date range for this club's members
+$wishesResult = Database::query(
+    "SELECT dw.pilot_id, dw.datum, dw.wunsch 
+     FROM dienste_wuensche dw
+     INNER JOIN mitglieder m ON dw.pilot_id = m.pilot_id
+     WHERE dw.datum BETWEEN :startDate AND :endDate AND m.verein = :clubId",
+    ['startDate' => $startDate, 'endDate' => $endDate, 'clubId' => $clubId]
+);
 
+// Step 4: Get all entered dienste in the date range
+$diensteResult = Database::query(
+    "SELECT d.flugtag, d.pilot_id, d.windenfahrer, d.startleiter 
+     FROM dienste d
+     INNER JOIN mitglieder m ON d.pilot_id = m.pilot_id
+     WHERE d.flugtag BETWEEN :startDate AND :endDate AND m.verein = :clubId",
+    ['startDate' => $startDate, 'endDate' => $endDate, 'clubId' => $clubId]
+);
+
+// Build lookup structures for fast access
+$members = [];
+foreach ($membersResult as $member) {
+    $members[$member['pilot_id']] = [
+        'pilot_id' => (int)$member['pilot_id'],
+        'firstname' => $member['firstname'],
+        'lastname' => $member['lastname'],
+        'windenfahrer' => (int)$member['windenfahrer'],
+        'max_dienste_halbjahr' => $member['max_dienste_halbjahr'] !== null ? (int)$member['max_dienste_halbjahr'] : null
+    ];
+}
+
+// Wishes indexed by date => pilot_id => wunsch value
+$wishes = [];
+foreach ($wishesResult as $wish) {
+    $datum = $wish['datum'];
+    $pilotId = (int)$wish['pilot_id'];
+    if (!isset($wishes[$datum])) {
+        $wishes[$datum] = [];
+    }
+    $wishes[$datum][$pilotId] = (int)$wish['wunsch'];
+}
+
+// Dienste indexed by date => array of entries
+$dienste = [];
+foreach ($diensteResult as $dienst) {
+    $flugtag = $dienst['flugtag'];
+    if (!isset($dienste[$flugtag])) {
+        $dienste[$flugtag] = [];
+    }
+    $dienste[$flugtag][] = [
+        'pilot_id' => (int)$dienst['pilot_id'],
+        'windenfahrer' => (int)$dienst['windenfahrer'],
+        'startleiter' => (int)$dienst['startleiter']
+    ];
+}
+
+// Build the response data
 $data = [];
 
-if ($result !== false && $result !== []) {
-    foreach ($result as $row) {
-        $startleiterOptions = $row['startleiterOptionen'] !== null ? explode(',', $row['startleiterOptionen']) : $allPilots;
-        $windenfahrerOptions = $row['windenfahrerOptionen'] !== null ? explode(',', $row['windenfahrerOptionen']) : $allPilots;
-
-        $startleiterOptionsWithId = [];
-        $startleiterIds = $row['startleiterOptionen_ID'] !== null ? explode(',', $row['startleiterOptionen_ID']) : [];
-
-        foreach ($startleiterOptions as $index => $pilot) {
-            $id = isset($startleiterIds[$index]) && $startleiterIds[$index] !== 'null' ? $startleiterIds[$index] : null;
-            $startleiterOptionsWithId[] = [
-                'name' => $pilot,
-                'id' => $id,
-            ];
+foreach ($flugtageResult as $flugtag) {
+    $datum = $flugtag['datum'];
+    
+    $startleiterOptionen = [];
+    $windenfahrerOptionen = [];
+    $enteredStartleiter = [];
+    $enteredWindenfahrer = [];
+    
+    // Build options for each role, adding wish indicators
+    foreach ($members as $pilotId => $member) {
+        $fullName = $member['firstname'] . ' ' . $member['lastname'];
+        
+        // Check if this pilot has a wish for this date
+        $wishSuffix = '';
+        if (isset($wishes[$datum][$pilotId])) {
+            $wishSuffix = $wishes[$datum][$pilotId] === 1 ? '+' : '-';
         }
-
-        $windenfahrerOptionsWithId = [];
-        $windenfahrerIds = $row['windenfahrerOptionen_ID'] !== null ? explode(',', $row['windenfahrerOptionen_ID']) : [];
-
-        foreach ($windenfahrerOptions as $index => $pilot) {
-            $id = isset($windenfahrerIds[$index]) && $windenfahrerIds[$index] !== 'null' ? $windenfahrerIds[$index] : null;
-            $windenfahrerOptionsWithId[] = [
-                'name' => $pilot,
-                'id' => $id,
-            ];
-        }
-
-        $entry = [
-            'date' => $row['datum'],
-            'startleiterOptionen' => $startleiterOptionsWithId,
-            'windenfahrerOptionen' => $windenfahrerOptionsWithId,
-            'startleiter' => $row['startleiter'],
-            'windenfahrer' => $row['windenfahrer'],
+        
+        $pilotOption = [
+            'name' => $fullName . $wishSuffix,
+            'id' => (string)$pilotId,
+            'max_dienste_halbjahr' => $member['max_dienste_halbjahr']
         ];
-        $data[] = $entry;
+        
+        // windenfahrer = 0 means this member is a Startleiter candidate
+        // windenfahrer = 1 means this member is a Windenfahrer candidate
+        if ($member['windenfahrer'] === 0) {
+            $startleiterOptionen[] = $pilotOption;
+        } else {
+            $windenfahrerOptionen[] = $pilotOption;
+        }
     }
+    
+    // Build list of entered pilot IDs for this date
+    if (isset($dienste[$datum])) {
+        foreach ($dienste[$datum] as $dienst) {
+            // Use the specific column: startleiter = 1 means entered as Startleiter
+            if ($dienst['startleiter'] === 1) {
+                $enteredStartleiter[] = (string)$dienst['pilot_id'];
+            }
+            // windenfahrer = 1 means entered as Windenfahrer
+            if ($dienst['windenfahrer'] === 1) {
+                $enteredWindenfahrer[] = (string)$dienst['pilot_id'];
+            }
+        }
+    }
+    
+    $data[] = [
+        'date' => $datum,
+        'startleiterOptionen' => $startleiterOptionen,
+        'windenfahrerOptionen' => $windenfahrerOptionen,
+        'startleiter' => $enteredStartleiter,
+        'windenfahrer' => $enteredWindenfahrer
+    ];
 }
 
 header('Content-Type: application/json');

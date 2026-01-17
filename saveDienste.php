@@ -10,7 +10,8 @@ Helper::checkLogin();
 Database::connect();
 
 $sql = "INSERT INTO dienste (id, flugtag, pilot_id, windenfahrer, startleiter) 
-        VALUES (CONCAT(:flugtag, '_' ,:pilot_id) , :flugtag, :pilot_id, :windenfahrer, :startleiter)";
+        VALUES (CONCAT(:flugtag, '_' ,:pilot_id) , :flugtag, :pilot_id, :windenfahrer, :startleiter)
+        ON DUPLICATE KEY UPDATE windenfahrer = VALUES(windenfahrer), startleiter = VALUES(startleiter)";
 
 $result = Database::execute(
     $sql,

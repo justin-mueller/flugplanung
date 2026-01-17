@@ -2,13 +2,13 @@
 <html lang="de">
   <head>
     <title>Login</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-	<meta name="apple-mobile-web-app-title" content="Flugplanung">
-	<link rel="manifest" href="/manifest.php">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Flugplanung">
+    <link rel="manifest" href="/manifest.php">
 
     <link
       rel="stylesheet"
@@ -103,21 +103,32 @@
                     Login
                   </button>
 
-                  <p class="small mb-5 pb-lg-2">
-                    <a class="text-muted" href="#!" onclick="forgotPassword()">Passwort vergessen?</a>
-                  </p>
                   {% if error %}
                   <div class="alert alert-danger" role="alert">{{ error }}</div>
                   {% endif %}
                 </form>
 
+                <div class="small mb-5 pb-lg-2">
+                    <a class="text-muted" href="#" onclick="forgotPassword()">Passwort vergessen?</a>
+
+                    <form action="send_password_reset_mail.php" method="post" class="d-none" id="forgot-password-form">
+                      <div class="form-outline mb-4">
+                        <input class="form-control form-control-lg" type="email" id="email" name="email" required placeholder="E-Mail" aria-label="E-Mail">
+                      </div>
+
+                      <button type="submit" class="btn btn-primary btn-md btn-block mb-4 ui-button">
+                        Reset-Link senden
+                      </button>
+                    </form>
+                </div>
+
                 <hr class="my-4" />
 
-                <p class="small mb-5 pb-lg-2">
+                <p class="small pb-lg-2">
                   Noch keinen Account?<br>
                   <button
                     type="button"
-                    class="btn btn-danger mb-5 btn-md ui-button"
+                    class="btn btn-danger btn-md ui-button"
                     onclick="openRegisterForm()"
                   >
                   Hier registrieren!
@@ -161,6 +172,7 @@
                           required
                           placeholder="Vorname"
                           aria-label="Vorname"
+                          autocapitalize="none"
                         />
                       </div>
                       <div class="form-outline mb-4">
@@ -172,6 +184,7 @@
                           required
                           placeholder="Nachname"
                           aria-label="Nachname"
+                          autocapitalize="none"
                         />
                       </div>
 
@@ -270,23 +283,23 @@
                     class="btn btn-primary btn-lg btn-block mb-4 ui-button"
                     type="submit"
                   >
-                    Registrieren
+                      Registrieren
                   </button>
-                  <div
-                    id="register-error"
-                    class="alert alert-danger d-none"
-                    role="alert"
-                  ></div>
+                    <div
+                            id="register-error"
+                            class="alert alert-danger d-none"
+                            role="alert"
+                    ></div>
                 </form>
 
-                <hr class="my-4" />
+                  <hr class="my-4" />
 
-                <p class="small mb-5 pb-lg-2">
-                  Um die Flugplanung auf deinem Handy bequem zu nutzen, verwende die
-                  Funktion "Zum Home-Bildschirm" (je nach System heisst diese evtl.
-                  anders). Dann kannst du die Flugplanung wie eine App aufmachen und
-                  hast mehr Platz auf dem Bildschirm.
-                </p>
+                  <p class="small mb-5 pb-lg-2">
+                      Um die Flugplanung auf deinem Handy bequem zu nutzen, verwende die
+                      Funktion "Zum Home-Bildschirm" (je nach System heisst diese evtl.
+                      anders). Dann kannst du die Flugplanung wie eine App aufmachen und
+                      hast mehr Platz auf dem Bildschirm.
+                  </p>
               </div>
             </div>
           </div>

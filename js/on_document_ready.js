@@ -15,8 +15,15 @@ $(document).ready(function () {
     betriebAbfragen();
   });
 
+  if (typeof initHistoryRange === "function") {
+    initHistoryRange();
+  }
+
   if (typeof getUserWuensche === "function") {
     getUserWuensche();
+  }
+  if (typeof initMaxDiensteField === "function") {
+    initMaxDiensteField();
   }
   getDashboardData();
   getDienste();
@@ -46,67 +53,132 @@ $(document).ready(function () {
       ? "windenfahrer"
       : "startleiter";
     const pilot_id = parseInt(clickedDiv.attr("data-pilot-id")); // Ensure pilot_id is an integer
+    const maxDiensteAttr = clickedDiv.attr("data-max-dienste");
+    const max_dienste_halbjahr = maxDiensteAttr !== '' && maxDiensteAttr !== undefined ? parseInt(maxDiensteAttr) : null;
 
-    const date = sourceColumn.slice(-10); // Extract the date
+    // Extract the flugtag date from the column ID (timestamp format)
+    const columnParts = sourceColumn.split("_");
+    const flugtag = columnParts[columnParts.length - 1]; // Get the timestamp at the end
+    
     let name = clickedDiv[0].innerHTML;
-
+    // Remove the {N} max dienste indicator if present
+    name = name.replace(/\s*\{\d+\}$/, '');
     // Remove any trailing "+" or "-" from the name
     name = name.endsWith("+") || name.endsWith("-") ? name.slice(0, -1) : name;
 
     let destinationColumn;
+    const isAssigning = sourceColumn.includes("Optionen"); // Moving from Optionen to active = assigning
 
-    if (sourceColumn.includes("Optionen")) {
+    if (isAssigning) {
       destinationColumn = sourceColumn.replace("Optionen_", "");
-
-      // Find the pilot in dashboardDataHistory and subtract 1 from duties_count_thisyear
-      const pilotData = dashboardDataHistory.find(
-        (item) => item.pilot_id === pilot_id
-      );
-      if (pilotData) {
-        pilotData.duties_count_thisyear += 1;
-      }
     } else {
       destinationColumn = "Optionen_" + sourceColumn;
-
-      // Find the pilot in dashboardDataHistory and add 1 to duties_count_thisyear
-      const pilotData = dashboardDataHistory.find(
-        (item) => item.pilot_id === pilot_id
-      );
-      if (pilotData) {
-        pilotData.duties_count_thisyear = Math.max(
-          0,
-          pilotData.duties_count_thisyear - 1
-        );
-      }
     }
 
     const destinationCell = $(`#${destinationColumn}`);
 
-    if (
+    // Check if move is valid: either destination is empty (for active columns) or it's an Optionen column
+    const canMove =
       (!destinationCell.text().trim() &&
         !destinationCell.attr("id").includes("Optionen")) ||
-      destinationCell.attr("id").includes("Optionen")
-    ) {
-      destinationCell.append(clickedDiv);
-      clickedDiv.data("column", destinationColumn);
+      destinationCell.attr("id").includes("Optionen");
 
-      if (sourceColumn.includes("Optionen")) {
-        // Add the entry to enteredDienste when moving into "active" columns
-        enteredDienste.push({
-          pilot_id: pilot_id,
-          name: name,
-          date: date,
-          dienst: dienst,
-        });
-      } else {
-        // Remove the entry from enteredDienste when moving into "Optionen" columns
-        enteredDienste = enteredDienste.filter(
-          (item) => !(item.name === name && item.date === date)
-        );
+    if (canMove) {
+      // Check if pilot would exceed their max dienste limit when assigning
+      if (isAssigning && max_dienste_halbjahr !== null) {
+        // Count current duties for this pilot
+        const currentDutyCount = enteredDienste.filter(
+          (item) => item.pilot_id === pilot_id || item.pilot_id === String(pilot_id)
+        ).length;
+        
+        if (currentDutyCount >= max_dienste_halbjahr) {
+          showToast(
+            'Achtung!', 
+            'Maximale Dienste erreicht', 
+            `${name} hat bereits ${currentDutyCount} Dienste und möchte max. ${max_dienste_halbjahr} Dienste in diesem Halbjahr!`, 
+            'warning'
+          );
+        }
       }
-    }
+      
+      // Prepare the AJAX call based on whether we're assigning or unassigning
+      let ajaxConfig;
+      
+      if (isAssigning) {
+        // Assigning: INSERT into backend
+        ajaxConfig = {
+          url: 'saveDienste.php',
+          method: 'POST',
+          data: {
+            flugtag: flugtag,
+            pilot_id: pilot_id,
+            windenfahrer: dienst === 'windenfahrer' ? 1 : 0,
+            startleiter: dienst === 'startleiter' ? 1 : 0
+          }
+        };
+      } else {
+        // Unassigning: DELETE from backend
+        ajaxConfig = {
+          url: 'deleteSingleDienst.php',
+          method: 'POST',
+          data: {
+            flugtag: flugtag,
+            pilot_id: pilot_id
+          }
+        };
+      }
 
-    populateDashboardHistory();
+      // Make the backend call
+      $.ajax(ajaxConfig)
+        .done(function(response) {
+          // Backend succeeded - now update the frontend
+          destinationCell.append(clickedDiv);
+          clickedDiv.data("column", destinationColumn);
+
+          // Update the pilot's duty count in dashboardDataHistory
+          const pilotData = dashboardDataHistory.find(
+            (item) => item.pilot_id === pilot_id
+          );
+          if (pilotData) {
+            if (isAssigning) {
+              pilotData.duties_count_thisyear += 1;
+            } else {
+              pilotData.duties_count_thisyear = Math.max(
+                0,
+                pilotData.duties_count_thisyear - 1
+              );
+            }
+          }
+
+          if (isAssigning) {
+            // Add the entry to enteredDienste only if it doesn't already exist
+            const alreadyExists = enteredDienste.some(
+              (item) => item.pilot_id === pilot_id && item.date === flugtag && item.dienst === dienst
+            );
+            if (!alreadyExists) {
+              enteredDienste.push({
+                pilot_id: pilot_id,
+                name: name,
+                date: flugtag,
+                dienst: dienst,
+                max_dienste_halbjahr: max_dienste_halbjahr
+              });
+            }
+          } else {
+            // Remove the entry from enteredDienste (matching pilot_id, date, AND dienst)
+            enteredDienste = enteredDienste.filter(
+              (item) => !(item.pilot_id === pilot_id && item.date === flugtag && item.dienst === dienst)
+            );
+          }
+
+          // Live update the history table
+          populateDashboardHistory();
+        })
+        .fail(function(xhr, status, error) {
+          console.error('Error saving/deleting dienst:', error);
+          showToast('Oops!', 'Fehler', 'Die Änderung konnte nicht gespeichert werden.', 'error');
+        });
+    }
   });
 
   $(".year-dropdown").each(function () {
@@ -124,8 +196,12 @@ $(document).ready(function () {
     if (typeof getUserWuensche === "function") {
       getUserWuensche();
     }
+    if (typeof initMaxDiensteField === "function") {
+      initMaxDiensteField();
+    }
     getDashboardData();
     loadFlugtage();
+    getDienste();
   });
 
   loadChatbox(true);
