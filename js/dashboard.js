@@ -1,92 +1,46 @@
-function getDefaultHistoryRange() {
+function getDefaultHistoryStartDate() {
     const previousYear = new Date().getFullYear() - 1;
-    return {
-        startDate: new Date(previousYear, 0, 1, 12, 0, 0),
-        endDate: new Date(previousYear, 11, 31, 12, 0, 0),
-    };
+    return new Date(previousYear, 0, 1, 12, 0, 0);
 }
 
-function formatShortGermanDate(dateString) {
-    const date = new Date(`${dateString}T00:00:00`);
-    return date.toLocaleDateString('de-DE');
-}
-
-function updateHistoryRangeLabels(startDateString, endDateString) {
-    const beforeLabel = `vor ${formatShortGermanDate(startDateString)}`;
-    const rangeLabel = `${formatShortGermanDate(startDateString)} - ${formatShortGermanDate(endDateString)}`;
-
-    document.querySelectorAll('.history-range-before-label').forEach(label => {
-        label.textContent = beforeLabel;
-    });
-    document.querySelectorAll('.history-range-label').forEach(label => {
-        label.textContent = rangeLabel;
-    });
-}
-
-function getHistoryRangeValues() {
-    const defaults = getDefaultHistoryRange();
+function getHistoryStartDateValue() {
     const startInput = document.getElementById('historyStartDate');
-    const endInput = document.getElementById('historyEndDate');
-
-    let startDate = defaults.startDate;
-    let endDate = defaults.endDate;
+    let startDate = getDefaultHistoryStartDate();
 
     if (startInput && startInput.value) {
         startDate = new Date(`${startInput.value}T12:00:00`);
-    }
-    if (endInput && endInput.value) {
-        endDate = new Date(`${endInput.value}T12:00:00`);
-    }
-
-    if (endDate < startDate) {
-        endDate = new Date(startDate.getTime());
     }
 
     if (startInput && !startInput.value) {
         startInput.value = formatDateString(startDate);
     }
-    if (endInput && !endInput.value) {
-        endInput.value = formatDateString(endDate);
-    }
 
-    return {
-        startDate: formatDateString(startDate),
-        endDate: formatDateString(endDate),
-    };
+    return formatDateString(startDate);
 }
 
 function initHistoryRange() {
     const startInput = document.getElementById('historyStartDate');
-    const endInput = document.getElementById('historyEndDate');
     const applyButton = document.getElementById('historyRangeApply');
 
-    if (!startInput || !endInput) {
+    if (!startInput) {
         return;
     }
 
-    const { startDate, endDate } = getHistoryRangeValues();
-    updateHistoryRangeLabels(startDate, endDate);
-
-    const applyRange = () => {
-        const range = getHistoryRangeValues();
-        updateHistoryRangeLabels(range.startDate, range.endDate);
-        getDashboardData();
-    };
+    // Set default value
+    getHistoryStartDateValue();
 
     if (applyButton) {
-        applyButton.addEventListener('click', applyRange);
+        applyButton.addEventListener('click', () => {
+            getDashboardData();
+        });
     }
-
-    startInput.addEventListener('change', () => updateHistoryRangeLabels(getHistoryRangeValues().startDate, getHistoryRangeValues().endDate));
-    endInput.addEventListener('change', () => updateHistoryRangeLabels(getHistoryRangeValues().startDate, getHistoryRangeValues().endDate));
 }
 
 function getDashboardData() {
 
     let startDate = formatDateString(saisonStartDate);
     let endDate = formatDateString(saisonEndDate);
-    const historyRange = getHistoryRangeValues();
-    updateHistoryRangeLabels(historyRange.startDate, historyRange.endDate);
+    const historyStartDate = getHistoryStartDateValue();
 
     enteredDienste = [];
 
@@ -101,7 +55,7 @@ function getDashboardData() {
             url: 'getDashboardDataHistory.php',
             type: 'GET',
             dataType: 'json',
-            data: { startDate: historyRange.startDate, endDate: historyRange.endDate }
+            data: { startDate: historyStartDate }
         }),
     ];
 
@@ -160,7 +114,7 @@ function populateDashboardHistory() {
 
     // Add the sum to each row and calculate points
     dashboardDataHistory.forEach(row => {
-        row.sum = row.duties_count_history + row.active_duties_count_history + row.duties_count_thisyear + row.active_duties_count_thisyear - row.active_flying_days_history * 0.2;
+        row.sum = row.duties_count + row.active_duties_count - row.active_flying_days * 0.2;
     });
 
     // Sort the data by the sum (ascending)
@@ -180,14 +134,12 @@ function populateDashboardHistory() {
         nameCell.textContent = fullName;
         nameCell.title = fullName;
         
-        // Conditionally format the last two columns
-        const noDutiesCell_hist = `<td style="background-color: ${row.duties_count_history === 0 ? '#ffd699' : 'inherit'}">${row.duties_count_history}</td>`;
-        const activeDutiesCell_hist = `<td style="background-color: ${row.active_duties_count_history === 0 ? '#ffd699' : 'inherit'}">${row.active_duties_count_history}</td>`;
-        const noDutiesCell_thisSeason = `<td style="background-color: ${row.duties_count_thisyear === 0 ? '#ffd699' : 'inherit'}">${row.duties_count_thisyear}</td>`;
-        const activeDutiesCell_thisSeason = `<td style="background-color: ${row.active_duties_count_thisyear === 0 ? '#ffd699' : 'inherit'}">${row.active_duties_count_thisyear}</td>`;
-        const activeFlyingDaysHistory = `<td style="background-color: ${row.active_flying_days_history === 0 ? '#8bffb1' : '#ffd699'}">${row.active_flying_days_history}</td>`;
+        // Conditionally format cells
+        const dutiesCell = `<td style="background-color: ${row.duties_count === 0 ? '#ffd699' : 'inherit'}">${row.duties_count}</td>`;
+        const activeDutiesCell = `<td style="background-color: ${row.active_duties_count === 0 ? '#ffd699' : 'inherit'}">${row.active_duties_count}</td>`;
+        const activeFlyingDays = `<td style="background-color: ${row.active_flying_days === 0 ? '#8bffb1' : '#ffd699'}">${row.active_flying_days}</td>`;
 
-        // Calculate points using the new sum, rounded to 1 decimal place
+        // Calculate points using the sum, rounded to 1 decimal place
         const roundedSum = parseFloat(row.sum.toFixed(1));
         const points = `<td style="background-color: ${row.sum <= 0 ? '#ffd699' : 'inherit'}">${roundedSum}</td>`;
 
@@ -195,7 +147,7 @@ function populateDashboardHistory() {
         tr.appendChild(nameCell);
         tr.insertAdjacentHTML(
             'beforeend',
-            noDutiesCell_hist + activeDutiesCell_hist + noDutiesCell_thisSeason + activeDutiesCell_thisSeason + activeFlyingDaysHistory + points
+            dutiesCell + activeDutiesCell + activeFlyingDays + points
         );
         tbody.appendChild(tr);
     });
