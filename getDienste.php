@@ -9,65 +9,55 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-if (!isset($_GET['year']) || !filter_var($_GET['year'], FILTER_VALIDATE_INT)) {
+if (!isset($_GET['startDate']) || !isset($_GET['endDate'])) {
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'Invalid year parameter'], JSON_THROW_ON_ERROR);
+    echo json_encode(['error' => 'Missing startDate or endDate parameter'], JSON_THROW_ON_ERROR);
     exit;
 }
 
+$startDate = $_GET['startDate'];
+$endDate = $_GET['endDate'];
+$clubId = Helper::$configuration['clubId'];
 
-$allPilots = [['error']];
-
-// Check if startDate and endDate are provided
-$startDate = $_GET['startDate'] ?? null;
-$endDate = $_GET['endDate'] ?? null;
-$year = $_GET['year'] ?? null;
+// Query dienste for the date range, using the dienste table fields to determine role
 $sql = "
-
 SELECT
     d.flugtag,
-    NULLIF(GROUP_CONCAT(CASE 
-        WHEN m.windenfahrer = 1 THEN CONCAT(m.firstname, ' ', m.lastname) 
+    GROUP_CONCAT(DISTINCT CASE 
+        WHEN d.windenfahrer = 1 THEN CONCAT(m.firstname, ' ', m.lastname) 
         ELSE NULL 
-    END SEPARATOR ', '), '') AS Windenfahrer,
-    NULLIF(GROUP_CONCAT(CASE 
-        WHEN m.windenfahrer = 0 THEN CONCAT(m.firstname, ' ',  m.lastname) 
+    END SEPARATOR ', ') AS Windenfahrer,
+    GROUP_CONCAT(DISTINCT CASE 
+        WHEN d.startleiter = 1 THEN CONCAT(m.firstname, ' ', m.lastname) 
         ELSE NULL 
-    END SEPARATOR ', '), '') AS Startleiter,
-    NULLIF(GROUP_CONCAT(CASE 
-        WHEN m.windenfahrer = 1 THEN m.pilot_id
+    END SEPARATOR ', ') AS Startleiter,
+    GROUP_CONCAT(DISTINCT CASE 
+        WHEN d.windenfahrer = 1 THEN CAST(m.pilot_id AS CHAR)
         ELSE NULL
-    END SEPARATOR ', '), '') AS Windenfahrer_ids,
-    NULLIF(GROUP_CONCAT(CASE 
-        WHEN m.windenfahrer = 0 THEN m.pilot_id
+    END SEPARATOR ',') AS Windenfahrer_ids,
+    GROUP_CONCAT(DISTINCT CASE 
+        WHEN d.startleiter = 1 THEN CAST(m.pilot_id AS CHAR)
         ELSE NULL
-    END SEPARATOR ', '), '') AS Startleiter_ids
+    END SEPARATOR ',') AS Startleiter_ids
 FROM 
-    mitglieder m
-LEFT JOIN 
-    dienste d ON m.pilot_id = d.pilot_id
+    dienste d
+INNER JOIN 
+    mitglieder m ON d.pilot_id = m.pilot_id
 WHERE 
     m.verein = :clubId
-    AND YEAR(d.flugtag) = :year
+    AND d.flugtag >= :startDate
+    AND d.flugtag <= :endDate
 GROUP BY 
     d.flugtag
 ORDER BY 
     d.flugtag;
-
-
 ";
 
-if ($startDate && $endDate) {
-    $sql .= ' AND (mf.datum BETWEEN :startDate AND :endDate)';
-    $params = [
-        'year' => $_GET['year'],
-        'startDate' => $startDate,
-        'endDate' => $endDate,
-        'clubId' => Helper::$configuration['clubId'],
-    ];
-} else {
-    $params = []; // No parameters needed if no date filter is applied
-}
+$params = [
+    'startDate' => $startDate,
+    'endDate' => $endDate,
+    'clubId' => $clubId,
+];
 
 $result = Database::query($sql, $params);
 

@@ -77,6 +77,12 @@ a {
 	cursor: pointer;
 }
 
+#flugtag:hover,
+#additional_flugtag:hover,
+.date-picker:hover {
+	cursor: pointer;
+}
+
 .fpbanner {
 	flex-direction: column;
 }
@@ -295,6 +301,7 @@ form {
 	margin-bottom: 2px;
 	background-color: #f2f2f2;
 	cursor: pointer;
+	font-size: smaller;
 }
 
 .pilot-div-not-available {
@@ -314,6 +321,7 @@ form {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    font-size: smaller;
 }
 
 .date-table th, .date-table td {
