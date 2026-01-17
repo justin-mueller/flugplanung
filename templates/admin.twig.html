@@ -1,34 +1,275 @@
 <div class="card mt-3">
     <div class="card-header">
-        <h5 class="card-title">Newsletter senden</h5>
+        <h5 class="card-title mb-0">
+            <i class="fa-solid fa-envelope me-2"></i>Newsletter / E-Mails senden
+        </h5>
     </div>
     <div class="card-body">
-
-        <form action="sendNewsletter.php?key=dsfkjh33fdsdsdfd3fc32098fe&test=true" method="post">
-            <div class="input-group mb-3">
-                <div class="input-group-append">
-                    <p>Test geht nur an die Admin-Email</p>
-                    <button class="btn btn-primary" type="submit">Test Senden</button>
-                </div>
+        
+        <!-- Test Recipient Selection -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label for="test-recipient" class="form-label fw-semibold">Test-Empfänger auswählen</label>
+                <select id="test-recipient" class="form-select">
+                    <option value="">Mitglieder werden geladen...</option>
+                </select>
+                <small class="text-muted">Wähle einen Empfänger für Test-E-Mails</small>
             </div>
-        </form>
+        </div>
 
-        <p class="card-text">Gebe "ja ich bin mir sicher" ein, um den Newsletter (Datei: newsletter/newsletter.html) an alle User zu senden.</p>
-        <form action="sendNewsletter.php?key=dsfkjh33fdsdsdfd3fc32098fe&test=false" method="post">
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="ja ich bin mir sicher" aria-label="ja ich bin mir sicher" aria-describedby="basic-addon2" required
-                    pattern="^ja ich bin mir sicher$"
-                    title="Bitte genau diese Phrase eingeben">
-                <div class="input-group-append">
-                    <button class="btn btn-primary" type="submit">Senden</button>
-                </div>
+        <hr class="my-4">
+
+        <!-- Mail List -->
+        <h6 class="fw-semibold mb-3">Verfügbare E-Mail-Vorlagen</h6>
+        <div id="mail-list" class="mb-4">
+            <div class="text-muted">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                E-Mails werden geladen...
             </div>
-        </form>
-
-
+        </div>
 
     </div>
 </div>
 
+<!-- Mail Preview Modal -->
+<div class="modal fade" id="mailPreviewModal" tabindex="-1" aria-labelledby="mailPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mailPreviewModalLabel">E-Mail Vorschau</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="mail-preview-iframe" style="width: 100%; height: 500px; border: none;"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Confirm Send Modal -->
+<div class="modal fade" id="confirmSendModal" tabindex="-1" aria-labelledby="confirmSendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmSendModalLabel">
+                    <i class="fa-solid fa-exclamation-triangle me-2"></i>Bestätigung erforderlich
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <div class="modal-body">
+                <p>Du bist dabei, die E-Mail <strong id="confirm-mail-subject"></strong> an <strong>alle Newsletter-Abonnenten</strong> zu senden.</p>
+                <p class="mb-3">Gebe zur Bestätigung ein:</p>
+                <input type="text" id="confirm-phrase-input" class="form-control" 
+                    placeholder="ja ich bin mir sicher"
+                    autocomplete="off">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-danger" id="confirm-send-btn">
+                    <i class="fa-solid fa-paper-plane me-1"></i>Senden
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script>
+(function() {
+    const SECRET_KEY = 'dsfkjh33fdsdsdfd3fc32098fe';
+    let mailsData = [];
+    let membersData = [];
+    let pendingMailFilename = null;
+
+    // Load admin data on init
+    function loadAdminData() {
+        fetch('getAdminData.php')
+            .then(response => response.json())
+            .then(data => {
+                mailsData = data.mails || [];
+                membersData = data.members || [];
+                renderMailList();
+                renderMembersDropdown();
+            })
+            .catch(error => {
+                console.error('Error loading admin data:', error);
+                document.getElementById('mail-list').innerHTML = 
+                    '<div class="alert alert-danger">Fehler beim Laden der Daten</div>';
+            });
+    }
+
+    // Render members dropdown
+    function renderMembersDropdown() {
+        const select = document.getElementById('test-recipient');
+        select.innerHTML = '<option value="">-- Empfänger wählen --</option>';
+        
+        membersData.forEach(member => {
+            const option = document.createElement('option');
+            option.value = member.pilot_id;
+            option.textContent = `${member.lastname}, ${member.firstname} (${member.email})`;
+            select.appendChild(option);
+        });
+    }
+
+    // Render mail list
+    function renderMailList() {
+        const container = document.getElementById('mail-list');
+        
+        if (mailsData.length === 0) {
+            container.innerHTML = '<div class="alert alert-info">Keine E-Mail-Vorlagen im Ordner "mails" gefunden.</div>';
+            return;
+        }
+
+        let html = '<div class="table-responsive"><table class="table table-hover align-middle mb-0">';
+        html += '<thead class="table-light"><tr>';
+        html += '<th>Betreff</th>';
+        html += '<th>Datei</th>';
+        html += '<th style="width: 80px;" class="text-center">Test</th>';
+        html += '<th style="width: 80px;" class="text-center">Senden</th>';
+        html += '<th style="width: 80px;" class="text-center">Vorschau</th>';
+        html += '</tr></thead><tbody>';
+
+        mailsData.forEach(mail => {
+            html += '<tr>';
+            html += `<td class="fw-semibold">${escapeHtml(mail.subject)}</td>`;
+            html += `<td class="text-muted small">${escapeHtml(mail.filename)}</td>`;
+            html += `<td class="text-center">
+                <div class="form-check d-flex justify-content-center mb-0">
+                    <input class="form-check-input test-checkbox" type="checkbox" data-filename="${escapeHtml(mail.filename)}" id="test-${escapeHtml(mail.filename)}" checked>
+                </div>
+            </td>`;
+            html += `<td class="text-center">
+                <button type="button" class="btn btn-sm btn-primary send-btn" data-filename="${escapeHtml(mail.filename)}" data-subject="${escapeHtml(mail.subject)}">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </td>`;
+            html += `<td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-secondary preview-btn" data-filename="${escapeHtml(mail.filename)}">
+                    <i class="fa-solid fa-eye"></i>
+                </button>
+            </td>`;
+            html += '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+
+        // Attach event listeners
+        attachEventListeners();
+    }
+
+    // Attach event listeners
+    function attachEventListeners() {
+        // Send buttons
+        document.querySelectorAll('.send-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const filename = this.dataset.filename;
+                const subject = this.dataset.subject;
+                const testCheckbox = document.querySelector(`.test-checkbox[data-filename="${filename}"]`);
+                const isTest = testCheckbox ? testCheckbox.checked : true;
+                const testRecipient = document.getElementById('test-recipient').value;
+
+                if (isTest) {
+                    if (!testRecipient) {
+                        alert('Bitte wähle einen Test-Empfänger aus.');
+                        return;
+                    }
+                    sendMail(filename, true, testRecipient);
+                } else {
+                    // Show confirmation modal for sending to all
+                    showConfirmModal(filename, subject);
+                }
+            });
+        });
+
+        // Preview buttons
+        document.querySelectorAll('.preview-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const filename = this.dataset.filename;
+                showPreview(filename);
+            });
+        });
+    }
+
+    // Show confirmation modal
+    function showConfirmModal(filename, subject) {
+        pendingMailFilename = filename;
+        document.getElementById('confirm-mail-subject').textContent = subject;
+        document.getElementById('confirm-phrase-input').value = '';
+        const modal = new bootstrap.Modal(document.getElementById('confirmSendModal'));
+        modal.show();
+    }
+
+    // Send mail
+    function sendMail(filename, isTest, testRecipient) {
+        const formData = new FormData();
+        formData.append('mail_file', filename);
+        if (isTest && testRecipient) {
+            formData.append('test_recipient', testRecipient);
+        }
+
+        const testParam = isTest ? 'true' : 'false';
+        const url = `sendNewsletter.php?key=${SECRET_KEY}&test=${testParam}`;
+
+        // Open in new window to show result
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = url;
+        form.target = '_blank';
+
+        const mailInput = document.createElement('input');
+        mailInput.type = 'hidden';
+        mailInput.name = 'mail_file';
+        mailInput.value = filename;
+        form.appendChild(mailInput);
+
+        if (isTest && testRecipient) {
+            const recipientInput = document.createElement('input');
+            recipientInput.type = 'hidden';
+            recipientInput.name = 'test_recipient';
+            recipientInput.value = testRecipient;
+            form.appendChild(recipientInput);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+    }
+
+    // Show preview modal
+    function showPreview(filename) {
+        const modal = new bootstrap.Modal(document.getElementById('mailPreviewModal'));
+        const iframe = document.getElementById('mail-preview-iframe');
+        iframe.src = 'getMailContent.php?file=' + encodeURIComponent(filename);
+        modal.show();
+    }
+
+    // Confirm send button handler
+    document.getElementById('confirm-send-btn').addEventListener('click', function() {
+        const phrase = document.getElementById('confirm-phrase-input').value;
+        
+        if (phrase !== 'ja ich bin mir sicher') {
+            alert('Bitte gebe "ja ich bin mir sicher" ein.');
+            return;
+        }
+
+        if (pendingMailFilename) {
+            sendMail(pendingMailFilename, false, null);
+            bootstrap.Modal.getInstance(document.getElementById('confirmSendModal')).hide();
+            pendingMailFilename = null;
+        }
+    });
+
+    // Escape HTML helper
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Initialize
+    loadAdminData();
+})();
+</script>

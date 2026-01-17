@@ -2,9 +2,19 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Increase execution time for bulk sending (10 minutes)
+set_time_limit(600);
+ini_set('max_execution_time', 600);
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+// Flush output immediately
+ini_set('output_buffering', 'off');
+ini_set('implicit_flush', true);
+ob_implicit_flush(true);
+if (ob_get_level()) ob_end_flush();
 
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Mailer;
@@ -27,28 +37,45 @@ $dsn = 'smtp://newsletter@hdgf.de:123456@s185.goserver.host:587';
 $transport = Transport::fromDsn($dsn);
 $mailer = new Mailer($transport);
 
-// Fetch newsletter subscribers
-$testing = $_GET['test'];
+// Get parameters
+$testing = isset($_GET['test']) && $_GET['test'] === 'true';
+$mailFile = isset($_POST['mail_file']) ? $_POST['mail_file'] : 'newsletter.html';
+$testRecipientId = isset($_POST['test_recipient']) ? intval($_POST['test_recipient']) : null;
 
-echo "Sending newsletter with Test mode: " . ($testing ? "true" : "false");
+// Sanitize mail file name (prevent directory traversal)
+$mailFile = basename($mailFile);
 
-$sql = "SELECT email, firstname, lastname 
-        FROM mitglieder 
-        WHERE newsletter = 1";
-if ($testing) {
-    $sql .= " AND email = 'register@simulux.de' ";
+echo "Sending mail: " . htmlspecialchars($mailFile) . "<br>";
+echo "Test mode: " . ($testing ? "true" : "false") . "<br>";
+
+// Fetch recipients
+if ($testing && $testRecipientId) {
+    // Send only to selected test recipient
+    $sql = "SELECT email, firstname, lastname 
+            FROM mitglieder 
+            WHERE pilot_id = :pilotId";
+    $recipients = Database::query($sql, ['pilotId' => $testRecipientId]);
+    echo "Test recipient ID: " . $testRecipientId . "<br>";
+} else {
+    // Send to all newsletter subscribers
+    $sql = "SELECT email, firstname, lastname 
+            FROM mitglieder 
+            WHERE newsletter = 1";
+    $recipients = Database::query($sql, []);
 }
 
-$recipients = Database::query($sql, []);
+if (empty($recipients)) {
+    die("No recipients found!");
+}
 
-// Load newsletter file
-$emailFile = __DIR__ . '/newsletter/newsletter.html';
+// Load mail file from mails folder
+$emailFile = __DIR__ . '/mails/' . $mailFile;
 if (!file_exists($emailFile)) {
-    die("Newsletter file not found!");
+    die("Mail file not found: " . htmlspecialchars($mailFile));
 }
 $emailContent = file_get_contents($emailFile);
 
-// Try to extract subject and body
+// Try to extract subject from first line
 $lines = preg_split("/\r\n|\n|\r/", $emailContent);
 $subject = "Newsletter";
 $body = $emailContent;
@@ -66,7 +93,18 @@ if (count($parts) === 2) {
     $body = $parts[1]; // just the body part
 }
 
+echo "Subject: " . htmlspecialchars($subject) . "<br>";
+echo "Sending to " . count($recipients) . " recipient(s)<br>";
+echo "<strong>Adding 2 second delay between emails to avoid rate limiting...</strong><br><br>";
+
+$successCount = 0;
+$failCount = 0;
+$failedEmails = [];
+$total = count($recipients);
+$current = 0;
+
 foreach ($recipients as $recipient) {
+    $current++;
     $to = $recipient['email'];
 
     // Personalize
@@ -88,11 +126,46 @@ foreach ($recipients as $recipient) {
         ->subject($subject)
         ->html($personalizedBody);
 
-    try {
-        $mailer->send($email);
-        echo "Newsletter sent to {$to}\n";
-    } catch (\Throwable $e) {
-        echo "Failed to send to {$to}: " . $e->getMessage() . "\n";
+    $sent = false;
+    $retries = 3;
+    
+    for ($attempt = 1; $attempt <= $retries && !$sent; $attempt++) {
+        try {
+            $mailer->send($email);
+            echo "[{$current}/{$total}] ✓ Sent to {$to}<br>";
+            $successCount++;
+            $sent = true;
+        } catch (\Throwable $e) {
+            $errorMsg = $e->getMessage();
+            
+            // Check if it's a rate limit error (450)
+            if (strpos($errorMsg, '450') !== false && $attempt < $retries) {
+                echo "[{$current}/{$total}] ⏳ Rate limited for {$to}, waiting 5 seconds (attempt {$attempt}/{$retries})...<br>";
+                sleep(5);
+            } else {
+                echo "[{$current}/{$total}] ✗ Failed to send to {$to}: {$errorMsg}<br>";
+                $failCount++;
+                $failedEmails[] = ['email' => $to, 'error' => $errorMsg];
+            }
+        }
+    }
+
+    // Add delay between emails to avoid rate limiting (skip on last email)
+    if ($current < $total) {
+        sleep(3);
     }
 }
 
+echo "<br><hr>";
+echo "<strong>Summary:</strong><br>";
+echo "✓ Successfully sent: {$successCount}<br>";
+echo "✗ Failed: {$failCount}<br>";
+
+if (!empty($failedEmails)) {
+    echo "<br><strong>Failed emails:</strong><br>";
+    foreach ($failedEmails as $failed) {
+        echo "- " . htmlspecialchars($failed['email']) . "<br>";
+    }
+}
+
+echo "<br><strong>Done!</strong>";
