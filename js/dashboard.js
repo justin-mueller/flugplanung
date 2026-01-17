@@ -108,6 +108,24 @@ function getDashboardData() {
         console.error('Dashboard Daten konnten nicht geladen werden:', status, error);
     });
 }
+function refreshDashboardHistory() {
+    const historyStartDate = getHistoryStartDateValue();
+    
+    $.ajax({
+        url: 'getDashboardDataHistory.php',
+        type: 'GET',
+        dataType: 'json',
+        data: { startDate: historyStartDate }
+    })
+    .done(function(history) {
+        dashboardDataHistory = history;
+        populateDashboardHistory();
+    })
+    .fail(function(xhr, status, error) {
+        console.error('Failed to refresh history data:', status, error);
+    });
+}
+
 function populateDashboardHistory() {
     console.log("history");
     console.log(dashboardDataHistory);

@@ -135,21 +135,6 @@ $(document).ready(function () {
           destinationCell.append(clickedDiv);
           clickedDiv.data("column", destinationColumn);
 
-          // Update the pilot's duty count in dashboardDataHistory
-          const pilotData = dashboardDataHistory.find(
-            (item) => item.pilot_id === pilot_id
-          );
-          if (pilotData) {
-            if (isAssigning) {
-              pilotData.duties_count_thisyear += 1;
-            } else {
-              pilotData.duties_count_thisyear = Math.max(
-                0,
-                pilotData.duties_count_thisyear - 1
-              );
-            }
-          }
-
           if (isAssigning) {
             // Add the entry to enteredDienste only if it doesn't already exist
             const alreadyExists = enteredDienste.some(
@@ -171,8 +156,8 @@ $(document).ready(function () {
             );
           }
 
-          // Live update the history table
-          populateDashboardHistory();
+          // Refresh history table from backend to ensure accurate counts
+          refreshDashboardHistory();
         })
         .fail(function(xhr, status, error) {
           console.error('Error saving/deleting dienst:', error);
