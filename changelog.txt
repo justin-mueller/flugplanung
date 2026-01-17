@@ -1,0 +1,7 @@
+Updates Version 1.1.0!
+
+Dienste können vom User selbst übernommen werden
+Flugbetrieb kann auch vom Windenfahrer eingetragen werden
+Tage, die nicht offiziell als Flugtage eingetragen wurden, werden als solche gekennzeichnet
+Das Passwort kann jetzt vom User selbst zurückgesetzt werden
+Newsletter boolean (in den einstellungen)
