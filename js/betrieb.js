@@ -46,7 +46,6 @@ function betriebAusrufen(Fluggebiet) {
 
 function betriebAbfragen() {
 
-	
 
 	toggleSpinner(true);
 	$.ajax({
@@ -100,7 +99,7 @@ function betriebAbfragen() {
 					$('#minpilotreached').addClass('d-none');
 				} else {
 					$('#banner_aufbau').addClass('d-none');
-					$('#minpilotreached').removeClass('d-none');
+					if (isFlugtag) $('#minpilotreached').removeClass('d-none');
 				}		
 
 				if (FlugbetriebAbgesagt) {

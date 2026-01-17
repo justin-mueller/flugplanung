@@ -55,6 +55,7 @@
 			Austragen
 		</button>
 	</div>
+
 </div>
 
 <div class="row  d-none" id="flugbetriebAusrufen">
@@ -127,12 +128,20 @@
 			</svg>
 		</div>
 
+		<div id="no_official_flugtag" class="alert alert-warning d-flex align-items-center mt-3 fpbanner d-none" role="alert">
+			<svg class="bi me-2" width="24" height="24" role="img" aria-label="Info:">
+				<use xlink:href="img/warning.svg#warning-fill" />
+			</svg>
+			Dieser Tag ist nicht als Flugtag eingetragen!
+		</div>
+
 		<div id="abgesagt" class="alert alert-danger d-flex align-items-center mt-3 fpbanner d-none" role="alert">
 			<svg class="bi me-2" width="24" height="24" role="img" aria-label="Info:">
 				<use xlink:href="img/warning.svg#warning-fill" />
 			</svg>
 			Der Flugbetrieb für diesen Tag wurde abgesagt!
 		</div>
+
 
 		<!--- Chatbox --->
 
@@ -157,7 +166,6 @@
 			</div>
 		</div>
 
-
 		<div class="row mt-3 mb-3">
 			<div class="accordion" id="helpAccordion">
 				<div class="accordion-item">
@@ -170,16 +178,14 @@
 					<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
 						data-bs-parent="#helpAccordion">
 						<div class="accordion-body">
-							<strong>Willkommen zur neuen Flugplanung!</strong><br>Du hast ggf. noch einige Fragen. Im
-							Prinzip ist alles wie vorher.
-							Ein paar Neuerungen gibt es dennoch. Wenn Du das hier siehst, hast Du Dich ja bereits
-							erfolgreich registriert - das ist schon mal gut!<br>
-							Das heißt, jetzt kannst nur noch Du selbst Dich ein- und austragen. Demnächst wird auch die
-							Wunschliste hier verfügbar sein (zweites Halbjahr 2024)<br>
-							Was neu ist: ab jetzt wählst Du das Fluggebiet aus, welches du bevorzugst. Da wir aber ja 3
-							an der Zahl haben, kannst du die anderen beiden übrigen als Alternative auswählen. Dann
-							sieht jeder, ob du nur zu dem einen, oder wenn der Betrieb doch woanders stattfindet, auch
-							dort hin kommen würdest. Toll, nicht wahr?
+							<strong>Updates Version 1.1.0!</strong><br>
+							<ul>
+								<li>Dienste können vom User selbst übernommen werden</li>
+								<li>Flugbetrieb kann auch vom Windenfahrer eingetragen werden</li>
+								<li>Tage, die nicht offiziell als Flugtage eingetragen wurden, werden als solche gekennzeichnet</li>
+								<li>Das Passwort kann jetzt vom User selbst zurückgesetzt werden</li>
+							</ul>
+							
 							<br>
 							Wenn du Fragen zur neuen Planung hast, wende Dich bitte an Justin.
 						</div>
@@ -187,11 +193,10 @@
 				</div>
 			</div>
 		</div>
-
+		-->
 	</div>
 </div>
 
-<!-- Modal -->
 <div class="modal fade" id="enterModal" tabindex="-1" aria-labelledby="enterModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
@@ -245,6 +250,11 @@
 
 				</form>
 
+				<div id="take_over_duty" class="d-none">
+					<p id="take_over_duty_text"></p>
+					<button type="button"  class="btn btn-outline-warning ui-button mb-4"
+						data-bs-toggle="modal" data-bs-target="#confirmTakeOverModal">Dienst übernehmen</button>
+				</div>
 
 				<div class="modal-footer">
 					<button type="button" class="btn btn-outline-warning ui-button"
@@ -253,7 +263,31 @@
 						data-bs-dismiss="modal">Absenden</button>
 
 				</div>
+
 			</div>
 		</div>
 	</div>
 </div>
+
+
+<div class="modal fade" id="confirmTakeOverModal" tabindex="-1" aria-labelledby="confirmTakeOverModalLabel"
+	aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="confirmTakeOverModalLabel">Bestätigung</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p id="confirmTakeOverModalText">Ja, ich möchte diesen Dienst übernehmen!</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-warning ui-button"
+					data-bs-dismiss="modal">Abbrechen</button>
+				<button type="button" class="btn btn-outline-success ui-button"
+					onclick="enterDienst(); $('#confirmTakeOverModal').modal('hide')" data-bs-dismiss="modal">Bestätigen</button>
+			</div>
+		</div>
+	</div>
+</div>
+
