@@ -17,7 +17,7 @@ function calcSeasonEnd(options) {
 }
 
 function getFormattedGermanDate(dateString) {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
     const germanDate = new Date(dateString).toLocaleDateString('de-DE', options);
     return germanDate;
 }

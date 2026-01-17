@@ -181,15 +181,15 @@ function populateDashboardHistory() {
         nameCell.title = fullName;
         
         // Conditionally format the last two columns
-        const noDutiesCell_hist = `<td style="background-color: ${row.duties_count_history === 0 ? 'orange' : 'inherit'}">${row.duties_count_history}</td>`;
-        const activeDutiesCell_hist = `<td style="background-color: ${row.active_duties_count_history === 0 ? 'orange' : 'inherit'}">${row.active_duties_count_history}</td>`;
-        const noDutiesCell_thisSeason = `<td style="background-color: ${row.duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.duties_count_thisyear}</td>`;
-        const activeDutiesCell_thisSeason = `<td style="background-color: ${row.active_duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.active_duties_count_thisyear}</td>`;
-        const activeFlyingDaysHistory = `<td style="background-color: ${row.active_flying_days_history === 0 ? 'green' : 'orange'}">${row.active_flying_days_history}</td>`;
+        const noDutiesCell_hist = `<td style="background-color: ${row.duties_count_history === 0 ? '#ffd699' : 'inherit'}">${row.duties_count_history}</td>`;
+        const activeDutiesCell_hist = `<td style="background-color: ${row.active_duties_count_history === 0 ? '#ffd699' : 'inherit'}">${row.active_duties_count_history}</td>`;
+        const noDutiesCell_thisSeason = `<td style="background-color: ${row.duties_count_thisyear === 0 ? '#ffd699' : 'inherit'}">${row.duties_count_thisyear}</td>`;
+        const activeDutiesCell_thisSeason = `<td style="background-color: ${row.active_duties_count_thisyear === 0 ? '#ffd699' : 'inherit'}">${row.active_duties_count_thisyear}</td>`;
+        const activeFlyingDaysHistory = `<td style="background-color: ${row.active_flying_days_history === 0 ? '#8bffb1' : '#ffd699'}">${row.active_flying_days_history}</td>`;
 
         // Calculate points using the new sum, rounded to 1 decimal place
         const roundedSum = parseFloat(row.sum.toFixed(1));
-        const points = `<td style="background-color: ${row.sum <= 0 ? 'orange' : 'inherit'}">${roundedSum}</td>`;
+        const points = `<td style="background-color: ${row.sum <= 0 ? '#ffd699' : 'inherit'}">${roundedSum}</td>`;
 
         // Add cells to the row
         tr.appendChild(nameCell);
