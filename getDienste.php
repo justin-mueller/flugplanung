@@ -9,16 +9,17 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-if (!isset($_GET['year']) || !filter_var($_GET['year'], FILTER_VALIDATE_INT)) {
+if (!isset($_GET['startDate']) || !isset($_GET['endDate'])) {
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'Invalid year parameter'], JSON_THROW_ON_ERROR);
+    echo json_encode(['error' => 'Missing startDate or endDate parameter'], JSON_THROW_ON_ERROR);
     exit;
 }
 
-$year = (int)$_GET['year'];
+$startDate = $_GET['startDate'];
+$endDate = $_GET['endDate'];
 $clubId = Helper::$configuration['clubId'];
 
-// Query dienste for the year, using the dienste table fields to determine role
+// Query dienste for the date range, using the dienste table fields to determine role
 $sql = "
 SELECT
     d.flugtag,
@@ -44,7 +45,8 @@ INNER JOIN
     mitglieder m ON d.pilot_id = m.pilot_id
 WHERE 
     m.verein = :clubId
-    AND YEAR(d.flugtag) = :year
+    AND d.flugtag >= :startDate
+    AND d.flugtag <= :endDate
 GROUP BY 
     d.flugtag
 ORDER BY 
@@ -52,7 +54,8 @@ ORDER BY
 ";
 
 $params = [
-    'year' => $year,
+    'startDate' => $startDate,
+    'endDate' => $endDate,
     'clubId' => $clubId,
 ];
 

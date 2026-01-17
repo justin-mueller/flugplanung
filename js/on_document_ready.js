@@ -201,6 +201,7 @@ $(document).ready(function () {
     }
     getDashboardData();
     loadFlugtage();
+    getDienste();
   });
 
   loadChatbox(true);

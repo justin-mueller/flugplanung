@@ -44,7 +44,7 @@ function getDienste() {
                     }
 
                     // Assign values, use '/' as default if null
-                    cell1.textContent = entry.flugtag;
+                    cell1.textContent = getFormattedGermanDate(entry.flugtag);
                     cell2.textContent = entry.Windenfahrer || '/';  // Use '/' if Windenfahrer is null
                     cell3.textContent = entry.Startleiter || '/';  // Use '/' if Startleiter is null
                 }
