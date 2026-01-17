@@ -17,7 +17,7 @@ function calcSeasonEnd(options) {
 }
 
 function getFormattedGermanDate(dateString) {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' };
     const germanDate = new Date(dateString).toLocaleDateString('de-DE', options);
     return germanDate;
 }
@@ -30,32 +30,67 @@ function parseDateStringWithGermanMonth(dateString) {
         September: '09', Oktober: '10', November: '11', Dezember: '12'
     };
 
-    const match = dateString.match(/(\d+)\. (\D+) (\d+)/);
+    // Try to match format with weekday prefix first (e.g., "Freitag, 15. März 2024")
+    let match = dateString.match(/\d+\. \D+ \d+/);
+    if (match) {
+        // Extract just the date part without weekday
+        const datePart = match[0];
+        const innerMatch = datePart.match(/(\d+)\. (\D+) (\d+)/);
+
+        if (innerMatch) {
+            const [, day, month, year] = innerMatch;
+            const numericMonth = germanMonths[month];
+            if (numericMonth) {
+                const numericDateString = `${year}-${numericMonth}-${day.padStart(2, '0')}`;
+                return new Date(numericDateString);
+            }
+        }
+    }
+
+    // Fallback to original regex for formats without weekday
+    match = dateString.match(/(\d+)\. (\D+) (\d+)/);
 
     if (!match) {
-        throw new Error('Invalid date string format');
+        throw new Error('Invalid date string format: ' + dateString);
     }
 
     const [, day, month, year] = match;
 
     const numericMonth = germanMonths[month];
+    if (!numericMonth) {
+        throw new Error('Unknown month: ' + month);
+    }
+
     const numericDateString = `${year}-${numericMonth}-${day.padStart(2, '0')}`;
     return new Date(numericDateString);
 }
 
 
 function dateToSQLFormat(date) {
-    return date.toISOString().split('T')[0];
+    // Use local date components to avoid timezone conversion issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 function formatDateString(date) {
-    return date.toISOString().slice(0, 10);
+    // Use local date components to avoid timezone conversion issues
+    // toISOString() converts to UTC which can shift dates by ±1 day
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 function formatDateStringA(date) {
     const formattedDate = new Date(date);
     formattedDate.setHours(0, 0, 0, 0);
-    return formattedDate.toISOString().slice(0, 10);
+    // Use local date components to avoid timezone conversion issues
+    const year = formattedDate.getFullYear();
+    const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(formattedDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 
@@ -91,17 +126,20 @@ function updateCountdown() {
     const timeDifference = flugtag_deadline - now;
 
     // Check if the countdown has finished
-    if (timeDifference < 0) {
-        clearInterval(intervalId); // Clear the interval using the interval ID
-        document.getElementById('countdown').innerHTML = "Warten auf Entscheidung vom Startleiter...";
-    } else {
-        // Calculate remaining time components
-        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+    const countdownElement = document.getElementById('countdown');
+    if (countdownElement) {
+        if (timeDifference < 0) {
+            clearInterval(intervalId); // Clear the interval using the interval ID
+            countdownElement.innerHTML = "Warten auf Entscheidung vom Startleiter...";
+        } else {
+            // Calculate remaining time components
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
-        // Display the remaining time
-		document.getElementById('countdown').innerHTML = `Zeit bis Entscheidung (20 Uhr Vortrag): <strong>${days} Tage, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</strong>`;
+            // Display the remaining time
+            countdownElement.innerHTML = `Zeit bis Entscheidung (20 Uhr Vortrag): <strong>${days} Tage, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</strong>`;
+        }
     }
 }

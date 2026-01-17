@@ -2,8 +2,8 @@
 
 <div class="row mb-3">
 	<div class="col-md-6">
-		<div class="input-group date">
-			<input type="text" class="form-control date-picker" id="additional_flugtag"
+		<div class="input-group" id="additional_flugtag_wrapper">
+			<input type="text" class="form-control" id="additional_flugtag"
 				style="text-align: center" />
 			<span class="input-group-append">
 				<span class="input-group-text bg-light d-block">
@@ -37,9 +37,11 @@
 			weekStart: 1,
 			daysOfWeekHighlighted: [0,6],
 			todayHighlight: true,
+			autoclose: true,
+			forceParse: false,
 			format: 'dd.mm.yyyy'
 		});
-		$('#additional_flugtag').val(new Date().toLocaleDateString("de-DE"));
+		$('#additional_flugtag').datepicker('update', new Date());
 	});
 </script>
 

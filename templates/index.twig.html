@@ -17,6 +17,7 @@
 	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/solid.min.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/style.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/chatbox.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/cards.css' %}">
 
 	<script>
 		var User_Information = {{ mitgliederData|json_encode|raw }};
@@ -47,6 +48,7 @@
 	<script src="{% cache_busting 'js/delete_user.js' %}"></script>
 	{% if mitgliederData.vereinId == clubId %}
 	<script src="{% cache_busting 'js/wunschliste.js' %}"></script>
+	<script src="{% cache_busting 'js/enterDienst.js' %}"></script>
 	{% endif %}
 	<script src="{% cache_busting 'js/dashboard.js' %}"></script>
 	<script src="{% cache_busting 'js/getDienste.js' %}"></script>

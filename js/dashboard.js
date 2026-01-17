@@ -1,7 +1,46 @@
+function getDefaultHistoryStartDate() {
+    const previousYear = new Date().getFullYear() - 1;
+    return new Date(previousYear, 0, 1, 12, 0, 0);
+}
+
+function getHistoryStartDateValue() {
+    const startInput = document.getElementById('historyStartDate');
+    let startDate = getDefaultHistoryStartDate();
+
+    if (startInput && startInput.value) {
+        startDate = new Date(`${startInput.value}T12:00:00`);
+    }
+
+    if (startInput && !startInput.value) {
+        startInput.value = formatDateString(startDate);
+    }
+
+    return formatDateString(startDate);
+}
+
+function initHistoryRange() {
+    const startInput = document.getElementById('historyStartDate');
+    const applyButton = document.getElementById('historyRangeApply');
+
+    if (!startInput) {
+        return;
+    }
+
+    // Set default value
+    getHistoryStartDateValue();
+
+    if (applyButton) {
+        applyButton.addEventListener('click', () => {
+            getDashboardData();
+        });
+    }
+}
+
 function getDashboardData() {
 
     let startDate = formatDateString(saisonStartDate);
     let endDate = formatDateString(saisonEndDate);
+    const historyStartDate = getHistoryStartDateValue();
 
     enteredDienste = [];
 
@@ -16,7 +55,7 @@ function getDashboardData() {
             url: 'getDashboardDataHistory.php',
             type: 'GET',
             dataType: 'json',
-            data: { startDate: startDate, endDate: endDate }
+            data: { startDate: historyStartDate }
         }),
     ];
 
@@ -29,8 +68,8 @@ function getDashboardData() {
         // Clean data, weil SQL code nicht richtig funktioniert!
 
         data.forEach(entry => {
-            const startleiterWithPlus = new Set(entry.startleiterOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id) })));
-            const windenfahrerWithPlus = new Set(entry.windenfahrerOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id) })));
+            const startleiterWithPlus = new Set(entry.startleiterOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id), max_dienste_halbjahr: pilot.max_dienste_halbjahr })));
+            const windenfahrerWithPlus = new Set(entry.windenfahrerOptionen.map(pilot => ({ name: pilot.name, id: extractNumericId(pilot.id), max_dienste_halbjahr: pilot.max_dienste_halbjahr })));
 
             const deleteId = (pilotSet, pilotWithoutPlus) => {
                 const indexToDelete = [...pilotSet].findIndex(pilot => pilot.name === pilotWithoutPlus);
@@ -65,17 +104,99 @@ function getDashboardData() {
         populateDashboardTable();
         //populatePilotTable();
         populateDashboardHistory();
+        
+        // Sort pilot cards according to history table order
+        sortPilotCards();
+        
+        // Update disabled states after dashboard is populated
+        if (typeof updateDisabledStates === 'function') {
+            updateDisabledStates();
+        }
     }).fail(function (xhr, status, error) {
         console.error('Dashboard Daten konnten nicht geladen werden:', status, error);
     });
 }
+function refreshDashboardHistory() {
+    const historyStartDate = getHistoryStartDateValue();
+    
+    $.ajax({
+        url: 'getDashboardDataHistory.php',
+        type: 'GET',
+        dataType: 'json',
+        data: { startDate: historyStartDate }
+    })
+    .done(function(history) {
+        dashboardDataHistory = history;
+        populateDashboardHistory();
+        sortPilotCards();
+    })
+    .fail(function(xhr, status, error) {
+        console.error('Failed to refresh history data:', status, error);
+    });
+}
+
+// Sort pilot cards in option cells according to history table order
+function sortPilotCards() {
+    // Get the sorted pilot IDs from dashboardDataHistory
+    const sortedPilotIds = dashboardDataHistory.map(row => String(row.pilot_id));
+    
+    // Find all option cells (both startleiter and windenfahrer)
+    $('[id^="Optionen_startleiter_"], [id^="Optionen_windenfahrer_"]').each(function() {
+        const cell = $(this);
+        const cards = cell.find('.pilot-div').toArray();
+        
+        // Sort cards based on their position in the history table
+        cards.sort((a, b) => {
+            const idA = $(a).attr('data-pilot-id');
+            const idB = $(b).attr('data-pilot-id');
+            const indexA = sortedPilotIds.indexOf(idA);
+            const indexB = sortedPilotIds.indexOf(idB);
+            
+            // If pilot not found in history, put at end
+            const posA = indexA === -1 ? 9999 : indexA;
+            const posB = indexB === -1 ? 9999 : indexB;
+            
+            return posA - posB;
+        });
+        
+        // Re-append cards in sorted order
+        cards.forEach(card => cell.append(card));
+    });
+    
+    // Also sort cards in the assigned cells (startleiter_*, windenfahrer_*)
+    $('[id^="startleiter_"], [id^="windenfahrer_"]').each(function() {
+        const cellId = $(this).attr('id');
+        // Skip if this is an Optionen cell
+        if (cellId.startsWith('Optionen_')) return;
+        
+        const cell = $(this);
+        const cards = cell.find('.pilot-div').toArray();
+        
+        if (cards.length > 1) {
+            cards.sort((a, b) => {
+                const idA = $(a).attr('data-pilot-id');
+                const idB = $(b).attr('data-pilot-id');
+                const indexA = sortedPilotIds.indexOf(idA);
+                const indexB = sortedPilotIds.indexOf(idB);
+                
+                const posA = indexA === -1 ? 9999 : indexA;
+                const posB = indexB === -1 ? 9999 : indexB;
+                
+                return posA - posB;
+            });
+            
+            cards.forEach(card => cell.append(card));
+        }
+    });
+}
+
 function populateDashboardHistory() {
     console.log("history");
     console.log(dashboardDataHistory);
 
     // Add the sum to each row and calculate points
     dashboardDataHistory.forEach(row => {
-        row.sum = row.duties_count_history + row.active_duties_count_history + row.duties_count_thisyear + row.active_duties_count_thisyear - row.active_flying_days_history * 0.2;
+        row.sum = row.duties_count + row.active_duties_count - row.active_flying_days * 0.2;
     });
 
     // Sort the data by the sum (ascending)
@@ -89,20 +210,27 @@ function populateDashboardHistory() {
         const tr = document.createElement('tr');
 
         // Create cells
-        const firstnameCell = `<td>${row.firstname + ' ' + row.lastname}</td>`;
+        const fullName = `${row.firstname} ${row.lastname}`.trim();
+        const nameCell = document.createElement('td');
+        nameCell.classList.add('dienste-name');
+        nameCell.textContent = fullName;
+        nameCell.title = fullName;
         
-        // Conditionally format the last two columns
-        const noDutiesCell_hist = `<td style="background-color: ${row.duties_count_history === 0 ? 'orange' : 'inherit'}">${row.duties_count_history}</td>`;
-        const activeDutiesCell_hist = `<td style="background-color: ${row.active_duties_count_history === 0 ? 'orange' : 'inherit'}">${row.active_duties_count_history}</td>`;
-        const noDutiesCell_thisSeason = `<td style="background-color: ${row.duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.duties_count_thisyear}</td>`;
-        const activeDutiesCell_thisSeason = `<td style="background-color: ${row.active_duties_count_thisyear === 0 ? 'orange' : 'inherit'}">${row.active_duties_count_thisyear}</td>`;
-        const activeFlyingDaysHistory = `<td style="background-color: ${row.active_flying_days_history === 0 ? 'green' : 'orange'}">${row.active_flying_days_history}</td>`;
+        // Conditionally format cells
+        const dutiesCell = `<td style="background-color: ${row.duties_count === 0 ? '#ffd699' : 'inherit'}">${row.duties_count}</td>`;
+        const activeDutiesCell = `<td style="background-color: ${row.active_duties_count === 0 ? '#ffd699' : 'inherit'}">${row.active_duties_count}</td>`;
+        const activeFlyingDays = `<td style="background-color: ${row.active_flying_days === 0 ? '#8bffb1' : '#ffd699'}">${row.active_flying_days}</td>`;
 
-        // Calculate points using the new sum
-        const points = `<td style="background-color: ${row.sum <= 0 ? 'orange' : 'inherit'}">${row.sum}</td>`;
+        // Calculate points using the sum, rounded to 1 decimal place
+        const roundedSum = parseFloat(row.sum.toFixed(1));
+        const points = `<td style="background-color: ${row.sum <= 0 ? '#ffd699' : 'inherit'}">${roundedSum}</td>`;
 
         // Add cells to the row
-        tr.innerHTML = firstnameCell + noDutiesCell_hist + activeDutiesCell_hist + noDutiesCell_thisSeason + activeDutiesCell_thisSeason + activeFlyingDaysHistory + points;
+        tr.appendChild(nameCell);
+        tr.insertAdjacentHTML(
+            'beforeend',
+            dutiesCell + activeDutiesCell + activeFlyingDays + points
+        );
         tbody.appendChild(tr);
     });
 }
@@ -224,64 +352,47 @@ function populatePilotOptions(cell_option, cell_dienst, pilotOptions, date, dien
 
         if (pilotEntered) {
             destination_cell = cell_dienst;
-            enteredDienste.push({ pilot_id: pilotId.id, name: pilotId.name.replace("+", "").replace("-", ""), date: date, dienst: dienst });
+            // Only add if not already in enteredDienste (prevent duplicates)
+            const alreadyExists = enteredDienste.some(
+                (item) => item.pilot_id === pilotId.id && item.date === date && item.dienst === dienst
+            );
+            if (!alreadyExists) {
+                enteredDienste.push({ 
+                    pilot_id: pilotId.id, 
+                    name: pilotId.name.replace("+", "").replace("-", ""), 
+                    date: date, 
+                    dienst: dienst,
+                    max_dienste_halbjahr: pilotId.max_dienste_halbjahr
+                });
+            }
         }
 
         const pilotDiv = document.createElement('div');
-        pilotDiv.textContent = `${pilotId.name}`;
+        
+        // Build display name with max dienste indicator
+        let displayName = pilotId.name;
+        if (pilotId.max_dienste_halbjahr !== null && pilotId.max_dienste_halbjahr !== undefined) {
+            displayName += ` {${pilotId.max_dienste_halbjahr}}`;
+        }
+        pilotDiv.textContent = displayName;
+        
         pilotDiv.setAttribute('data-pilot-id', `${pilotId.id}`);
+        pilotDiv.setAttribute('data-max-dienste', pilotId.max_dienste_halbjahr !== null ? pilotId.max_dienste_halbjahr : '');
         pilotDiv.classList.add('pilot-div');
 
         if (pilotEntered) {
             pilotDiv.classList.add('pilot-div-entered');
         }
 
-        if (pilotId.name.includes('-')) {
+        if (pilotId.name.endsWith('-')) {
             pilotDiv.classList.add('pilot-div-not-available');
-        } else if (pilotId.name.includes('+')) {
+        } else if (pilotId.name.endsWith('+')) {
             pilotDiv.classList.add('pilot-div-wish');
         }
 
         destination_cell.appendChild(pilotDiv);
     });
 }
-
-
-/*
-function populatePilotOptions2(cell_option, cell_dienst, pilotOptions, date, dienst, entered) {
-
-    pilotOptions.forEach(pilotId => {
-
-        var pilotEntered = [];
-
-        if (typeof (diensteJahr) === 'object') {
-            pilotEntered = diensteJahr.filter(function (pilot2) {
-                return pilot2.pilot_id == pilotId.id && pilot2.flugtag == date;
-            });
-        }
-
-        var destination_cell = cell_option;
-
-        if (pilotEntered.length > 0) {
-            destination_cell = cell_dienst;
-            enteredDienste.push({ pilot_id: pilotId.id, name: pilotId.name.replace("+", "").replace("-", ""), date: date, dienst: dienst });
-        }
-
-
-        const pilotDiv = document.createElement('div');
-        pilotDiv.textContent = `${pilotId.name}`;
-        pilotDiv.setAttribute('data-pilot-id', `${pilotId.id}`);
-        pilotDiv.classList.add('pilot-div');
-        if (pilotId.name.includes('-')) {
-            pilotDiv.classList.add('pilot-div-not-available');
-        } else if (pilotId.name.includes('+')) {
-            pilotDiv.classList.add('pilot-div-wish');
-        }
-        destination_cell.appendChild(pilotDiv);
-
-    });
-
-}*/
 
 
 function populatePilotTable() {}
@@ -347,8 +458,61 @@ function populatePilotTable() {
     }
 }*/
 
+// Check if any pilot exceeds their max dienste limit and show warning
+function checkMaxDiensteExceeded() {
+    const pilotCounts = {};
+    const pilotMaxLimits = {};
+    const pilotNames = {};
+    
+    // Count duties per pilot and collect max limits
+    enteredDienste.forEach(entry => {
+        const pilotId = entry.pilot_id;
+        pilotCounts[pilotId] = (pilotCounts[pilotId] || 0) + 1;
+        
+        // Store the max limit and name (only needs to be set once per pilot)
+        if (entry.max_dienste_halbjahr !== null && entry.max_dienste_halbjahr !== undefined) {
+            pilotMaxLimits[pilotId] = entry.max_dienste_halbjahr;
+        }
+        if (entry.name) {
+            pilotNames[pilotId] = entry.name;
+        }
+    });
+    
+    // Check for exceeded limits
+    const exceededPilots = [];
+    for (const pilotId in pilotCounts) {
+        const count = pilotCounts[pilotId];
+        const maxLimit = pilotMaxLimits[pilotId];
+        
+        if (maxLimit !== undefined && count > maxLimit) {
+            exceededPilots.push({
+                name: pilotNames[pilotId] || `Pilot ${pilotId}`,
+                count: count,
+                max: maxLimit
+            });
+        }
+    }
+    
+    return exceededPilots;
+}
+
 //Error Handling ist hier etwas schlecht
 function saveDienste() {
+    
+    // Check for pilots exceeding their max dienste limit
+    const exceededPilots = checkMaxDiensteExceeded();
+    if (exceededPilots.length > 0) {
+        const warningMessages = exceededPilots.map(p => 
+            `${p.name}: ${p.count} Dienste (max. ${p.max})`
+        ).join(', ');
+        
+        showToast(
+            'Achtung!', 
+            'Maximale Dienste überschritten', 
+            `Folgende Piloten haben mehr Dienste als gewünscht: ${warningMessages}`, 
+            'warning'
+        );
+    }
 
     $.ajax({
         url: `deleteDienste.php?year=${saisonJahr}`,

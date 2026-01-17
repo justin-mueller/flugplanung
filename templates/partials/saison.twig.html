@@ -1,12 +1,23 @@
-<div class="row mb-3 mt-3">
-	<div class="col-md-6">
-		<select class="form-control year-dropdown"></select>
+<div class="card mb-3">
+	<div class="card-header">
+		<h4 class="mb-0 fw-bold">Saison wählen:</h4>
 	</div>
-</div>
+	<div class="card-body">
+		<div class="row mb-3">
+			<div class="col-md-6">
+				<label class="form-label">Jahr</label>
+				<select class="form-control year-dropdown"></select>
+			</div>
+		</div>
 
-<div class="row mb-3">
-	<div class="col-md-6">
-		<button class="btn btn-secondary ui-button season1-button" onclick="SelectSeason(this, 1)">bis 30.6.</button>
-		<button class="btn btn-outline-secondary ui-button season2-button" onclick="SelectSeason(this, 2)">ab 1.7.</button>
+		<div class="row">
+			<div class="col-md-6">
+				<label class="form-label">Halbjahreshälfte</label>
+				<div class="mt-2">
+					<button class="btn btn-secondary ui-button season1-button" onclick="SelectSeason(this, 1)">bis 30.6.</button>
+					<button class="btn btn-outline-secondary ui-button season2-button" onclick="SelectSeason(this, 2)">ab 1.7.</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

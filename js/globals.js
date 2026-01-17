@@ -3,6 +3,7 @@ var startleiter_official = null;
 var flugtagData = null;
 var flugtag_formatted = null;
 var flugtag_unformatted = null;
+var isFlugtag = false;
 var flugtag_deadline = null;
 var intervalId = null; // intervall for counter
 var min_pilot_amount_reached = false;

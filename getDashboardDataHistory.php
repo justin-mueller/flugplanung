@@ -9,59 +9,41 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$allPilots = [['error']];
+// Default to 1.1.[current year - 1]
+$currentYear = (int)date('Y') - 1;
+$defaultStartDate = $currentYear . '-01-01';
 
-// Check if startDate and endDate are provided
-$startDate = $_GET['startDate'] ?? null;
-$endDate = $_GET['endDate'] ?? null;
+$startDate = $_GET['startDate'] ?? $defaultStartDate;
 
 $sql = "SELECT
 m.pilot_id,
 m.firstname,
 m.lastname,
--- Historical Counts
+
+-- Count ALL dienste from startDate onwards
 (SELECT COUNT(d.pilot_id)
  FROM dienste d
- LEFT JOIN flugtage mf ON mf.datum = d.flugtag
  WHERE d.pilot_id = m.pilot_id
-   AND mf.datum < DATE_FORMAT(CURDATE(), '%Y-01-01')
+   AND d.flugtag >= :startDate
+) AS duties_count,
+
+-- Count dienste with active betrieb from startDate onwards
+(SELECT COUNT(d.pilot_id)
+ FROM dienste d
+ INNER JOIN flugtage mf ON mf.datum = d.flugtag
+ WHERE d.pilot_id = m.pilot_id
+   AND d.flugtag >= :startDate
    AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
-) AS active_duties_count_history,
+) AS active_duties_count,
 
-(SELECT COUNT( d.pilot_id)
- FROM dienste d
- LEFT JOIN flugtage mf ON mf.datum = d.flugtag
- WHERE d.pilot_id = m.pilot_id
-   AND mf.datum < DATE_FORMAT(CURDATE(), '%Y-01-01')
-) AS duties_count_history,
-
--- Current Year Counts
-(SELECT COUNT( d.pilot_id)
- FROM dienste d
- LEFT JOIN flugtage mf ON mf.datum = d.flugtag
- WHERE d.pilot_id = m.pilot_id
-   AND mf.datum >= DATE_FORMAT(CURDATE(), '%Y-01-01')
-   AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
-) AS active_duties_count_thisyear,
-
-(SELECT COUNT( d.pilot_id)
- FROM dienste d
- LEFT JOIN flugtage mf ON mf.datum = d.flugtag
- WHERE d.pilot_id = m.pilot_id
-   AND mf.datum >= DATE_FORMAT(CURDATE(), '%Y-01-01')
-) AS duties_count_thisyear,
-
--- Active Flying Days History
--- Active Flying Days History
+-- Active Flying Days (pilot flew on days with active betrieb from startDate onwards)
 (SELECT COUNT(tp.pilot_id)
-FROM tagesplanung tp
-LEFT JOIN flugtage mf ON mf.datum = tp.flugtag
-WHERE tp.pilot_id = m.pilot_id
-AND tp.flugtag < DATE_FORMAT(CURDATE(), '%Y-01-01')
-AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
-AND (tp.flugtag = mf.datum OR tp.flugtag IS NULL)
-) AS active_flying_days_history
-
+ FROM tagesplanung tp
+ INNER JOIN flugtage mf ON mf.datum = tp.flugtag
+ WHERE tp.pilot_id = m.pilot_id
+   AND tp.flugtag >= :startDate
+   AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
+) AS active_flying_days
 
 FROM
 mitglieder m
@@ -69,18 +51,10 @@ WHERE
     m.verein = :clubId;
 ";
 
-if ($startDate && $endDate) {
-    $sql .= ' AND (mf.datum BETWEEN :startDate AND :endDate)';
-    $params = [
-        'startDate' => $startDate,
-        'endDate' => $endDate,
-        'clubId' => Helper::$configuration['clubId'],
-    ];
-} else {
-    $params = []; // No parameters needed if no date filter is applied
-}
-
-$sql .= ' GROUP BY mf.datum;';
+$params = [
+    'startDate' => $startDate,
+    'clubId' => Helper::$configuration['clubId'],
+];
 
 $result = Database::query($sql, $params);
 

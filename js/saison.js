@@ -15,5 +15,6 @@ function SelectSeason(clickedButton, Season_Chosen) {
 	}
 	getDashboardData();
 	loadFlugtage();
+	getDienste();
 
 }
