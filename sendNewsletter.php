@@ -118,7 +118,7 @@ if (count($parts) === 2) {
 
 echo "Subject: " . htmlspecialchars($subject) . "<br>";
 echo "Sending to " . count($recipients) . " recipient(s)<br>";
-echo "<strong>Adding 2 second delay between emails to avoid rate limiting...</strong><br><br>";
+echo "<strong>Adding delay between emails to avoid rate limiting...</strong><br><br>";
 
 $successCount = 0;
 $failCount = 0;
