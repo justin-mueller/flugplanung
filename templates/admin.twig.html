@@ -76,6 +76,29 @@
     </div>
 </div>
 
+<!-- Logs Modal -->
+<div class="modal fade" id="logsModal" tabindex="-1" aria-labelledby="logsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logsModalLabel">Versand-Protokolle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <div class="modal-body">
+                <div id="logs-list">
+                    <div class="text-muted">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        Logs werden geladen...
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 (function() {
     const SECRET_KEY = '{{ newsletterSecret }}';
@@ -129,6 +152,7 @@
         html += '<th style="width: 80px;" class="text-center">Test</th>';
         html += '<th style="width: 80px;" class="text-center">Senden</th>';
         html += '<th style="width: 80px;" class="text-center">Vorschau</th>';
+        html += '<th style="width: 80px;" class="text-center">Logs</th>';
         html += '</tr></thead><tbody>';
 
         mailsData.forEach(mail => {
@@ -148,6 +172,11 @@
             html += `<td class="text-center">
                 <button type="button" class="btn btn-sm btn-outline-secondary preview-btn" data-filename="${escapeHtml(mail.filename)}">
                     <i class="fa-solid fa-eye"></i>
+                </button>
+            </td>`;
+            html += `<td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-info logs-btn" data-filename="${escapeHtml(mail.filename)}">
+                    <i class="fa-solid fa-file-lines"></i>
                 </button>
             </td>`;
             html += '</tr>';
@@ -189,6 +218,14 @@
             btn.addEventListener('click', function() {
                 const filename = this.dataset.filename;
                 showPreview(filename);
+            });
+        });
+
+        // Logs buttons
+        document.querySelectorAll('.logs-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const filename = this.dataset.filename;
+                showLogs(filename);
             });
         });
     }
@@ -244,6 +281,57 @@
         const iframe = document.getElementById('mail-preview-iframe');
         iframe.src = 'getMailContent.php?file=' + encodeURIComponent(filename);
         modal.show();
+    }
+
+    // Show logs modal
+    function showLogs(filename) {
+        fetch('getMailLogs.php?mail_file=' + encodeURIComponent(filename))
+            .then(response => response.json())
+            .then(data => {
+                displayLogsModal(filename, data.logs || []);
+            })
+            .catch(error => {
+                console.error('Error loading logs:', error);
+                alert('Fehler beim Laden der Logs');
+            });
+    }
+
+    // Display logs in modal
+    function displayLogsModal(mailFile, logs) {
+        const modal = new bootstrap.Modal(document.getElementById('logsModal'));
+        const logsContainer = document.getElementById('logs-list');
+        
+        document.getElementById('logsModalLabel').textContent = 'Versand-Protokolle: ' + mailFile;
+        
+        if (logs.length === 0) {
+            logsContainer.innerHTML = '<div class="alert alert-info">Keine Logs für diese E-Mail-Vorlage gefunden.</div>';
+        } else {
+            let html = '<div class="list-group">';
+            logs.forEach(log => {
+                const badge = log.is_test ? '<span class="badge bg-warning text-dark ms-2">TEST</span>' : '';
+                html += `<a href="mails/mail_logs/${encodeURIComponent(log.filename)}" target="_blank" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <div>
+                            <i class="fa-solid fa-file-lines me-2 text-primary"></i>
+                            <strong>${escapeHtml(log.readable_date)}</strong>
+                            ${badge}
+                        </div>
+                        <small class="text-muted">${formatFileSize(log.file_size)}</small>
+                    </div>
+                </a>`;
+            });
+            html += '</div>';
+            logsContainer.innerHTML = html;
+        }
+        
+        modal.show();
+    }
+
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
 
     // Confirm send button handler
