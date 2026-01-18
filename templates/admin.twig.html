@@ -17,6 +17,42 @@
             </div>
         </div>
 
+        <!-- User ID Range Limit -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Begrenzen auf User-ID Bereich</label>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="input-group">
+                            <span class="input-group-text">Von</span>
+                            <input type="number" id="user-id-from" class="form-control" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="input-group">
+                            <span class="input-group-text">Bis</span>
+                            <input type="number" id="user-id-to" class="form-control" value="99999" min="0">
+                        </div>
+                    </div>
+                </div>
+                <small class="text-muted">Nur Empfänger mit User-ID in diesem Bereich erhalten die E-Mail</small>
+            </div>
+        </div>
+
+        <!-- Internal Club Filter -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Auf Vereinsmitglieder begrenzen</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="internal-only" value="1">
+                    <label class="form-check-label" for="internal-only">
+                        Nur an interne Vereinsmitglieder senden
+                    </label>
+                </div>
+                <small class="text-muted" id="club-filter-preview">Nur an Mitglieder von <strong>{{ clubName }} ({{ clubId }})</strong> senden</small>
+            </div>
+        </div>
+
         <hr class="my-4">
 
         <!-- Mail List -->
@@ -268,6 +304,32 @@
             recipientInput.name = 'test_recipient';
             recipientInput.value = testRecipient;
             form.appendChild(recipientInput);
+        }
+
+        // Add user ID range parameters
+        const userIdFrom = document.getElementById('user-id-from').value;
+        const userIdTo = document.getElementById('user-id-to').value;
+        
+        const fromInput = document.createElement('input');
+        fromInput.type = 'hidden';
+        fromInput.name = 'user_id_from';
+        fromInput.value = userIdFrom;
+        form.appendChild(fromInput);
+
+        const toInput = document.createElement('input');
+        toInput.type = 'hidden';
+        toInput.name = 'user_id_to';
+        toInput.value = userIdTo;
+        form.appendChild(toInput);
+
+        // Add internal only parameter
+        const internalOnly = document.getElementById('internal-only').checked;
+        if (internalOnly) {
+            const internalInput = document.createElement('input');
+            internalInput.type = 'hidden';
+            internalInput.name = 'internal_only';
+            internalInput.value = '1';
+            form.appendChild(internalInput);
         }
 
         document.body.appendChild(form);

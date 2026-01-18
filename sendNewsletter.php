@@ -41,6 +41,10 @@ $mailer = new Mailer($transport);
 $testing = isset($_GET['test']) && $_GET['test'] === 'true';
 $mailFile = isset($_POST['mail_file']) ? $_POST['mail_file'] : 'newsletter.html';
 $testRecipientId = isset($_POST['test_recipient']) ? intval($_POST['test_recipient']) : null;
+$userIdFrom = isset($_POST['user_id_from']) ? intval($_POST['user_id_from']) : 0;
+$userIdTo = isset($_POST['user_id_to']) ? intval($_POST['user_id_to']) : 99999;
+$internalOnly = isset($_POST['internal_only']) && $_POST['internal_only'] === '1';
+$configClubId = Helper::$configuration['clubId'] ?? null;
 
 // Sanitize mail file name (prevent directory traversal)
 $mailFile = basename($mailFile);
@@ -51,17 +55,36 @@ echo "Test mode: " . ($testing ? "true" : "false") . "<br>";
 // Fetch recipients
 if ($testing && $testRecipientId) {
     // Send only to selected test recipient
-    $sql = "SELECT email, firstname, lastname 
+    $sql = "SELECT pilot_id, email, firstname, lastname, verein 
             FROM mitglieder 
             WHERE pilot_id = :pilotId";
     $recipients = Database::query($sql, ['pilotId' => $testRecipientId]);
     echo "Test recipient ID: " . $testRecipientId . "<br>";
 } else {
-    // Send to all newsletter subscribers
-    $sql = "SELECT email, firstname, lastname 
+    // Build query with filters
+    $sql = "SELECT pilot_id, email, firstname, lastname, verein 
             FROM mitglieder 
-            WHERE newsletter = 1";
-    $recipients = Database::query($sql, []);
+            WHERE newsletter = 1 
+            AND pilot_id >= :userIdFrom 
+            AND pilot_id <= :userIdTo";
+    
+    $params = [
+        'userIdFrom' => $userIdFrom,
+        'userIdTo' => $userIdTo
+    ];
+    
+    // Add internal only filter if enabled
+    if ($internalOnly && $configClubId !== null) {
+        $sql .= " AND verein = :clubId";
+        $params['clubId'] = $configClubId;
+    }
+    
+    $recipients = Database::query($sql, $params);
+    
+    echo "User ID range: " . $userIdFrom . " - " . $userIdTo . "<br>";
+    if ($internalOnly && $configClubId !== null) {
+        echo "<strong>Nur interne Mitglieder (Verein ID: " . $configClubId . ")</strong><br>";
+    }
 }
 
 if (empty($recipients)) {
@@ -110,6 +133,10 @@ $logData = [
     'subject' => $subject,
     'is_test' => $testing,
     'test_recipient_id' => $testRecipientId,
+    'user_id_from' => $userIdFrom,
+    'user_id_to' => $userIdTo,
+    'internal_only' => $internalOnly,
+    'club_id' => $configClubId,
     'total_recipients' => $total,
     'recipients' => []
 ];
@@ -134,9 +161,11 @@ foreach ($recipients as $recipient) {
     $sent = false;
     $retries = 3;
     $recipientLog = [
+        'pilot_id' => $recipient['pilot_id'],
         'email' => $to,
         'firstname' => $recipient['firstname'],
         'lastname' => $recipient['lastname'],
+        'verein' => $recipient['verein'] ?? null,
         'status' => 'failed',
         'attempts' => 0,
         'error' => null
@@ -345,6 +374,8 @@ function generateHtmlLog($logData) {
             <p><strong>Abgeschlossen:</strong> ' . htmlspecialchars($logData['completed_at']) . '</p>
             <p><strong>E-Mail Vorlage:</strong> ' . htmlspecialchars($logData['mail_file']) . '</p>
             <p><strong>Betreff:</strong> ' . htmlspecialchars($logData['subject']) . '</p>
+            <p><strong>User-ID Bereich:</strong> ' . htmlspecialchars($logData['user_id_from']) . ' - ' . htmlspecialchars($logData['user_id_to']) . '</p>
+            <p><strong>Nur interne Mitglieder:</strong> ' . ($logData['internal_only'] ? 'Ja (Verein ID: ' . htmlspecialchars($logData['club_id']) . ')' : 'Nein') . '</p>
             <p><strong>Gesamt Empfänger:</strong> ' . htmlspecialchars($logData['total_recipients']) . '</p>
         </div>
         
@@ -364,8 +395,10 @@ function generateHtmlLog($logData) {
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>User-ID</th>
                     <th>Name</th>
                     <th>E-Mail</th>
+                    <th>Verein</th>
                     <th>Status</th>
                     <th>Versuche</th>
                     <th>Fehler</th>
@@ -381,8 +414,10 @@ function generateHtmlLog($logData) {
         
         $html .= '<tr>
                     <td>' . $index++ . '</td>
+                    <td>' . htmlspecialchars($recipient['pilot_id']) . '</td>
                     <td>' . htmlspecialchars($recipient['lastname'] . ', ' . $recipient['firstname']) . '</td>
                     <td>' . htmlspecialchars($recipient['email']) . '</td>
+                    <td>' . htmlspecialchars($recipient['verein'] ?? '-') . '</td>
                     <td><span class="status-badge ' . $statusClass . '">' . $statusIcon . ' ' . $statusText . '</span></td>
                     <td>' . htmlspecialchars($recipient['attempts']) . '</td>
                     <td>' . ($recipient['error'] ? '<div class="error-msg">' . htmlspecialchars($recipient['error']) . '</div>' : '-') . '</td>
