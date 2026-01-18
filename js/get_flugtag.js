@@ -1,3 +1,5 @@
+var zeitBarChartInstance = null;
+
 function getRowCount(data, rowKey, targetValue, clubFilter = 0) {
 	var count = 0;
 	$.each(data, function (index, row) {
@@ -6,6 +8,177 @@ function getRowCount(data, rowKey, targetValue, clubFilter = 0) {
 		}
 	});
 	return count;
+}
+
+// Store chart data globally for filter updates
+var zeitChartData = null;
+var zeitChartLabels = [];
+
+function updateZeitBarChart(data) {
+	const canvas = document.getElementById('zeitBarChart');
+	if (!canvas) return;
+
+	// Generate fixed time labels from 08:00 to 18:00
+	zeitChartLabels = [];
+	for (let h = 8; h <= 18; h++) {
+		zeitChartLabels.push(h.toString().padStart(2, '0') + ':00');
+	}
+
+	// Initialize data structure for each Fluggebiet
+	const fluggebiete = ['NGL', 'HRP', 'AMD'];
+	zeitChartData = {};
+	
+	fluggebiete.forEach(fg => {
+		zeitChartData[fg] = {
+			counts: {},
+			names: {}
+		};
+		zeitChartLabels.forEach(label => {
+			zeitChartData[fg].counts[label] = 0;
+			zeitChartData[fg].names[label] = [];
+		});
+	});
+
+	// Process data and assign to Fluggebiet based on first choice (value 0)
+	data.forEach(row => {
+		if (row.zeit) {
+			const hour = parseInt(row.zeit.substring(0, 2));
+			const timeFormatted = hour.toString().padStart(2, '0') + ':00';
+			const pilotName = row.Pilot ? row.Pilot.split(' ')[0] : '';
+
+			// Check which Fluggebiet is the first choice (value 0)
+			let firstChoice = null;
+			if (row.NGL == 0) firstChoice = 'NGL';
+			else if (row.HRP == 0) firstChoice = 'HRP';
+			else if (row.AMD == 0) firstChoice = 'AMD';
+
+			if (firstChoice && zeitChartData[firstChoice].counts.hasOwnProperty(timeFormatted)) {
+				zeitChartData[firstChoice].counts[timeFormatted]++;
+				if (pilotName) {
+					zeitChartData[firstChoice].names[timeFormatted].push(pilotName);
+				}
+			}
+		}
+	});
+
+	// Render chart with current filter state
+	renderZeitBarChart();
+}
+
+function updateZeitBarChartFilter() {
+	renderZeitBarChart();
+}
+
+function renderZeitBarChart() {
+	const canvas = document.getElementById('zeitBarChart');
+	if (!canvas || !zeitChartData) return;
+	
+	const ctx = canvas.getContext('2d');
+
+	// Check which filters are active
+	const showNGL = document.getElementById('chartFilterNGL')?.checked ?? true;
+	const showHRP = document.getElementById('chartFilterHRP')?.checked ?? true;
+	const showAMD = document.getElementById('chartFilterAMD')?.checked ?? true;
+
+	// Define colors for each Fluggebiet
+	const colors = {
+		NGL: { bg: 'rgba(54, 162, 235, 0.6)', border: 'rgba(54, 162, 235, 1)' },
+		HRP: { bg: 'rgba(255, 159, 64, 0.6)', border: 'rgba(255, 159, 64, 1)' },
+		AMD: { bg: 'rgba(75, 192, 192, 0.6)', border: 'rgba(75, 192, 192, 1)' }
+	};
+
+	const labels = {
+		NGL: 'Neustadt-Glewe',
+		HRP: 'Hörpel',
+		AMD: 'Altenmedingen'
+	};
+
+	// Build datasets based on filter
+	const datasets = [];
+	const fluggebieteConfig = [
+		{ key: 'NGL', show: showNGL },
+		{ key: 'HRP', show: showHRP },
+		{ key: 'AMD', show: showAMD }
+	];
+
+	fluggebieteConfig.forEach(config => {
+		if (config.show) {
+			const fg = config.key;
+			const chartData = zeitChartLabels.map(label => zeitChartData[fg].counts[label]);
+			const namesPerBar = zeitChartLabels.map(label => zeitChartData[fg].names[label]);
+
+			datasets.push({
+				label: labels[fg],
+				data: chartData,
+				backgroundColor: colors[fg].bg,
+				borderColor: colors[fg].border,
+				borderWidth: 1,
+				namesPerBar: namesPerBar
+			});
+		}
+	});
+
+	// Destroy existing chart if it exists
+	if (zeitBarChartInstance) {
+		zeitBarChartInstance.destroy();
+	}
+
+	// Render the chart
+	zeitBarChartInstance = new Chart(ctx, {
+		type: 'bar',
+		data: {
+			labels: zeitChartLabels,
+			datasets: datasets
+		},
+		options: {
+			responsive: true,
+			layout: {
+				padding: {
+					top: 30
+				}
+			},
+			scales: {
+				x: {
+					title: {
+						display: true,
+						text: 'Uhrzeit'
+					}
+				},
+				y: {
+					beginAtZero: true,
+					ticks: {
+						stepSize: 1
+					},
+					title: {
+						display: true,
+						text: 'Anzahl Piloten'
+					}
+				}
+			},
+			plugins: {
+				legend: {
+					position: 'bottom'
+				},
+				datalabels: {
+					anchor: 'end',
+					align: 'top',
+					color: '#333',
+					font: {
+						size: 9
+					},
+					formatter: function(value, context) {
+						const dataset = context.dataset;
+						if (dataset.namesPerBar) {
+							const names = dataset.namesPerBar[context.dataIndex];
+							return names && names.length > 0 ? names.join(', ') : '';
+						}
+						return '';
+					}
+				}
+			}
+		},
+		plugins: [ChartDataLabels]
+	});
 }
 
 function getFlugtag() {
@@ -41,6 +214,9 @@ function getFlugtag() {
 		success: function (data) {
 
 			flugtagData = data;
+
+			// Always update the Zeit bar chart (with empty array if no data)
+			updateZeitBarChart(Array.isArray(data) ? data : []);
 
 			if (typeof(data) === 'object') {
 				console.log('Planung für den ' + flugtag_formatted + ' erfolgreich geladen:');

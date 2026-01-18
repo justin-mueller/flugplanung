@@ -36,58 +36,25 @@
 			<div class="spinner-border" role="status"> </div>
 		</div>
 		<!-- Chart.js Bar Chart for Zeit values -->
-		<div class="mt-4">
-			<canvas id="zeitBarChart" height="80"></canvas>
+		<div class="accordion mt-4" id="zeitChartAccordion">
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="zeitChartHeading">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+						data-bs-target="#zeitChartCollapse" aria-expanded="false" aria-controls="zeitChartCollapse">
+						Zeitübersicht
+					</button>
+				</h2>
+				<div id="zeitChartCollapse" class="accordion-collapse collapse" aria-labelledby="zeitChartHeading"
+					data-bs-parent="#zeitChartAccordion">
+					<div class="accordion-body">
+						<canvas id="zeitBarChart" height="100"></canvas>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
 
-<div class="row">
-	<div class="col-12 mb-3">
-		<div class="mt-4">
-			<canvas id="dummyBarChart" height="80"></canvas>
-		</div>
-		<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			const ctx = document.getElementById('dummyBarChart').getContext('2d');
-			// Generate time labels from 10:00 to 18:00
-			const dummyLabels = [];
-			for (let h = 10; h <= 18; h++) {
-				dummyLabels.push(h.toString().padStart(2, '0') + ':00');
-			}
-			const dummyData = Array.from({length: dummyLabels.length}, () => Math.floor(Math.random() * 20) + 5);
-
-			new Chart(ctx, {
-				type: 'bar',
-				data: {
-					labels: dummyLabels,
-					datasets: [{
-						label: 'Dummy Data',
-						data: dummyData,
-						backgroundColor: 'rgba(54, 162, 235, 0.6)',
-						borderColor: 'rgba(54, 162, 235, 1)',
-						borderWidth: 1
-					}]
-				},
-				options: {
-					responsive: true,
-					scales: {
-						x: {
-							title: {
-								display: true,
-								text: 'Uhrzeit'
-							}
-						},
-						y: {
-							beginAtZero: true
-						}
-					}
-				}
-			});
-		});
-		</script>
-	</div>
-</div>
 
 <div class="row" id="eintraege">
 	<div class="col-6 mb-3">
@@ -345,67 +312,3 @@
 	</div>
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const ctx = document.getElementById('zeitBarChart').getContext('2d');
-
-    // Fetch data for the chart
-    $.ajax({
-        url: 'get_flugtag.php',
-        type: 'GET',
-        data: { flugtag: flugtag_formatted },
-        success: function(data) {
-            if (typeof data === 'object') {
-                const timeCounts = {};
-
-                // Process 'zeit' values and count occurrences rounded to half-hourly intervals
-                data.forEach(row => {
-                    if (row.zeit) {
-                        timeCounts[row.zeit] = (timeCounts[row.zeit] || 0) + 1;
-                    }
-                });
-
-                // Prepare labels and data for the chart
-                const labels = Object.keys(timeCounts).sort();
-                const chartData = labels.map(label => timeCounts[label]);
-
-                // Render the chart
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Piloten pro Zeitfenster',
-                            data: chartData,
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Zeit (gerundet auf halbe Stunden)'
-                                }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Anzahl der Piloten'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        },
-        error: function(xhr) {
-            console.error('Fehler beim Laden der Zeitdaten:', xhr.responseText);
-        }
-    });
-});
-</script>
