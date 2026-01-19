@@ -8,7 +8,8 @@
         "ext-pdo": "*",
         "twig/twig": "^3.0",
         "adriansuter/twig-cache-busting": "^3.0",
-        "symfony/mailer": "^7.3"
+        "symfony/mailer": "^7.3",
+        "symfony/mime": "^7.3"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest"

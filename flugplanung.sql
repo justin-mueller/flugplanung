@@ -75,6 +75,7 @@ CREATE TABLE `mitglieder` (
   `password` varchar(64) DEFAULT NULL,
   `email` varchar(64) NOT NULL,
   `avatar` smallint(6) NOT NULL DEFAULT 1,
+  `newsletter` tinyint(1) DEFAULT 1,
   `max_dienste_halbjahr` smallint(6) DEFAULT NULL COMMENT 'Maximum number of duties per half-year for windenfahrer, NULL = no limit'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

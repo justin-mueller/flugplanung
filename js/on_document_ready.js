@@ -271,6 +271,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			  User_Information.fluggeraet.includes("S")
 			);
 
+			$("#newsletter").prop(
+			  "checked",
+			  User_Information.newsletter == 1
+			);
+
 			updatePreview(User_Information.avatar-1);
 
 
@@ -396,3 +401,4 @@ function updateDisabledStates() {
     });
   });
 }
+>>>>>>> main
