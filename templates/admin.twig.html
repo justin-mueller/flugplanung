@@ -9,11 +9,9 @@
         <!-- Test Recipient Selection -->
         <div class="row mb-4">
             <div class="col-md-6">
-                <label for="test-recipient" class="form-label fw-semibold">Test-Empfänger auswählen</label>
-                <select id="test-recipient" class="form-select">
-                    <option value="">Mitglieder werden geladen...</option>
-                </select>
-                <small class="text-muted">Wähle einen Empfänger für Test-E-Mails</small>
+                <label for="test-recipient" class="form-label fw-semibold">Test-Empfänger E-Mail</label>
+                <input type="email" id="test-recipient" class="form-control" value="{{ currentUserEmail }}" placeholder="E-Mail-Adresse eingeben">
+                <small class="text-muted">Gebe eine E-Mail-Adresse für Test-E-Mails ein</small>
             </div>
         </div>
 
@@ -139,7 +137,6 @@
 (function() {
     const SECRET_KEY = '{{ newsletterSecret }}';
     let mailsData = [];
-    let membersData = [];
     let pendingMailFilename = null;
 
     // Load admin data on init
@@ -148,28 +145,13 @@
             .then(response => response.json())
             .then(data => {
                 mailsData = data.mails || [];
-                membersData = data.members || [];
                 renderMailList();
-                renderMembersDropdown();
             })
             .catch(error => {
                 console.error('Error loading admin data:', error);
                 document.getElementById('mail-list').innerHTML = 
                     '<div class="alert alert-danger">Fehler beim Laden der Daten</div>';
             });
-    }
-
-    // Render members dropdown
-    function renderMembersDropdown() {
-        const select = document.getElementById('test-recipient');
-        select.innerHTML = '<option value="">-- Empfänger wählen --</option>';
-        
-        membersData.forEach(member => {
-            const option = document.createElement('option');
-            option.value = member.pilot_id;
-            option.textContent = `${member.lastname}, ${member.firstname} (${member.email})`;
-            select.appendChild(option);
-        });
     }
 
     // Render mail list
@@ -238,7 +220,7 @@
 
                 if (isTest) {
                     if (!testRecipient) {
-                        alert('Bitte wähle einen Test-Empfänger aus.');
+                        alert('Bitte gebe eine Test-E-Mail-Adresse ein.');
                         return;
                     }
                     sendMail(filename, true, testRecipient);

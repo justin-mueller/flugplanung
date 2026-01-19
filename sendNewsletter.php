@@ -40,7 +40,7 @@ $mailer = new Mailer($transport);
 // Get parameters
 $testing = isset($_GET['test']) && $_GET['test'] === 'true';
 $mailFile = isset($_POST['mail_file']) ? $_POST['mail_file'] : 'newsletter.html';
-$testRecipientId = isset($_POST['test_recipient']) ? intval($_POST['test_recipient']) : null;
+$testRecipientEmail = isset($_POST['test_recipient']) ? $_POST['test_recipient'] : null;
 $userIdFrom = isset($_POST['user_id_from']) ? intval($_POST['user_id_from']) : 0;
 $userIdTo = isset($_POST['user_id_to']) ? intval($_POST['user_id_to']) : 99999;
 $internalOnly = isset($_POST['internal_only']) && $_POST['internal_only'] === '1';
@@ -53,13 +53,13 @@ echo "Sending mail: " . htmlspecialchars($mailFile) . "<br>";
 echo "Test mode: " . ($testing ? "true" : "false") . "<br>";
 
 // Fetch recipients
-if ($testing && $testRecipientId) {
+if ($testing && $testRecipientEmail) {
     // Send only to selected test recipient
     $sql = "SELECT pilot_id, email, firstname, lastname, verein 
             FROM mitglieder 
-            WHERE pilot_id = :pilotId";
-    $recipients = Database::query($sql, ['pilotId' => $testRecipientId]);
-    echo "Test recipient ID: " . $testRecipientId . "<br>";
+            WHERE email = :email";
+    $recipients = Database::query($sql, ['email' => $testRecipientEmail]);
+    echo "Test recipient email: " . htmlspecialchars($testRecipientEmail) . "<br>";
 } else {
     // Build query with filters
     $sql = "SELECT pilot_id, email, firstname, lastname, verein 
@@ -132,7 +132,7 @@ $logData = [
     'mail_file' => $mailFile,
     'subject' => $subject,
     'is_test' => $testing,
-    'test_recipient_id' => $testRecipientId,
+    'test_recipient_email' => $testRecipientEmail,
     'user_id_from' => $userIdFrom,
     'user_id_to' => $userIdTo,
     'internal_only' => $internalOnly,
@@ -374,6 +374,7 @@ function generateHtmlLog($logData) {
             <p><strong>Abgeschlossen:</strong> ' . htmlspecialchars($logData['completed_at']) . '</p>
             <p><strong>E-Mail Vorlage:</strong> ' . htmlspecialchars($logData['mail_file']) . '</p>
             <p><strong>Betreff:</strong> ' . htmlspecialchars($logData['subject']) . '</p>
+            ' . ($logData['is_test'] && $logData['test_recipient_email'] ? '<p><strong>Test-Empfänger:</strong> ' . htmlspecialchars($logData['test_recipient_email']) . '</p>' : '') . '
             <p><strong>User-ID Bereich:</strong> ' . htmlspecialchars($logData['user_id_from']) . ' - ' . htmlspecialchars($logData['user_id_to']) . '</p>
             <p><strong>Nur interne Mitglieder:</strong> ' . ($logData['internal_only'] ? 'Ja (Verein ID: ' . htmlspecialchars($logData['club_id']) . ')' : 'Nein') . '</p>
             <p><strong>Gesamt Empfänger:</strong> ' . htmlspecialchars($logData['total_recipients']) . '</p>

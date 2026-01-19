@@ -58,7 +58,8 @@ if ($mitgliederData['dienste_admin']) {
         'content' => $twig->render('admin.twig.html', [
             'newsletterSecret' => Helper::$configuration['newsletterSecret'],
             'clubId' => $clubId,
-            'clubName' => $clubName
+            'clubName' => $clubName,
+            'currentUserEmail' => $mitgliederData['email'] ?? ''
         ])
     ];
 }
