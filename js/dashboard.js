@@ -104,10 +104,92 @@ function getDashboardData() {
         populateDashboardTable();
         //populatePilotTable();
         populateDashboardHistory();
+        
+        // Sort pilot cards according to history table order
+        sortPilotCards();
+        
+        // Update disabled states after dashboard is populated
+        if (typeof updateDisabledStates === 'function') {
+            updateDisabledStates();
+        }
     }).fail(function (xhr, status, error) {
         console.error('Dashboard Daten konnten nicht geladen werden:', status, error);
     });
 }
+function refreshDashboardHistory() {
+    const historyStartDate = getHistoryStartDateValue();
+    
+    $.ajax({
+        url: 'getDashboardDataHistory.php',
+        type: 'GET',
+        dataType: 'json',
+        data: { startDate: historyStartDate }
+    })
+    .done(function(history) {
+        dashboardDataHistory = history;
+        populateDashboardHistory();
+        sortPilotCards();
+    })
+    .fail(function(xhr, status, error) {
+        console.error('Failed to refresh history data:', status, error);
+    });
+}
+
+// Sort pilot cards in option cells according to history table order
+function sortPilotCards() {
+    // Get the sorted pilot IDs from dashboardDataHistory
+    const sortedPilotIds = dashboardDataHistory.map(row => String(row.pilot_id));
+    
+    // Find all option cells (both startleiter and windenfahrer)
+    $('[id^="Optionen_startleiter_"], [id^="Optionen_windenfahrer_"]').each(function() {
+        const cell = $(this);
+        const cards = cell.find('.pilot-div').toArray();
+        
+        // Sort cards based on their position in the history table
+        cards.sort((a, b) => {
+            const idA = $(a).attr('data-pilot-id');
+            const idB = $(b).attr('data-pilot-id');
+            const indexA = sortedPilotIds.indexOf(idA);
+            const indexB = sortedPilotIds.indexOf(idB);
+            
+            // If pilot not found in history, put at end
+            const posA = indexA === -1 ? 9999 : indexA;
+            const posB = indexB === -1 ? 9999 : indexB;
+            
+            return posA - posB;
+        });
+        
+        // Re-append cards in sorted order
+        cards.forEach(card => cell.append(card));
+    });
+    
+    // Also sort cards in the assigned cells (startleiter_*, windenfahrer_*)
+    $('[id^="startleiter_"], [id^="windenfahrer_"]').each(function() {
+        const cellId = $(this).attr('id');
+        // Skip if this is an Optionen cell
+        if (cellId.startsWith('Optionen_')) return;
+        
+        const cell = $(this);
+        const cards = cell.find('.pilot-div').toArray();
+        
+        if (cards.length > 1) {
+            cards.sort((a, b) => {
+                const idA = $(a).attr('data-pilot-id');
+                const idB = $(b).attr('data-pilot-id');
+                const indexA = sortedPilotIds.indexOf(idA);
+                const indexB = sortedPilotIds.indexOf(idB);
+                
+                const posA = indexA === -1 ? 9999 : indexA;
+                const posB = indexB === -1 ? 9999 : indexB;
+                
+                return posA - posB;
+            });
+            
+            cards.forEach(card => cell.append(card));
+        }
+    });
+}
+
 function populateDashboardHistory() {
     console.log("history");
     console.log(dashboardDataHistory);
