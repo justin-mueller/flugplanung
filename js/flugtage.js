@@ -156,7 +156,7 @@ function deleteFlugtage(datum) {
 
 function enterSingleFlugtag() {
 	let date = $('#additional_flugtag').val()
-	date = dateToSQLFormat(parseDateStringWithGermanMonth(date))
+	date = calc_flugtag_date(date)
 	insertFlugtag([date])
 }
 
