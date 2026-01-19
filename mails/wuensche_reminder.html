@@ -1,0 +1,128 @@
+Subject: Bitte trage deine Dienst-Wünsche für die kommende Halbsaison ein
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dienst-Wünsche Erinnerung</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .reminder-box {
+            background-color: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .reminder-box strong {
+            color: #0056b3;
+        }
+        .cta-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .cta-button:hover {
+            background-color: #0056b3;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #dee2e6;
+        }
+        .info-list {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+        .info-list li {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Dienst-Wünsche für die kommende Halbsaison</h1>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">
+                Hallo {{firstname}},
+            </div>
+
+            <p>Bitte trage deine Dienst-Wünsche für die kommende Halbsaison ein. Das hilft uns bei der Planung und ermöglicht es, auf deine Verfügbarkeiten Rücksicht zu nehmen.</p>
+
+            <div class="reminder-box">
+                <strong>Für die erste Saisonhälfte bitte bis spätestens zum 31.01, zur zweiten Saisonhälfte bis zum 31.05 eintragen!</strong> 
+            </div>
+
+            <div class="cta-section">
+                <p>Hier geht's zu der</p>
+                <a href="https://hdgf.de/flugplanung" class="cta-button">Flugplanung</a>
+                <p>Danach gehst Du zum Reiter <strong>Wunschliste</strong></p>
+            </div>
+
+
+            <strong style="color: #d9534f; background-color: #fbeaea; padding: 8px 12px; border-radius: 4px; display: inline-block;">Neu:</strong>
+                Windenfahrer können nun angeben, wie viele Dienste sie max. pro Halbsaison übernehmen möchten.
+
+            <p>Wenn du Fragen hast oder Hilfe bei der Eingabe brauchst, melde dich gerne bei uns.</p>
+
+            <p>Danke für deine Mithilfe!</p>
+
+            <p>Viele Grüße,<br>
+            euer Planungsteam</p>
+        </div>
+        
+        <div class="footer">
+            <p>Das ist eine automatisch erzeugte Nachricht — bitte nicht direkt darauf antworten.</p>
+            <p>Bei Fragen: melde dich bei Justin.</p>
+        </div>
+    </div>
+</body>
+</html>
