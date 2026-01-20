@@ -138,6 +138,7 @@
     const SECRET_KEY = '{{ newsletterSecret }}';
     let mailsData = [];
     let pendingMailFilename = null;
+    let pendingMailWrapper = null;
 
     // Load admin data on init
     function loadAdminData() {
@@ -167,6 +168,7 @@
         html += '<thead class="table-light"><tr>';
         html += '<th>Betreff</th>';
         html += '<th>Datei</th>';
+        html += '<th style=\"width: 200px;\">Absender</th>';
         html += '<th style="width: 80px;" class="text-center">Test</th>';
         html += '<th style="width: 80px;" class="text-center">Senden</th>';
         html += '<th style="width: 80px;" class="text-center">Vorschau</th>';
@@ -176,14 +178,16 @@
         mailsData.forEach(mail => {
             html += '<tr>';
             html += `<td class="fw-semibold">${escapeHtml(mail.subject)}</td>`;
-            html += `<td class="text-muted small">${escapeHtml(mail.filename)}</td>`;
-            html += `<td class="text-center">
+            html += `<td class="text-muted small">${escapeHtml(mail.filename)}</td>`;            
+            // Add sender address
+            html += `<td class="text-muted small">${escapeHtml(mail.sender)}</td>`;
+                        html += `<td class="text-center">
                 <div class="form-check d-flex justify-content-center mb-0">
                     <input class="form-check-input test-checkbox" type="checkbox" data-filename="${escapeHtml(mail.filename)}" id="test-${escapeHtml(mail.filename)}" checked>
                 </div>
             </td>`;
             html += `<td class="text-center">
-                <button type="button" class="btn btn-sm btn-primary send-btn" data-filename="${escapeHtml(mail.filename)}" data-subject="${escapeHtml(mail.subject)}">
+                <button type="button" class="btn btn-sm btn-primary send-btn" data-filename="${escapeHtml(mail.filename)}" data-subject="${escapeHtml(mail.subject)}" data-wrapper="${escapeHtml(mail.wrapper)}">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </td>`;
@@ -214,6 +218,7 @@
             btn.addEventListener('click', function() {
                 const filename = this.dataset.filename;
                 const subject = this.dataset.subject;
+                const wrapper = this.dataset.wrapper;
                 const testCheckbox = document.querySelector(`.test-checkbox[data-filename="${filename}"]`);
                 const isTest = testCheckbox ? testCheckbox.checked : true;
                 const testRecipient = document.getElementById('test-recipient').value;
@@ -223,10 +228,10 @@
                         alert('Bitte gebe eine Test-E-Mail-Adresse ein.');
                         return;
                     }
-                    sendMail(filename, true, testRecipient);
+                    sendMail(filename, true, testRecipient, wrapper);
                 } else {
                     // Show confirmation modal for sending to all
-                    showConfirmModal(filename, subject);
+                    showConfirmModal(filename, subject, wrapper);
                 }
             });
         });
@@ -249,8 +254,9 @@
     }
 
     // Show confirmation modal
-    function showConfirmModal(filename, subject) {
+    function showConfirmModal(filename, subject, wrapper) {
         pendingMailFilename = filename;
+        pendingMailWrapper = wrapper;
         document.getElementById('confirm-mail-subject').textContent = subject;
         document.getElementById('confirm-phrase-input').value = '';
         const modal = new bootstrap.Modal(document.getElementById('confirmSendModal'));
@@ -258,7 +264,7 @@
     }
 
     // Send mail
-    function sendMail(filename, isTest, testRecipient) {
+    function sendMail(filename, isTest, testRecipient, wrapper) {
         const formData = new FormData();
         formData.append('mail_file', filename);
         if (isTest && testRecipient) {
@@ -266,7 +272,8 @@
         }
 
         const testParam = isTest ? 'true' : 'false';
-        const url = `sendNewsletter.php?key=${SECRET_KEY}&test=${testParam}`;
+        const wrapperFile = wrapper || 'sendMail.php';
+        const url = `${wrapperFile}?key=${SECRET_KEY}&test=${testParam}`;
 
         // Open in new window to show result
         const form = document.createElement('form');
@@ -388,9 +395,10 @@
         }
 
         if (pendingMailFilename) {
-            sendMail(pendingMailFilename, false, null);
+            sendMail(pendingMailFilename, false, null, pendingMailWrapper);
             bootstrap.Modal.getInstance(document.getElementById('confirmSendModal')).hide();
             pendingMailFilename = null;
+            pendingMailWrapper = null;
         }
     });
 

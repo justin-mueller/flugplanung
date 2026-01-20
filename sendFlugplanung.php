@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Newsletter Mail Trigger
+ * Flugplanung Mail Trigger
  * 
- * This script sends newsletter emails to all subscribed users.
+ * This script sends general flugplanung emails (like New Year greetings, etc.)
  * It acts as a wrapper around sendMail.php and can be triggered
  * by admin interface or HTTP request.
  * 
- * Usage: curl "http://yourdomain.com/flugplanung/sendNewsletter.php?key=YOUR_SECRET"
+ * Usage: curl "http://yourdomain.com/flugplanung/sendFlugplanung.php?key=YOUR_SECRET"
  */
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -24,7 +24,7 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret) {
     exit("Forbidden: Invalid or missing key");
 }
 
-// Set sender email address for newsletter emails
+// Set sender email address for Flugplanung emails
 $_POST['sender_email'] = Helper::$configuration['newsletterFrom'];
 
 // Pass through test mode

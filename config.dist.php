@@ -11,7 +11,8 @@ return [
 
     'smtpDsn' => 'smtp://user:password@smtp.example.com:587',
 
-    'newsletterFrom' => 'Newsletter <newsletter@yourdomain.de>',
+    'newsletterFrom' => 'Newsletter <newsletter.flugplanung@yourdomain.de>',
+    'flugplanungFrom' => 'Flugplanung <flugplanung@yourdomain.de>',
 
     'db' => [
         'servername' => $_SERVER['DATABASE_HOST'] ?? 'localhost',

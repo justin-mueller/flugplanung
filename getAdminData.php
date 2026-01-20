@@ -45,10 +45,31 @@ if (is_dir($mailsDir)) {
                 }
             }
             
+            // Determine mail type and sender based on filename
+            $mailType = 'Newsletter';
+            $wrapper = 'sendNewsletter.php';
+            $sender = Helper::$configuration['newsletterFrom'];
+            if (strpos($file, 'wuensche') !== false) {
+                $mailType = 'Wünsche-Erinnerung';
+                $wrapper = 'sendWuenscheReminder.php';
+                $sender = Helper::$configuration['flugplanungFrom'];
+            } elseif (strpos($file, 'duty') !== false || strpos($file, 'dienst') !== false) {
+                $mailType = 'Dienst-Erinnerung';
+                $wrapper = 'sendDutyReminder.php';
+                $sender = Helper::$configuration['flugplanungFrom'];
+            } elseif (strpos($file, 'neujahr') !== false) {
+                $mailType = 'Flugplanung';
+                $wrapper = 'sendFlugplanung.php';
+                $sender = Helper::$configuration['newsletterFrom']; // Changed to newsletter sender
+            }
+            
             $mails[] = [
                 'filename' => $file,
                 'subject' => $subject,
-                'modified' => filemtime($filePath)
+                'modified' => filemtime($filePath),
+                'type' => $mailType,
+                'wrapper' => $wrapper,
+                'sender' => $sender
             ];
         }
     }
