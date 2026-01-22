@@ -75,7 +75,11 @@ if ($mitgliederData['vereinId'] === Helper::$configuration['clubId']) {
 $tabs['einstellungen'] = [
     'label' => 'Nutzerkonto',
     'content' => $twig->render('einstellungen.twig.html', [
-        'clubs' => Helper::$configuration['clubs']
+        'clubs' => Helper::$configuration['clubs'],
+        'User_Information' => $mitgliederData,
+        'config' => [
+            'ClubID' => Helper::$configuration['clubId']
+        ]
     ])
 ];
 

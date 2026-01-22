@@ -189,6 +189,9 @@
                       >Ich möchte den E-Mail Newsletter für Updates in der Flugplanung erhalten.</label
                     >
                   </div>
+
+                  {% if User_Information.vereinId == config.ClubID %}
+
                   <div class="form-check d-flex justify-content-start mb-4">
                     <input
                       class="form-check-input"
@@ -210,9 +213,11 @@
                         value="7"
                         aria-label="Tage vor Dienst für Erinnerung"
                       />
-                      Tage vor meinem Dienst eine Erinnerung erhalten.
+                      Tage
+                      vor meinem Dienst eine Erinnerung erhalten.
                     </label>
                   </div>
+
                   <div class="form-check d-flex justify-content-start mb-4">
                     <input
                       class="form-check-input"
@@ -224,7 +229,10 @@
                     <label class="form-check-label" for="wuensche_reminder"
                       >Ich möchte Erinnerungen zum Eintragen meiner Dienst-Wünsche erhalten.</label
                     >
-                  </div>
+                </div>
+
+                {% endif %}
+
                 </div>
               </div>
 
