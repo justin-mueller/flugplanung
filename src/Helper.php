@@ -9,12 +9,23 @@ class Helper
 
     public static function loadConfiguration(): void
     {
-        self::$configuration = include __DIR__ . '/../config.dist.php';
+        // Load default config if it exists
+        if (file_exists(__DIR__ . '/../config.dist.php')) {
+            self::$configuration = include __DIR__ . '/../config.dist.php';
+        }
 
+        // Load and merge actual config
         if (file_exists(__DIR__ . '/../config.php')) {
-            self::$configuration = array_merge(self::$configuration, include __DIR__ . '/../config.php');
+            $config = include __DIR__ . '/../config.php';
+            self::$configuration = array_merge(self::$configuration, $config);
+        }
+        
+        // Ensure configuration was loaded
+        if (empty(self::$configuration)) {
+            throw new \Exception('No configuration file found. Please ensure config.php exists.');
         }
     }
+
 
     public static function checkLogin(): void
     {
