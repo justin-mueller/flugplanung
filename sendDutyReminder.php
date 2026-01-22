@@ -135,7 +135,7 @@ foreach ($dutiesByPilot as $pilotId => $data) {
     $functionsText = !empty($functions) ? implode(', ', array_unique($functions)) : 'Nicht angegeben';
     
     // Format date
-    $dutyDate = date('d.m.Y (l)', strtotime($pilot['flugtag']));
+    $dutyDate = date('d.m.Y', strtotime($pilot['flugtag']));
     
     // Get reminder days for this user
     $reminderDays = $pilot['duty_reminder_days'] ?? 7;
