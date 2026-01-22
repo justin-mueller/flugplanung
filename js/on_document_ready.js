@@ -285,6 +285,11 @@ document.addEventListener("DOMContentLoaded", function () {
 			  User_Information.duty_reminder_days || 7
 			);
 
+			$("#wuensche_reminder").prop(
+			  "checked",
+			  User_Information.wuensche_reminder == 1
+			);
+
 			updatePreview(User_Information.avatar-1);
 
 

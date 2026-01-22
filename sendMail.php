@@ -6,9 +6,10 @@ require_once __DIR__ . '/vendor/autoload.php';
 set_time_limit(600);
 ini_set('max_execution_time', 600);
 
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-error_reporting(0);
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 // Flush output immediately
 ini_set('output_buffering', 'off');
@@ -53,6 +54,7 @@ echo "Sending mail: " . htmlspecialchars($mailFile) . "<br>";
 echo "Test mode: " . ($testing ? "true" : "false") . "<br>";
 
 // Fetch recipients
+$excludedByPreference = [];
 if ($testing && $testRecipientEmail) {
     // Send only to selected test recipient
     $sql = "SELECT pilot_id, email, firstname, lastname, verein 
@@ -62,10 +64,12 @@ if ($testing && $testRecipientEmail) {
     echo "Test recipient email: " . htmlspecialchars($testRecipientEmail) . "<br>";
 } else {
     // Build query with filters
+    // The preference filter column (newsletter, wuensche_reminder, etc.) is passed from wrapper scripts
+    $preferenceFilter = isset($_POST['preference_filter']) ? $_POST['preference_filter'] : null;
+    
     $sql = "SELECT pilot_id, email, firstname, lastname, verein 
             FROM mitglieder 
-            WHERE newsletter = 1 
-            AND pilot_id >= :userIdFrom 
+            WHERE pilot_id >= :userIdFrom 
             AND pilot_id <= :userIdTo";
     
     $params = [
@@ -79,9 +83,23 @@ if ($testing && $testRecipientEmail) {
         $params['clubId'] = $configClubId;
     }
     
+    // If preference filter is specified, get excluded users who don't have it enabled
+    if ($preferenceFilter !== null && preg_match('/^[a-z_]+$/', $preferenceFilter)) {
+        $excludedSql = $sql . " AND {$preferenceFilter} = 0";
+        $excludedResult = Database::query($excludedSql, $params);
+        $excludedByPreference = is_array($excludedResult) ? $excludedResult : [];
+        
+        // Add preference filter to main query
+        $sql .= " AND {$preferenceFilter} = 1";
+    }
+    
     $recipients = Database::query($sql, $params);
     
     echo "User ID range: " . $userIdFrom . " - " . $userIdTo . "<br>";
+    if ($preferenceFilter !== null) {
+        echo "<strong>Preference filter: " . htmlspecialchars($preferenceFilter) . " = 1</strong><br>";
+        echo "<em>Excluded by preference: " . count($excludedByPreference) . " user(s)</em><br>";
+    }
     if ($internalOnly && $configClubId !== null) {
         echo "<strong>Nur interne Mitglieder (Verein ID: " . $configClubId . ")</strong><br>";
     }
@@ -141,6 +159,7 @@ $logData = [
     'internal_only' => $internalOnly,
     'club_id' => $configClubId,
     'total_recipients' => $total,
+    'excluded_by_preference' => $excludedByPreference,
     'recipients' => []
 ];
 
@@ -221,15 +240,31 @@ if (!empty($failedEmails)) {
 echo "<br><strong>Done!</strong>";
 
 // Generate HTML log file
+echo "<br><br><strong>Generating log...</strong>";
 $logData['success_count'] = $successCount;
 $logData['fail_count'] = $failCount;
 $logData['completed_at'] = date('Y-m-d H:i:s');
 
 $logFilename = generateLogFilename($mailFile, $testing);
 $logPath = __DIR__ . '/mails/mail_logs/' . $logFilename;
-file_put_contents($logPath, generateHtmlLog($logData));
+echo "<br>Log path: " . htmlspecialchars($logPath);
 
-echo "<br><br><strong>Log saved:</strong> " . htmlspecialchars($logFilename);
+try {
+    $content = generateHtmlLog($logData);
+    $result = file_put_contents($logPath, $content);
+    
+    if ($result === false) {
+        $error = error_get_last();
+        echo "<br><strong>ERROR: Failed to write log file!</strong>";
+        if ($error) {
+            echo "<br>Last PHP Error: " . htmlspecialchars($error['message']);
+        }
+    } else {
+        echo "<br><strong>Log saved:</strong> " . htmlspecialchars($logFilename) . " (" . $result . " bytes)";
+    }
+} catch (\Throwable $e) {
+    echo "<br><strong>EXCEPTION during log generation:</strong> " . htmlspecialchars($e->getMessage());
+}
 
 /**
  * Generate log filename based on mail template and timestamp
@@ -307,6 +342,11 @@ function generateHtmlLog($logData) {
             border: 2px solid #dc3545;
             color: #721c24;
         }
+        .excluded-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+        }
         .summary-box h3 {
             margin: 0 0 10px 0;
             font-size: 16px;
@@ -348,6 +388,10 @@ function generateHtmlLog($logData) {
         .status-failed {
             background: #dc3545;
             color: white;
+        }
+        .status-excluded {
+            background: #ffc107;
+            color: #333;
         }
         .error-msg {
             color: #dc3545;
@@ -392,6 +436,11 @@ function generateHtmlLog($logData) {
                 <h3>✗ Fehlgeschlagen</h3>
                 <div class="count">' . htmlspecialchars($logData['fail_count']) . '</div>
             </div>
+            ' . (count($logData['excluded_by_preference']) > 0 ? '<div class="summary-box excluded-box">
+                <h3>⊗ Ausgeschlossen</h3>
+                <div class="count">' . count($logData['excluded_by_preference']) . '</div>
+                <p style="margin: 10px 0 0 0; font-size: 12px;">Preferenz deaktiviert</p>
+            </div>' : '') . '
         </div>
         
         <h2>Empfänger Details</h2>
@@ -426,6 +475,38 @@ function generateHtmlLog($logData) {
                     <td>' . htmlspecialchars($recipient['attempts']) . '</td>
                     <td>' . ($recipient['error'] ? '<div class="error-msg">' . htmlspecialchars($recipient['error']) . '</div>' : '-') . '</td>
                 </tr>';
+    }
+    
+    // Add excluded users section
+    if (count($logData['excluded_by_preference']) > 0) {
+        $html .= '</tbody>
+        </table>
+        
+        <h2 style="margin-top: 40px; color: #856404;">⊗ Ausgeschlossene Empfänger (Preferenz deaktiviert)</h2>
+        <p style="color: #666; font-size: 14px;">Diese Benutzer erfüllen alle Filterkriterien (User-ID, Verein), aber haben ihre Preferenz für diese E-Mail Art deaktiviert.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User-ID</th>
+                    <th>Name</th>
+                    <th>E-Mail</th>
+                    <th>Verein</th>
+                    <th>Grund für Ausschluss</th>
+                </tr>
+            </thead>
+            <tbody>';
+        
+        foreach ($logData['excluded_by_preference'] as $excluded) {
+            $html .= '<tr style="background: #fffbea;">
+                    <td>' . $index++ . '</td>
+                    <td>' . htmlspecialchars($excluded['pilot_id']) . '</td>
+                    <td>' . htmlspecialchars($excluded['lastname'] . ', ' . $excluded['firstname']) . '</td>
+                    <td>' . htmlspecialchars($excluded['email']) . '</td>
+                    <td>' . htmlspecialchars($excluded['verein'] ?? '-') . '</td>
+                    <td><span class="status-badge status-excluded">⊗ Preferenz deaktiviert</span></td>
+                </tr>';
+        }
     }
     
     $html .= '</tbody>

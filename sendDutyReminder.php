@@ -34,6 +34,15 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret) {
     exit("Forbidden: Invalid or missing key");
 }
 
+// Set preference filter for this mail type
+// This ensures only users who have duty_reminder enabled will receive emails
+$preferenceFilter = 'duty_reminder';
+
+echo "<h2>Duty Reminder - Running</h2>";
+echo "<p>Current date: " . date('Y-m-d') . "</p>";
+echo "<p>Preference filter: " . htmlspecialchars($preferenceFilter) . " = 1</p>";
+echo "<hr>";
+
 Database::connect();
 
 // Configure transport
@@ -41,10 +50,8 @@ $dsn = Helper::$configuration['smtpDsn'];
 $transport = Transport::fromDsn($dsn);
 $mailer = new Mailer($transport);
 
-echo "<h2>Duty Reminder - Running</h2>";
-echo "<p>Current date: " . date('Y-m-d') . "</p><hr>";
-
 // Query for duties with personalized reminder dates based on user preferences
+// Only queries users where {$preferenceFilter} = 1 (respects user preference filter)
 // The query finds users who have duty_reminder enabled and calculates the target date
 // based on their duty_reminder_days preference
 $sql = "SELECT 
@@ -59,7 +66,7 @@ $sql = "SELECT
 FROM dienste d
 JOIN mitglieder m ON d.pilot_id = m.pilot_id
 WHERE d.pilot_id IS NOT NULL
-AND m.duty_reminder = 1
+AND m.{$preferenceFilter} = 1
 AND DATEDIFF(d.flugtag, CURDATE()) = m.duty_reminder_days
 ORDER BY d.pilot_id, d.flugtag";
 
@@ -113,7 +120,7 @@ foreach ($duties as $duty) {
 }
 
 // Get sender email from configuration
-$senderEmail = Helper::$configuration['mailFrom'] ?? Helper::$configuration['newsletterFrom'] ?? 'noreply@example.com';
+$senderEmail = Helper::$configuration['mailFrom'] ?? Helper::$configuration['flugplanungFrom'] ?? 'noreply@example.com';
 
 foreach ($dutiesByPilot as $pilotId => $data) {
     $pilot = $data['pilot'];

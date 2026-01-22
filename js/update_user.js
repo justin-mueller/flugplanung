@@ -49,6 +49,11 @@ $(document).ready(function () {
       value: dutyReminderDays.val() || 7,
     });
 
+    var wuenscheReminderCheckbox = $("#wuensche_reminder");
+    formDataArray.push({
+      name: wuenscheReminderCheckbox.attr("name"),
+      value: wuenscheReminderCheckbox.is(":checked") ? 1 : 0,
+    });
 
     var formData = $.param(formDataArray);
 
