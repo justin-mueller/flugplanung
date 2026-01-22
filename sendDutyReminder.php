@@ -41,13 +41,12 @@ $dsn = Helper::$configuration['smtpDsn'];
 $transport = Transport::fromDsn($dsn);
 $mailer = new Mailer($transport);
 
-// Calculate target date (7 days from now)
-$targetDate = date('Y-m-d', strtotime('+7 days'));
-
-echo "<h2>Duty Reminder - Running for date: " . htmlspecialchars($targetDate) . "</h2>";
+echo "<h2>Duty Reminder - Running</h2>";
 echo "<p>Current date: " . date('Y-m-d') . "</p><hr>";
 
-// Query for duties on the target date with pilot and flight day information
+// Query for duties with personalized reminder dates based on user preferences
+// The query finds users who have duty_reminder enabled and calculates the target date
+// based on their duty_reminder_days preference
 $sql = "SELECT 
     d.flugtag,
     d.pilot_id,
@@ -55,22 +54,24 @@ $sql = "SELECT
     d.startleiter,
     m.firstname,
     m.lastname,
-    m.email
+    m.email,
+    m.duty_reminder_days
 FROM dienste d
 JOIN mitglieder m ON d.pilot_id = m.pilot_id
-WHERE d.flugtag = :targetDate
-AND d.pilot_id IS NOT NULL
+WHERE d.pilot_id IS NOT NULL
+AND m.duty_reminder = 1
+AND DATEDIFF(d.flugtag, CURDATE()) = m.duty_reminder_days
 ORDER BY d.pilot_id, d.flugtag";
 
-$duties = Database::query($sql, ['targetDate' => $targetDate]);
+$duties = Database::query($sql, []);
 
 if (empty($duties)) {
-    echo "<p><strong>No duties found for " . htmlspecialchars($targetDate) . "</strong></p>";
-    echo "<p>No reminder emails will be sent.</p>";
+    echo "<p><strong>No duty reminders to send today</strong></p>";
+    echo "<p>No users have duties matching their reminder preference for today.</p>";
     exit;
 }
 
-echo "<p>Found " . count($duties) . " duty assignment(s) for " . htmlspecialchars($targetDate) . "</p>";
+echo "<p>Found " . count($duties) . " duty assignment(s) to remind about</p>";
 echo "<hr>";
 
 // Load email template
@@ -129,10 +130,13 @@ foreach ($dutiesByPilot as $pilotId => $data) {
     // Format date
     $dutyDate = date('d.m.Y (l)', strtotime($pilot['flugtag']));
     
+    // Get reminder days for this user
+    $reminderDays = $pilot['duty_reminder_days'] ?? 7;
+    
     // Personalize email body
     $personalizedBody = str_replace(
-        ['{{firstname}}', '{{lastname}}', '{{duty_date}}', '{{duties}}'],
-        [$pilot['firstname'], $pilot['lastname'], $dutyDate, $functionsText],
+        ['{{firstname}}', '{{lastname}}', '{{duty_date}}', '{{duties}}', '{{reminder_days}}'],
+        [$pilot['firstname'], $pilot['lastname'], $dutyDate, $functionsText, $reminderDays],
         $bodyTemplate
     );
     
@@ -153,7 +157,7 @@ foreach ($dutiesByPilot as $pilotId => $data) {
     
     try {
         $mailer->send($email);
-        echo "✓ Sent to {$pilot['firstname']} {$pilot['lastname']} ({$to}) - Functions: {$functionsText}<br>";
+        echo "✓ Sent to {$pilot['firstname']} {$pilot['lastname']} ({$to}) - Functions: {$functionsText} - Reminder: {$reminderDays} days before<br>";
         $successCount++;
         $sentEmails[] = $to;
     } catch (\Throwable $e) {
@@ -169,7 +173,6 @@ foreach ($dutiesByPilot as $pilotId => $data) {
 
 echo "<br><hr>";
 echo "<strong>Summary:</strong><br>";
-echo "Target date: " . htmlspecialchars($targetDate) . "<br>";
 echo "✓ Successfully sent: {$successCount}<br>";
 echo "✗ Failed: {$failCount}<br>";
 echo "<br><strong>Done!</strong>";

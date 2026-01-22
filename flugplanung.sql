@@ -76,6 +76,8 @@ CREATE TABLE `mitglieder` (
   `email` varchar(64) NOT NULL,
   `avatar` smallint(6) NOT NULL DEFAULT 1,
   `newsletter` tinyint(1) DEFAULT 1,
+  `duty_reminder` tinyint(1) DEFAULT 1 COMMENT 'Enable duty reminder emails',
+  `duty_reminder_days` smallint(6) DEFAULT 7 COMMENT 'Days before duty to send reminder',
   `max_dienste_halbjahr` smallint(6) DEFAULT NULL COMMENT 'Maximum number of duties per half-year for windenfahrer, NULL = no limit'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

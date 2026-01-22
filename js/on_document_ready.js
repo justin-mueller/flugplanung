@@ -276,6 +276,15 @@ document.addEventListener("DOMContentLoaded", function () {
 			  User_Information.newsletter == 1
 			);
 
+			$("#duty_reminder").prop(
+			  "checked",
+			  User_Information.duty_reminder == 1
+			);
+
+			$("#duty_reminder_days").val(
+			  User_Information.duty_reminder_days || 7
+			);
+
 			updatePreview(User_Information.avatar-1);
 
 

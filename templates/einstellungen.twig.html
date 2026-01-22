@@ -174,7 +174,7 @@
 
               <div class="card mb-4">
                 <div class="card-header">
-                  <h5 class="card-title">Newsletter</h5>
+                  <h5 class="card-title">E-Mail Mitteilungen</h5>
                 </div>
                 <div class="card-body">
                   <div class="form-check d-flex justify-content-start mb-4">
@@ -188,6 +188,30 @@
                     <label class="form-check-label" for="newsletter"
                       >Ich möchte den E-Mail Newsletter für Updates in der Flugplanung erhalten.</label
                     >
+                  </div>
+                  <div class="form-check d-flex justify-content-start mb-4">
+                    <input
+                      class="form-check-input"
+                      name="duty_reminder"
+                      type="checkbox"
+                      value=""
+                      id="duty_reminder"
+                    />
+                    <label class="form-check-label ms-2" for="duty_reminder">
+                      Ich möchte
+                      <input
+                        type="number"
+                        name="duty_reminder_days"
+                        id="duty_reminder_days"
+                        class="form-control form-control-sm"
+                        style="width: 60px; display: inline-block; margin: 0 0.5rem;"
+                        min="1"
+                        max="30"
+                        value="7"
+                        aria-label="Tage vor Dienst für Erinnerung"
+                      />
+                      Tage vor meinem Dienst eine Erinnerung erhalten.
+                    </label>
                   </div>
                 </div>
               </div>

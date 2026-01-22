@@ -37,6 +37,18 @@ $(document).ready(function () {
       value: newsletterCheckbox.is(":checked") ? 1 : 0,
     });
 
+    var dutyReminderCheckbox = $("#duty_reminder");
+    formDataArray.push({
+      name: dutyReminderCheckbox.attr("name"),
+      value: dutyReminderCheckbox.is(":checked") ? 1 : 0,
+    });
+
+    var dutyReminderDays = $("#duty_reminder_days");
+    formDataArray.push({
+      name: dutyReminderDays.attr("name"),
+      value: dutyReminderDays.val() || 7,
+    });
+
 
     var formData = $.param(formDataArray);
 
