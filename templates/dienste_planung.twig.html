@@ -1,36 +1,5 @@
 {% include('partials/saison.twig.html') %}
 
-<style>
-	#diensteHistory {
-		table-layout: fixed;
-		width: 100%;
-		font-size: smaller;
-		font-weight: normal;
-	}
-	#diensteHistory th,
-	#diensteHistory td {
-		font-size: smaller;
-		font-weight: normal;
-	}
-	#diensteHistory tbody td {
-		white-space: nowrap;
-		vertical-align: middle;
-	}
-	#diensteHistory th:first-child,
-	#diensteHistory td:first-child {
-		width: 30%;
-	}
-	#diensteHistory .dienste-name {
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	/* Align option cells to top */
-	[id^="Optionen_"] {
-		vertical-align: top;
-	}
-</style>
-
 <div class="card mb-3">
 	<div class="card-header">
 		<h4 class="mb-0 fw-bold">Auswertung ab Datum</h4>
