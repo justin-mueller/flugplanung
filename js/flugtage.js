@@ -80,21 +80,43 @@ function loadFlugtage(init, fullYear = false) {
 
 			if (init) {
 
-				let startFlugtag = new Date();
-				const checkTime = new Date();
-				checkTime.setHours(14, 0, 0); 
-				
-				$.each(Flugtage, function (index, entry) {
-					let Flugtag_Converted = new Date(entry.datum);
+				// Determine the next appropriate Flugtag (today if available and before cutoff, otherwise next future date)
+				const now = new Date();
+				const cutoff = new Date();
+				cutoff.setHours(14, 0, 0, 0);
 
-					let flugtagDate = Flugtag_Converted.getFullYear().toString() + Flugtag_Converted.getMonth().toString() + Flugtag_Converted.getDate().toString();
-					let startFlugtagDate = startFlugtag.getFullYear().toString() + startFlugtag.getMonth().toString() + startFlugtag.getDate().toString();
+				// Convert entries to Date objects and sort ascending
+				let flugtageDates = Flugtage.map(entry => new Date(entry.datum));
+				flugtageDates.sort((a, b) => a - b);
 
-					if (Flugtag_Converted > startFlugtag || (flugtagDate == startFlugtagDate && checkTime > startFlugtag )) {
-						startFlugtag = Flugtag_Converted;
-						return false;
+				function isSameDay(a, b) {
+					return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+				}
+
+				let chosen = null;
+				for (let i = 0; i < flugtageDates.length; i++) {
+					const d = flugtageDates[i];
+					if (isSameDay(d, now)) {
+						if (now <= cutoff) {
+							chosen = d;
+							break;
+						} else {
+							continue; // today's Flugtag is past cutoff, skip
+						}
 					}
-				});
+					if (d > now && !isSameDay(d, now)) {
+						chosen = d;
+						break;
+					}
+				}
+
+				if (!chosen) {
+					// fallback: if no future flight found, use the last known entry or today
+					if (flugtageDates.length) chosen = flugtageDates[flugtageDates.length - 1];
+					else chosen = new Date();
+				}
+
+				let startFlugtag = chosen;
 
 				flugtag_formatted = dateToSQLFormat(startFlugtag);
 				flugtag_unformatted = startFlugtag;
