@@ -35,6 +35,8 @@ function getDienste() {
                 return;
             }
 
+            let currentWeek = null;
+
             validEntries.forEach(entry => {
                 // Convert comma-separated ID strings to arrays for proper matching
                 const windenfahrerIdArray = entry.Windenfahrer_ids ? entry.Windenfahrer_ids.split(',').map(id => id.trim()) : [];
@@ -45,6 +47,19 @@ function getDienste() {
                 
                 // Parse date for display
                 const dateObj = new Date(entry.flugtag);
+                
+                let week = getCalendarWeek(dateObj);
+                let year = dateObj.getFullYear();
+                let weekKey = year + '-' + week;
+
+                if (currentWeek !== weekKey) {
+                    currentWeek = weekKey;
+                    let sep = document.createElement('div');
+                    sep.className = 'week-separator';
+                    sep.textContent = 'KW ' + week;
+                    container.appendChild(sep);
+                }
+
                 const day = dateObj.getDate();
                 const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
                 const weekdayNames = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];

@@ -91,7 +91,23 @@ function populateWuenscheValues(wuenscheValues) {
         return;
     }
 
+    let currentWeek = null;
+
     wuenscheValues.forEach((entry) => {
+        
+        let dateObj = new Date(entry.date);
+        let week = getCalendarWeek(dateObj);
+        let year = dateObj.getFullYear();
+        let weekKey = year + '-' + week;
+
+        if (currentWeek !== weekKey) {
+            currentWeek = weekKey;
+            let sep = document.createElement('div');
+            sep.className = 'week-separator';
+            sep.textContent = 'KW ' + week;
+            container.appendChild(sep);
+        }
+
         const card = createWunschCard(entry.date, entry.wunsch);
         container.appendChild(card);
     });

@@ -243,3 +243,21 @@
 		height: 28px;
 	}
 }
+
+/* ==========================================================================
+   Week Grouping
+   ========================================================================== */
+.week-separator {
+	margin: 16px 0 8px 0;
+	padding-bottom: 4px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+	color: #6c757d;
+	font-size: 0.95rem;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+}
+
+/* Make the first separator have no top margin if it's at the very top */
+.cards-container > .week-separator:first-child {
+	margin-top: 0;
+}

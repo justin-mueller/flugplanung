@@ -76,7 +76,7 @@ function loadFlugtage(init, fullYear = false) {
 				},
 			  });
 			  
-			populateFlugtageTable(Flugtage);
+			renderFlugtageList(Flugtage);
 
 			if (init) {
 
@@ -85,7 +85,7 @@ function loadFlugtage(init, fullYear = false) {
 				checkTime.setHours(14, 0, 0); 
 				
 				$.each(Flugtage, function (index, entry) {
-					let Flugtag_Converted = parseDateStringWithGermanMonth(entry.datum);
+					let Flugtag_Converted = new Date(entry.datum);
 
 					let flugtagDate = Flugtag_Converted.getFullYear().toString() + Flugtag_Converted.getMonth().toString() + Flugtag_Converted.getDate().toString();
 					let startFlugtagDate = startFlugtag.getFullYear().toString() + startFlugtag.getMonth().toString() + startFlugtag.getDate().toString();
@@ -112,32 +112,65 @@ function loadFlugtage(init, fullYear = false) {
 	});
 }
 
-function populateFlugtageTable(data) {
+function renderFlugtageList(data) {
 
-	const tableBody = $("#flugtageTableBody");
-	tableBody.empty();
-	data.reverse()
-	$.each(data, function (index, entry) {
-		data[index].datum = getFormattedGermanDate(data[index].datum)
-	});
+	const container = $("#flugtage-container");
+	container.empty();
+	let displayData = [...data];
+	displayData.reverse();
 
-	if (data.length === 0) {
-		tableBody.append('<tr><td colspan="2">Keine Einträge gefunden!</td></tr>');
+	if (displayData.length === 0) {
+		container.append('<div class="alert alert-info">Keine Einträge gefunden!</div>');
 	} else {
-		$.each(data, function (index, entry) {
-			const row = `<tr>
-									  <td>${entry.datum}</td>
-									  <td><button class="btn btn-danger ui-button" onclick="deleteFlugtage('${entry.datum}')">Löschen</button></td>
-								 </tr>`;
-			tableBody.append(row);
+		let currentWeek = null;
+
+		$.each(displayData, function (index, entry) {
+			
+			let dateObj = new Date(entry.datum);
+			let week = getCalendarWeek(dateObj);
+			let year = dateObj.getFullYear();
+			// Handle year crossing roughly for grouping key
+			let weekKey = year + '-' + week;
+
+			if (currentWeek !== weekKey) {
+				currentWeek = weekKey;
+				container.append(`<div class="week-separator">KW ${week}</div>`);
+			}
+
+			let day = dateObj.getDate();
+			let monthShort = dateObj.toLocaleDateString('de-DE', { month: 'short' }).toUpperCase().replace('.', '');
+			// Ensure we strip possible dot "Okt."
+			
+			let fullDate = getFormattedGermanDate(entry.datum);
+
+			const card = `
+			<div class="card-row">
+				<div class="card-row-header">
+					<div class="card-date-badge">
+						<div class="card-date-day">${day}</div>
+						<div class="card-date-month">${monthShort}</div>
+					</div>
+					<div class="card-date-full">
+						${fullDate}
+					</div>
+					<div class="ms-auto">
+						<button class="btn btn-outline-danger btn-sm" onclick="deleteFlugtage('${entry.datum}')">
+							<i class="fa-solid fa-trash"></i>
+						</button>
+					</div>
+				</div>
+			</div>`;
+			container.append(card);
 		});
 	}
 }
 
 function deleteFlugtage(datum) {
 
-	datum = parseDateStringWithGermanMonth(datum);
-	datum = dateToSQLFormat(datum);
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(datum)) {
+		datum = parseDateStringWithGermanMonth(datum);
+		datum = dateToSQLFormat(datum);
+	}
 
 	$.ajax({
 		url: 'delete_flugtage.php',
