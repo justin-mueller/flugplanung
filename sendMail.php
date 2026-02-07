@@ -20,6 +20,7 @@ if (ob_get_level()) ob_end_flush();
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use JustinMueller\Flugplanung\Database;
 use JustinMueller\Flugplanung\Helper;
 
@@ -180,6 +181,18 @@ foreach ($recipients as $recipient) {
         ->subject($subject)
         ->html($personalizedBody);
 
+    // Attach images if configured
+    $attachmentConfig = require __DIR__ . '/mailAttachments.php';
+    if ($attachmentConfig['enabled'] && isset($attachmentConfig['attachments'][$mailFile])) {
+        foreach ($attachmentConfig['attachments'][$mailFile] as $imageFile => $cid) {
+            $imagePath = __DIR__ . '/mails/' . $imageFile;
+            if (file_exists($imagePath)) {
+                $mimeType = getMimeTypeFromExtension($imageFile);
+                $email->addPart((new DataPart(fopen($imagePath, 'r'), $imageFile, $mimeType))->setContentId($cid));
+            }
+        }
+    }
+
     $sent = false;
     $retries = 3;
     $recipientLog = [
@@ -274,6 +287,30 @@ function generateLogFilename($mailFile, $isTesting) {
     $timestamp = date('Y-m-d_His');
     $testSuffix = $isTesting ? '_TEST' : '';
     return "{$baseName}{$testSuffix}_{$timestamp}.html";
+}
+
+/**
+ * Get MIME type from file extension
+ */
+function getMimeTypeFromExtension($filename) {
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    switch ($extension) {
+        case 'jpg':
+        case 'jpeg':
+            return 'image/jpeg';
+        case 'png':
+            return 'image/png';
+        case 'gif':
+            return 'image/gif';
+        case 'bmp':
+            return 'image/bmp';
+        case 'webp':
+            return 'image/webp';
+        case 'svg':
+            return 'image/svg+xml';
+        default:
+            return 'application/octet-stream';
+    }
 }
 
 /**

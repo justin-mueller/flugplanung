@@ -57,9 +57,9 @@ if (is_dir($mailsDir)) {
                 $mailType = 'Dienst-Erinnerung';
                 $wrapper = 'sendDutyReminder.php';
                 $sender = Helper::$configuration['flugplanungFrom'];
-            } elseif (strpos($file, 'neujahr') !== false) {
-                $mailType = 'Flugplanung';
-                $wrapper = 'sendFlugplanung.php';
+            } elseif (strpos($file, 'test_mail') !== false) {
+                $mailType = 'Test Mail';
+                $wrapper = 'sendNewsletter.php';
                 $sender = Helper::$configuration['newsletterFrom']; // Changed to newsletter sender
             }
             
