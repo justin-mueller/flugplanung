@@ -2,28 +2,35 @@
    Dienste Planung - Table Styles
    ========================================================================== */
 
-#diensteHistory {
+.dienste-history-table {
 	table-layout: fixed;
 	width: 100%;
 	font-size: smaller;
 	font-weight: normal;
 }
-#diensteHistory th,
-#diensteHistory td {
+.dienste-history-table th,
+.dienste-history-table td {
 	font-size: smaller;
 	font-weight: normal;
 }
-#diensteHistory tbody td {
+.dienste-history-table tbody td {
 	white-space: nowrap;
 	vertical-align: middle;
 }
-#diensteHistory th:first-child,
-#diensteHistory td:first-child {
+.dienste-history-table th:first-child,
+.dienste-history-table td:first-child {
 	width: 30%;
 }
-#diensteHistory .dienste-name {
+.dienste-history-table .dienste-name {
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.history-section-title {
+	padding: 0.5rem 0.75rem;
+	font-size: 0.9rem;
+	font-weight: 600;
+	background-color: rgba(0, 0, 0, 0.03);
 }
 
 /* Align option cells to top */

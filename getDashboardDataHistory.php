@@ -27,6 +27,22 @@ m.lastname,
    AND d.flugtag >= :startDate
 ) AS duties_count,
 
+-- Count startleiter dienste from startDate onwards
+(SELECT COUNT(d.pilot_id)
+ FROM dienste d
+ WHERE d.pilot_id = m.pilot_id
+   AND d.flugtag >= :startDate
+   AND d.startleiter = 1
+) AS startleiter_duties_count,
+
+-- Count windenfahrer dienste from startDate onwards
+(SELECT COUNT(d.pilot_id)
+ FROM dienste d
+ WHERE d.pilot_id = m.pilot_id
+   AND d.flugtag >= :startDate
+   AND d.windenfahrer = 1
+) AS windenfahrer_duties_count,
+
 -- Count dienste with active betrieb from startDate onwards
 (SELECT COUNT(d.pilot_id)
  FROM dienste d
@@ -35,6 +51,26 @@ m.lastname,
    AND d.flugtag >= :startDate
    AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
 ) AS active_duties_count,
+
+-- Count startleiter dienste with active betrieb from startDate onwards
+(SELECT COUNT(d.pilot_id)
+ FROM dienste d
+ INNER JOIN flugtage mf ON mf.datum = d.flugtag
+ WHERE d.pilot_id = m.pilot_id
+   AND d.flugtag >= :startDate
+   AND d.startleiter = 1
+   AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
+) AS active_startleiter_duties_count,
+
+-- Count windenfahrer dienste with active betrieb from startDate onwards
+(SELECT COUNT(d.pilot_id)
+ FROM dienste d
+ INNER JOIN flugtage mf ON mf.datum = d.flugtag
+ WHERE d.pilot_id = m.pilot_id
+   AND d.flugtag >= :startDate
+   AND d.windenfahrer = 1
+   AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
+) AS active_windenfahrer_duties_count,
 
 -- Active Flying Days (pilot flew on days with active betrieb from startDate onwards)
 (SELECT COUNT(tp.pilot_id)
