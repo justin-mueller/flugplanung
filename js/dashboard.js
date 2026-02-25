@@ -1,6 +1,5 @@
 function getDefaultHistoryStartDate() {
-    const previousYear = new Date().getFullYear() - 1;
-    return new Date(previousYear, 0, 1, 12, 0, 0);
+    return new Date(2024, 0, 1, 12, 0, 0);
 }
 
 function getHistoryStartDateValue() {
@@ -199,40 +198,59 @@ function populateDashboardHistory() {
         row.sum = row.duties_count + row.active_duties_count - row.active_flying_days * 0.2;
     });
 
-    // Sort the data by the sum (ascending)
-    dashboardDataHistory.sort((a, b) => a.sum - b.sum);
+    const isWindenfahrer = (row) => row.windenfahrer === true || row.windenfahrer === 1 || row.windenfahrer === '1';
 
-    const tbody = document.querySelector('#diensteHistory tbody');
-    tbody.innerHTML = ''; // Clear the table body
+    const startleiterRows = dashboardDataHistory
+        .filter(row => !isWindenfahrer(row))
+        .sort((a, b) => a.sum - b.sum);
 
-    // Populate table rows
-    dashboardDataHistory.forEach(row => {
-        const tr = document.createElement('tr');
+    const windenfahrerRows = dashboardDataHistory
+        .filter(row => isWindenfahrer(row))
+        .sort((a, b) => a.sum - b.sum);
 
-        // Create cells
-        const fullName = `${row.firstname} ${row.lastname}`.trim();
-        const nameCell = document.createElement('td');
-        nameCell.classList.add('dienste-name');
-        nameCell.textContent = fullName;
-        nameCell.title = fullName;
-        
-        // Conditionally format cells
-        const dutiesCell = `<td style="background-color: ${row.duties_count === 0 ? '#ffd699' : 'inherit'}">${row.duties_count}</td>`;
-        const activeDutiesCell = `<td style="background-color: ${row.active_duties_count === 0 ? '#ffd699' : 'inherit'}">${row.active_duties_count}</td>`;
-        const activeFlyingDays = `<td style="background-color: ${row.active_flying_days === 0 ? '#8bffb1' : '#ffd699'}">${row.active_flying_days}</td>`;
+    const startleiterTbody = document.querySelector('#diensteHistoryStartleiter tbody');
+    const windenfahrerTbody = document.querySelector('#diensteHistoryWindenfahrer tbody');
+    const legacyTbody = document.querySelector('#diensteHistory tbody');
 
-        // Calculate points using the sum, rounded to 1 decimal place
-        const roundedSum = parseFloat(row.sum.toFixed(1));
-        const points = `<td style="background-color: ${row.sum <= 0 ? '#ffd699' : 'inherit'}">${roundedSum}</td>`;
+    const renderRows = (rows, tbody) => {
+        if (!tbody) {
+            return;
+        }
 
-        // Add cells to the row
-        tr.appendChild(nameCell);
-        tr.insertAdjacentHTML(
-            'beforeend',
-            dutiesCell + activeDutiesCell + activeFlyingDays + points
-        );
-        tbody.appendChild(tr);
-    });
+        tbody.innerHTML = '';
+
+        rows.forEach(row => {
+            const tr = document.createElement('tr');
+
+            const fullName = `${row.firstname} ${row.lastname}`.trim();
+            const nameCell = document.createElement('td');
+            nameCell.classList.add('dienste-name');
+            nameCell.textContent = fullName;
+            nameCell.title = fullName;
+
+            const dutiesCell = `<td style="background-color: ${row.duties_count === 0 ? '#ffd699' : 'inherit'}">${row.duties_count}</td>`;
+            const activeDutiesCell = `<td style="background-color: ${row.active_duties_count === 0 ? '#ffd699' : 'inherit'}">${row.active_duties_count}</td>`;
+            const activeFlyingDays = `<td style="background-color: ${row.active_flying_days === 0 ? '#8bffb1' : '#ffd699'}">${row.active_flying_days}</td>`;
+
+            const roundedSum = parseFloat(row.sum.toFixed(1));
+            const points = `<td style="background-color: ${row.sum <= 0 ? '#ffd699' : 'inherit'}">${roundedSum}</td>`;
+
+            tr.appendChild(nameCell);
+            tr.insertAdjacentHTML('beforeend', dutiesCell + activeDutiesCell + activeFlyingDays + points);
+            tbody.appendChild(tr);
+        });
+    };
+
+    renderRows(startleiterRows, startleiterTbody);
+    renderRows(windenfahrerRows, windenfahrerTbody);
+
+    // Backward compatibility if old single table markup is still present
+    if (legacyTbody) {
+        renderRows([...startleiterRows, ...windenfahrerRows], legacyTbody);
+    }
+
+    // Keep card sorting in sync with new table order (Startleiter first, then Windenfahrer)
+    dashboardDataHistory = [...startleiterRows, ...windenfahrerRows];
 }
 
 

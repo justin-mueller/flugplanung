@@ -2,26 +2,33 @@
    Dienste Planung - Table Styles
    ========================================================================== */
 
-#diensteHistory {
+#diensteHistoryStartleiter,
+#diensteHistoryWindenfahrer {
 	table-layout: fixed;
 	width: 100%;
 	font-size: smaller;
 	font-weight: normal;
 }
-#diensteHistory th,
-#diensteHistory td {
+#diensteHistoryStartleiter th,
+#diensteHistoryStartleiter td,
+#diensteHistoryWindenfahrer th,
+#diensteHistoryWindenfahrer td {
 	font-size: smaller;
 	font-weight: normal;
 }
-#diensteHistory tbody td {
+#diensteHistoryStartleiter tbody td,
+#diensteHistoryWindenfahrer tbody td {
 	white-space: nowrap;
 	vertical-align: middle;
 }
-#diensteHistory th:first-child,
-#diensteHistory td:first-child {
+#diensteHistoryStartleiter th:first-child,
+#diensteHistoryStartleiter td:first-child,
+#diensteHistoryWindenfahrer th:first-child,
+#diensteHistoryWindenfahrer td:first-child {
 	width: 30%;
 }
-#diensteHistory .dienste-name {
+#diensteHistoryStartleiter .dienste-name,
+#diensteHistoryWindenfahrer .dienste-name {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
