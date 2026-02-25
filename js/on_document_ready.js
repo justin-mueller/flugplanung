@@ -66,9 +66,9 @@ $(document).ready(function () {
     const columnParts = sourceColumn.split("_");
     const flugtag = columnParts[columnParts.length - 1]; // Get the timestamp at the end
     
-    let name = clickedDiv[0].innerHTML;
-    // Remove the {N} max dienste indicator if present
-    name = name.replace(/\s*\{\d+\}$/, '');
+    let name = clickedDiv.attr("data-pilot-name") || clickedDiv.text();
+    // Remove the "{x} von {y}" indicator if present
+    name = name.replace(/\s*\{\d+\}\s*von\s*\{[^}]+\}\s*$/, '');
     // Remove any trailing "+" or "-" from the name
     name = name.endsWith("+") || name.endsWith("-") ? name.slice(0, -1) : name;
 
@@ -178,6 +178,10 @@ $(document).ready(function () {
             enteredDienste = enteredDienste.filter(
               (item) => !(item.pilot_id === pilot_id && item.date === flugtag && item.dienst === dienst)
             );
+          }
+
+          if (typeof updatePilotDutyIndicators === 'function') {
+            updatePilotDutyIndicators();
           }
 
           // Update disabled states for option cards

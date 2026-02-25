@@ -259,8 +259,45 @@ function extractNumericId(name) {
     return matches ? matches[0] : null;
 }
 
+function buildCurrentDutyCounts(entries) {
+    const dutyCounts = {};
+
+    entries.forEach(entry => {
+        (entry.startleiter || []).forEach(pilotId => {
+            dutyCounts[pilotId] = (dutyCounts[pilotId] || 0) + 1;
+        });
+
+        (entry.windenfahrer || []).forEach(pilotId => {
+            dutyCounts[pilotId] = (dutyCounts[pilotId] || 0) + 1;
+        });
+    });
+
+    return dutyCounts;
+}
+
+function updatePilotDutyIndicators() {
+    const currentDutyCounts = {};
+
+    enteredDienste.forEach(entry => {
+        const pilotId = String(entry.pilot_id);
+        currentDutyCounts[pilotId] = (currentDutyCounts[pilotId] || 0) + 1;
+    });
+
+    $('.pilot-div').each(function() {
+        const card = $(this);
+        const pilotId = String(card.attr('data-pilot-id'));
+        const baseName = card.attr('data-pilot-name') || card.text().replace(/\s*\{\d+\}\s*von\s*\{[^}]+\}\s*$/, '');
+        const maxDiensteAttr = card.attr('data-max-dienste');
+        const maxDuties = (maxDiensteAttr !== '' && maxDiensteAttr !== undefined) ? maxDiensteAttr : 'offen';
+        const currentDuties = currentDutyCounts[pilotId] || 0;
+
+        card.text(`${baseName} {${currentDuties}} von {${maxDuties}}`);
+    });
+}
+
 function populateDashboardTable() {
     const tableBody = document.getElementById('table-body-dashboard');
+    const currentDutyCounts = buildCurrentDutyCounts(dashboardData);
 
     if (tableBody) {
         while (tableBody.firstChild) {
@@ -353,8 +390,8 @@ function populateDashboardTable() {
                 dateTable.appendChild(detailRow);
 
                 // Populate the cells
-                populatePilotOptions(startleiterOptionenCell, startleiterCell, entry.startleiterOptionen, date, 'startleiter', entry.startleiter);
-                populatePilotOptions(windenfahrerOptionenCell, windenfahrerCell, entry.windenfahrerOptionen, date, 'windenfahrer', entry.windenfahrer);
+                populatePilotOptions(startleiterOptionenCell, startleiterCell, entry.startleiterOptionen, date, 'startleiter', entry.startleiter, currentDutyCounts);
+                populatePilotOptions(windenfahrerOptionenCell, windenfahrerCell, entry.windenfahrerOptionen, date, 'windenfahrer', entry.windenfahrer, currentDutyCounts);
 
                 tableBody.appendChild(dateTable);
             }
@@ -362,7 +399,7 @@ function populateDashboardTable() {
     }
 }
 
-function populatePilotOptions(cell_option, cell_dienst, pilotOptions, date, dienst, entered) {
+function populatePilotOptions(cell_option, cell_dienst, pilotOptions, date, dienst, entered, currentDutyCounts) {
     pilotOptions.forEach(pilotId => {
         var pilotEntered = entered.includes(pilotId.id);
 
@@ -387,14 +424,18 @@ function populatePilotOptions(cell_option, cell_dienst, pilotOptions, date, dien
 
         const pilotDiv = document.createElement('div');
         
-        // Build display name with max dienste indicator
+        // Build display name with current duties and max duties indicator
         let displayName = pilotId.name;
-        if (pilotId.max_dienste_halbjahr !== null && pilotId.max_dienste_halbjahr !== undefined) {
-            displayName += ` {${pilotId.max_dienste_halbjahr}}`;
-        }
+        const currentDuties = currentDutyCounts && currentDutyCounts[pilotId.id] ? currentDutyCounts[pilotId.id] : 0;
+        const maxDuties = (pilotId.max_dienste_halbjahr !== null && pilotId.max_dienste_halbjahr !== undefined)
+            ? pilotId.max_dienste_halbjahr
+            : 'offen';
+
+        displayName += ` {${currentDuties}} von {${maxDuties}}`;
         pilotDiv.textContent = displayName;
         
         pilotDiv.setAttribute('data-pilot-id', `${pilotId.id}`);
+        pilotDiv.setAttribute('data-pilot-name', `${pilotId.name}`);
         pilotDiv.setAttribute('data-max-dienste', pilotId.max_dienste_halbjahr !== null ? pilotId.max_dienste_halbjahr : '');
         pilotDiv.classList.add('pilot-div');
 
