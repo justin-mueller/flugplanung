@@ -194,52 +194,45 @@ function populateDashboardHistory() {
     console.log("history");
     console.log(dashboardDataHistory);
 
-    // Add sums to each row for sorting and per-role points
+    // Add the sum to each row and calculate points
     dashboardDataHistory.forEach(row => {
         row.sum = row.duties_count + row.active_duties_count - row.active_flying_days * 0.2;
-        row.startleiter_sum = (row.startleiter_duties_count || 0) + (row.active_startleiter_duties_count || 0) - row.active_flying_days * 0.2;
-        row.windenfahrer_sum = (row.windenfahrer_duties_count || 0) + (row.active_windenfahrer_duties_count || 0) - row.active_flying_days * 0.2;
     });
 
     // Sort the data by the sum (ascending)
     dashboardDataHistory.sort((a, b) => a.sum - b.sum);
 
-    const startleiterTbody = document.querySelector('#diensteHistoryStartleiter tbody');
-    const windenfahrerTbody = document.querySelector('#diensteHistoryWindenfahrer tbody');
+    const tbody = document.querySelector('#diensteHistory tbody');
+    tbody.innerHTML = ''; // Clear the table body
 
-    const renderHistoryTable = (tbody, dutiesKey, activeDutiesKey, sumKey) => {
-        if (!tbody) {
-            return;
-        }
+    // Populate table rows
+    dashboardDataHistory.forEach(row => {
+        const tr = document.createElement('tr');
 
-        tbody.innerHTML = '';
+        // Create cells
+        const fullName = `${row.firstname} ${row.lastname}`.trim();
+        const nameCell = document.createElement('td');
+        nameCell.classList.add('dienste-name');
+        nameCell.textContent = fullName;
+        nameCell.title = fullName;
+        
+        // Conditionally format cells
+        const dutiesCell = `<td style="background-color: ${row.duties_count === 0 ? '#ffd699' : 'inherit'}">${row.duties_count}</td>`;
+        const activeDutiesCell = `<td style="background-color: ${row.active_duties_count === 0 ? '#ffd699' : 'inherit'}">${row.active_duties_count}</td>`;
+        const activeFlyingDays = `<td style="background-color: ${row.active_flying_days === 0 ? '#8bffb1' : '#ffd699'}">${row.active_flying_days}</td>`;
 
-        dashboardDataHistory.forEach(row => {
-            const tr = document.createElement('tr');
-            const dutiesCount = row[dutiesKey] || 0;
-            const activeDutiesCount = row[activeDutiesKey] || 0;
-            const sum = row[sumKey] || 0;
+        // Calculate points using the sum, rounded to 1 decimal place
+        const roundedSum = parseFloat(row.sum.toFixed(1));
+        const points = `<td style="background-color: ${row.sum <= 0 ? '#ffd699' : 'inherit'}">${roundedSum}</td>`;
 
-            const fullName = `${row.firstname} ${row.lastname}`.trim();
-            const nameCell = document.createElement('td');
-            nameCell.classList.add('dienste-name');
-            nameCell.textContent = fullName;
-            nameCell.title = fullName;
-
-            const dutiesCell = `<td style="background-color: ${dutiesCount === 0 ? '#ffd699' : 'inherit'}">${dutiesCount}</td>`;
-            const activeDutiesCell = `<td style="background-color: ${activeDutiesCount === 0 ? '#ffd699' : 'inherit'}">${activeDutiesCount}</td>`;
-            const activeFlyingDays = `<td style="background-color: ${row.active_flying_days === 0 ? '#8bffb1' : '#ffd699'}">${row.active_flying_days}</td>`;
-            const roundedSum = parseFloat(sum.toFixed(1));
-            const points = `<td style="background-color: ${sum <= 0 ? '#ffd699' : 'inherit'}">${roundedSum}</td>`;
-
-            tr.appendChild(nameCell);
-            tr.insertAdjacentHTML('beforeend', dutiesCell + activeDutiesCell + activeFlyingDays + points);
-            tbody.appendChild(tr);
-        });
-    };
-
-    renderHistoryTable(startleiterTbody, 'startleiter_duties_count', 'active_startleiter_duties_count', 'startleiter_sum');
-    renderHistoryTable(windenfahrerTbody, 'windenfahrer_duties_count', 'active_windenfahrer_duties_count', 'windenfahrer_sum');
+        // Add cells to the row
+        tr.appendChild(nameCell);
+        tr.insertAdjacentHTML(
+            'beforeend',
+            dutiesCell + activeDutiesCell + activeFlyingDays + points
+        );
+        tbody.appendChild(tr);
+    });
 }
 
 
