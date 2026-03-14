@@ -1,0 +1,556 @@
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+// Increase execution time for bulk sending (10 minutes)
+set_time_limit(600);
+ini_set('max_execution_time', 600);
+
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Flush output immediately
+ini_set('output_buffering', 'off');
+ini_set('implicit_flush', true);
+ob_implicit_flush(true);
+if (ob_get_level()) ob_end_flush();
+
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
+use JustinMueller\Flugplanung\Database;
+use JustinMueller\Flugplanung\Helper;
+
+Helper::loadConfiguration();
+
+$secret = Helper::$configuration['mailSecret'] ?? Helper::$configuration['newsletterSecret'] ?? null;
+
+if (!isset($_GET['key']) || $_GET['key'] !== $secret) {
+    http_response_code(403);
+    exit("Forbidden");
+}
+Database::connect();
+
+// Configure transport
+$dsn = Helper::$configuration['smtpDsn'];
+$transport = Transport::fromDsn($dsn);
+$mailer = new Mailer($transport);
+
+// Get parameters
+$testing = isset($_GET['test']) && $_GET['test'] === 'true';
+$mailFile = isset($_POST['mail_file']) ? $_POST['mail_file'] : 'mail.html';
+$testRecipientEmail = isset($_POST['test_recipient']) ? $_POST['test_recipient'] : null;
+$userIdFrom = isset($_POST['user_id_from']) ? intval($_POST['user_id_from']) : 0;
+$userIdTo = isset($_POST['user_id_to']) ? intval($_POST['user_id_to']) : 99999;
+$internalOnly = isset($_POST['internal_only']) && $_POST['internal_only'] === '1';
+$configClubId = Helper::$configuration['clubId'] ?? null;
+
+// Sanitize mail file name (prevent directory traversal)
+$mailFile = basename($mailFile);
+
+echo "Sending mail: " . htmlspecialchars($mailFile) . "<br>";
+echo "Test mode: " . ($testing ? "true" : "false") . "<br>";
+
+// Fetch recipients
+$excludedByPreference = [];
+if ($testing && $testRecipientEmail) {
+    // Send only to selected test recipient
+    $sql = "SELECT pilot_id, email, firstname, lastname, verein 
+            FROM mitglieder 
+            WHERE email = :email";
+    $recipients = Database::query($sql, ['email' => $testRecipientEmail]);
+    echo "Test recipient email: " . htmlspecialchars($testRecipientEmail) . "<br>";
+} else {
+    // Build query with filters
+    // The preference filter column (newsletter, wuensche_reminder, etc.) is passed from wrapper scripts
+    $preferenceFilter = isset($_POST['preference_filter']) ? $_POST['preference_filter'] : null;
+    
+    $sql = "SELECT pilot_id, email, firstname, lastname, verein 
+            FROM mitglieder 
+            WHERE pilot_id >= :userIdFrom 
+            AND pilot_id <= :userIdTo";
+    
+    $params = [
+        'userIdFrom' => $userIdFrom,
+        'userIdTo' => $userIdTo
+    ];
+    
+    // Add internal only filter if enabled
+    if ($internalOnly && $configClubId !== null) {
+        $sql .= " AND verein = :clubId";
+        $params['clubId'] = $configClubId;
+    }
+    
+    // If preference filter is specified, get excluded users who don't have it enabled
+    if ($preferenceFilter !== null && preg_match('/^[a-z_]+$/', $preferenceFilter)) {
+        $excludedSql = $sql . " AND {$preferenceFilter} = 0";
+        $excludedResult = Database::query($excludedSql, $params);
+        $excludedByPreference = is_array($excludedResult) ? $excludedResult : [];
+        
+        // Add preference filter to main query
+        $sql .= " AND {$preferenceFilter} = 1";
+    }
+    
+    $recipients = Database::query($sql, $params);
+    
+    echo "User ID range: " . $userIdFrom . " - " . $userIdTo . "<br>";
+    if ($preferenceFilter !== null) {
+        echo "<strong>Preference filter: " . htmlspecialchars($preferenceFilter) . " = 1</strong><br>";
+        echo "<em>Excluded by preference: " . count($excludedByPreference) . " user(s)</em><br>";
+    }
+    if ($internalOnly && $configClubId !== null) {
+        echo "<strong>Nur interne Mitglieder (Verein ID: " . $configClubId . ")</strong><br>";
+    }
+}
+
+if (empty($recipients)) {
+    die("No recipients found!");
+}
+
+// Load mail file from mails folder
+$emailFile = __DIR__ . '/mails/' . $mailFile;
+if (!file_exists($emailFile)) {
+    die("Mail file not found: " . htmlspecialchars($mailFile));
+}
+$emailContent = file_get_contents($emailFile);
+
+// Try to extract subject from first line
+$lines = preg_split("/\r\n|\n|\r/", $emailContent);
+$subject = "Mail";
+$body = $emailContent;
+
+foreach ($lines as $line) {
+    if (stripos($line, "Subject:") === 0) {
+        $subject = trim(substr($line, 8));
+        break;
+    }
+}
+
+// If headers + body separated by a blank line
+$parts = preg_split("/\R\R/", $emailContent, 2);
+if (count($parts) === 2) {
+    $body = $parts[1]; // just the body part
+}
+
+echo "Subject: " . htmlspecialchars($subject) . "<br>";
+echo "Sending to " . count($recipients) . " recipient(s)<br>";
+echo "<strong>Adding delay between emails to avoid rate limiting...</strong><br><br>";
+
+$successCount = 0;
+$failCount = 0;
+$failedEmails = [];
+$total = count($recipients);
+$current = 0;
+
+// Get sender email from configuration or POST parameter (set by wrapper scripts)
+$senderEmail = $_POST['sender_email'] ?? Helper::$configuration['mailFrom'] ?? Helper::$configuration['newsletterFrom'] ?? 'noreply@example.com';
+
+// Initialize log data
+$logData = [
+    'timestamp' => date('Y-m-d H:i:s'),
+    'mail_file' => $mailFile,
+    'subject' => $subject,
+    'is_test' => $testing,
+    'test_recipient_email' => $testRecipientEmail,
+    'user_id_from' => $userIdFrom,
+    'user_id_to' => $userIdTo,
+    'internal_only' => $internalOnly,
+    'club_id' => $configClubId,
+    'total_recipients' => $total,
+    'excluded_by_preference' => $excludedByPreference,
+    'recipients' => []
+];
+
+foreach ($recipients as $recipient) {
+    $current++;
+    $to = $recipient['email'];
+
+    // Personalize
+    $personalizedBody = str_replace(
+        ['{{firstname}}', '{{lastname}}'],
+        [$recipient['firstname'], $recipient['lastname']],
+        $body
+    );
+
+    $email = (new Email())
+        ->from($senderEmail)
+        ->to($to)
+        ->subject($subject)
+        ->html($personalizedBody);
+
+    // Attach images if configured
+    $attachmentConfig = require __DIR__ . '/mailAttachments.php';
+    if ($attachmentConfig['enabled'] && isset($attachmentConfig['attachments'][$mailFile])) {
+        foreach ($attachmentConfig['attachments'][$mailFile] as $imageFile => $cid) {
+            $imagePath = __DIR__ . '/mails/' . $imageFile;
+            if (file_exists($imagePath)) {
+                $mimeType = getMimeTypeFromExtension($imageFile);
+                $email->addPart((new DataPart(fopen($imagePath, 'r'), $imageFile, $mimeType))->setContentId($cid));
+            }
+        }
+    }
+
+    $sent = false;
+    $retries = 3;
+    $recipientLog = [
+        'pilot_id' => $recipient['pilot_id'],
+        'email' => $to,
+        'firstname' => $recipient['firstname'],
+        'lastname' => $recipient['lastname'],
+        'verein' => $recipient['verein'] ?? null,
+        'status' => 'failed',
+        'attempts' => 0,
+        'error' => null
+    ];
+    
+    for ($attempt = 1; $attempt <= $retries && !$sent; $attempt++) {
+        $recipientLog['attempts'] = $attempt;
+        try {
+            $mailer->send($email);
+            echo "[{$current}/{$total}] ✓ Sent to {$to}<br>";
+            $successCount++;
+            $sent = true;
+            $recipientLog['status'] = 'success';
+        } catch (\Throwable $e) {
+            $errorMsg = $e->getMessage();
+            $recipientLog['error'] = $errorMsg;
+            
+            // Check if it's a rate limit error (450)
+            if (strpos($errorMsg, '450') !== false && $attempt < $retries) {
+                echo "[{$current}/{$total}] ⏳ Rate limited for {$to}, waiting 5 seconds (attempt {$attempt}/{$retries})...<br>";
+                sleep(5);
+            } else {
+                echo "[{$current}/{$total}] ✗ Failed to send to {$to}: {$errorMsg}<br>";
+                $failCount++;
+                $failedEmails[] = ['email' => $to, 'error' => $errorMsg];
+            }
+        }
+    }
+    
+    $logData['recipients'][] = $recipientLog;
+
+    // Add delay between emails to avoid rate limiting (skip on last email)
+    if ($current < $total) {
+        usleep(500000); // 0.5 seconds
+    }
+}
+
+echo "<br><hr>";
+echo "<strong>Summary:</strong><br>";
+echo "✓ Successfully sent: {$successCount}<br>";
+echo "✗ Failed: {$failCount}<br>";
+
+if (!empty($failedEmails)) {
+    echo "<br><strong>Failed emails:</strong><br>";
+    foreach ($failedEmails as $failed) {
+        echo "- " . htmlspecialchars($failed['email']) . "<br>";
+    }
+}
+
+echo "<br><strong>Done!</strong>";
+
+// Generate HTML log file
+echo "<br><br><strong>Generating log...</strong>";
+$logData['success_count'] = $successCount;
+$logData['fail_count'] = $failCount;
+$logData['completed_at'] = date('Y-m-d H:i:s');
+
+$logFilename = generateLogFilename($mailFile, $testing);
+$logPath = __DIR__ . '/mails/mail_logs/' . $logFilename;
+echo "<br>Log path: " . htmlspecialchars($logPath);
+
+try {
+    $content = generateHtmlLog($logData);
+    $result = file_put_contents($logPath, $content);
+    
+    if ($result === false) {
+        $error = error_get_last();
+        echo "<br><strong>ERROR: Failed to write log file!</strong>";
+        if ($error) {
+            echo "<br>Last PHP Error: " . htmlspecialchars($error['message']);
+        }
+    } else {
+        echo "<br><strong>Log saved:</strong> " . htmlspecialchars($logFilename) . " (" . $result . " bytes)";
+    }
+} catch (\Throwable $e) {
+    echo "<br><strong>EXCEPTION during log generation:</strong> " . htmlspecialchars($e->getMessage());
+}
+
+/**
+ * Generate log filename based on mail template and timestamp
+ */
+function generateLogFilename($mailFile, $isTesting) {
+    $baseName = pathinfo($mailFile, PATHINFO_FILENAME);
+    $timestamp = date('Y-m-d_His');
+    $testSuffix = $isTesting ? '_TEST' : '';
+    return "{$baseName}{$testSuffix}_{$timestamp}.html";
+}
+
+/**
+ * Get MIME type from file extension
+ */
+function getMimeTypeFromExtension($filename) {
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    switch ($extension) {
+        case 'jpg':
+        case 'jpeg':
+            return 'image/jpeg';
+        case 'png':
+            return 'image/png';
+        case 'gif':
+            return 'image/gif';
+        case 'bmp':
+            return 'image/bmp';
+        case 'webp':
+            return 'image/webp';
+        case 'svg':
+            return 'image/svg+xml';
+        default:
+            return 'application/octet-stream';
+    }
+}
+
+/**
+ * Generate HTML log content
+ */
+function generateHtmlLog($logData) {
+    $html = '<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mail Log - ' . htmlspecialchars($logData['subject']) . '</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .metadata {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .metadata p {
+            margin: 5px 0;
+        }
+        .metadata strong {
+            display: inline-block;
+            width: 180px;
+        }
+        .summary {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .summary-box {
+            flex: 1;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .success-box {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+        .fail-box {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+        .excluded-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+        }
+        .summary-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        .summary-box .count {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background: #343a40;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-success {
+            background: #28a745;
+            color: white;
+        }
+        .status-failed {
+            background: #dc3545;
+            color: white;
+        }
+        .status-excluded {
+            background: #ffc107;
+            color: #333;
+        }
+        .error-msg {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .test-mode {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Mail Versand-Protokoll</h1>
+        
+        ' . ($logData['is_test'] ? '<div class="test-mode">⚠️ TEST-MODUS - Diese E-Mail wurde nur an einen Test-Empfänger gesendet.</div>' : '') . '
+        
+        <div class="metadata">
+            <p><strong>Zeitstempel:</strong> ' . htmlspecialchars($logData['timestamp']) . '</p>
+            <p><strong>Abgeschlossen:</strong> ' . htmlspecialchars($logData['completed_at']) . '</p>
+            <p><strong>E-Mail Vorlage:</strong> ' . htmlspecialchars($logData['mail_file']) . '</p>
+            <p><strong>Betreff:</strong> ' . htmlspecialchars($logData['subject']) . '</p>
+            ' . ($logData['is_test'] && $logData['test_recipient_email'] ? '<p><strong>Test-Empfänger:</strong> ' . htmlspecialchars($logData['test_recipient_email']) . '</p>' : '') . '
+            <p><strong>User-ID Bereich:</strong> ' . htmlspecialchars($logData['user_id_from']) . ' - ' . htmlspecialchars($logData['user_id_to']) . '</p>
+            <p><strong>Nur interne Mitglieder:</strong> ' . ($logData['internal_only'] ? 'Ja (Verein ID: ' . htmlspecialchars($logData['club_id']) . ')' : 'Nein') . '</p>
+            <p><strong>Gesamt Empfänger:</strong> ' . htmlspecialchars($logData['total_recipients']) . '</p>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-box success-box">
+                <h3>✓ Erfolgreich</h3>
+                <div class="count">' . htmlspecialchars($logData['success_count']) . '</div>
+            </div>
+            <div class="summary-box fail-box">
+                <h3>✗ Fehlgeschlagen</h3>
+                <div class="count">' . htmlspecialchars($logData['fail_count']) . '</div>
+            </div>
+            ' . (count($logData['excluded_by_preference']) > 0 ? '<div class="summary-box excluded-box">
+                <h3>⊗ Ausgeschlossen</h3>
+                <div class="count">' . count($logData['excluded_by_preference']) . '</div>
+                <p style="margin: 10px 0 0 0; font-size: 12px;">Preferenz deaktiviert</p>
+            </div>' : '') . '
+        </div>
+        
+        <h2>Empfänger Details</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User-ID</th>
+                    <th>Name</th>
+                    <th>E-Mail</th>
+                    <th>Verein</th>
+                    <th>Status</th>
+                    <th>Versuche</th>
+                    <th>Fehler</th>
+                </tr>
+            </thead>
+            <tbody>';
+    
+    $index = 1;
+    foreach ($logData['recipients'] as $recipient) {
+        $statusClass = $recipient['status'] === 'success' ? 'status-success' : 'status-failed';
+        $statusIcon = $recipient['status'] === 'success' ? '✓' : '✗';
+        $statusText = $recipient['status'] === 'success' ? 'Erfolgreich' : 'Fehlgeschlagen';
+        
+        $html .= '<tr>
+                    <td>' . $index++ . '</td>
+                    <td>' . htmlspecialchars($recipient['pilot_id']) . '</td>
+                    <td>' . htmlspecialchars($recipient['lastname'] . ', ' . $recipient['firstname']) . '</td>
+                    <td>' . htmlspecialchars($recipient['email']) . '</td>
+                    <td>' . htmlspecialchars($recipient['verein'] ?? '-') . '</td>
+                    <td><span class="status-badge ' . $statusClass . '">' . $statusIcon . ' ' . $statusText . '</span></td>
+                    <td>' . htmlspecialchars($recipient['attempts']) . '</td>
+                    <td>' . ($recipient['error'] ? '<div class="error-msg">' . htmlspecialchars($recipient['error']) . '</div>' : '-') . '</td>
+                </tr>';
+    }
+    
+    // Add excluded users section
+    if (count($logData['excluded_by_preference']) > 0) {
+        $html .= '</tbody>
+        </table>
+        
+        <h2 style="margin-top: 40px; color: #856404;">⊗ Ausgeschlossene Empfänger (Preferenz deaktiviert)</h2>
+        <p style="color: #666; font-size: 14px;">Diese Benutzer erfüllen alle Filterkriterien (User-ID, Verein), aber haben ihre Preferenz für diese E-Mail Art deaktiviert.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User-ID</th>
+                    <th>Name</th>
+                    <th>E-Mail</th>
+                    <th>Verein</th>
+                    <th>Grund für Ausschluss</th>
+                </tr>
+            </thead>
+            <tbody>';
+        
+        foreach ($logData['excluded_by_preference'] as $excluded) {
+            $html .= '<tr style="background: #fffbea;">
+                    <td>' . $index++ . '</td>
+                    <td>' . htmlspecialchars($excluded['pilot_id']) . '</td>
+                    <td>' . htmlspecialchars($excluded['lastname'] . ', ' . $excluded['firstname']) . '</td>
+                    <td>' . htmlspecialchars($excluded['email']) . '</td>
+                    <td>' . htmlspecialchars($excluded['verein'] ?? '-') . '</td>
+                    <td><span class="status-badge status-excluded">⊗ Preferenz deaktiviert</span></td>
+                </tr>';
+        }
+    }
+    
+    $html .= '</tbody>
+        </table>
+    </div>
+</body>
+</html>';
+    
+    return $html;
+}

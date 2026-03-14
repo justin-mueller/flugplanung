@@ -31,6 +31,30 @@ $(document).ready(function () {
       value: windenfahrerCheckbox.is(":checked") ? 1 : 0,
     });
 
+    var newsletterCheckbox = $("#newsletter");
+    formDataArray.push({
+      name: newsletterCheckbox.attr("name"),
+      value: newsletterCheckbox.is(":checked") ? 1 : 0,
+    });
+
+    var dutyReminderCheckbox = $("#duty_reminder");
+    formDataArray.push({
+      name: dutyReminderCheckbox.attr("name"),
+      value: dutyReminderCheckbox.is(":checked") ? 1 : 0,
+    });
+
+    var dutyReminderDays = $("#duty_reminder_days");
+    formDataArray.push({
+      name: dutyReminderDays.attr("name"),
+      value: dutyReminderDays.val() || 7,
+    });
+
+    var wuenscheReminderCheckbox = $("#wuensche_reminder");
+    formDataArray.push({
+      name: wuenscheReminderCheckbox.attr("name"),
+      value: wuenscheReminderCheckbox.is(":checked") ? 1 : 0,
+    });
+
     var formData = $.param(formDataArray);
 
     $.ajax({

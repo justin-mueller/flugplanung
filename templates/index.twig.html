@@ -17,6 +17,8 @@
 	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/solid.min.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/style.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/chatbox.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/cards.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/dienste_planung.css' %}">
 
 	<script>
 		var User_Information = {{ mitgliederData|json_encode|raw }};
@@ -29,6 +31,7 @@
 	<script src="{% cache_busting 'js_modules/bootstrap-datepicker.min.js' %}"></script>
 	<script src="{% cache_busting 'js_modules/bootstrap-datepicker.de.min.js' %}"></script>
 	<script src="{% cache_busting 'js/date_functions.js' %}"></script>
+	<script src="{% cache_busting 'js/confirm_modal.js' %}"></script>
 	<script src="{% cache_busting 'js/globals.js' %}"></script>
 	<script src="{% cache_busting 'js/on_document_ready.js' %}"></script>
 	<script src="{% cache_busting 'js/form_choose.js' %}"></script>
@@ -46,6 +49,7 @@
 	<script src="{% cache_busting 'js/delete_user.js' %}"></script>
 	{% if mitgliederData.vereinId == clubId %}
 	<script src="{% cache_busting 'js/wunschliste.js' %}"></script>
+	<script src="{% cache_busting 'js/enterDienst.js' %}"></script>
 	{% endif %}
 	<script src="{% cache_busting 'js/dashboard.js' %}"></script>
 	<script src="{% cache_busting 'js/getDienste.js' %}"></script>
@@ -83,6 +87,22 @@
 				{{ tab.content|raw }}
 			</div>
             {% endfor %}
+		</div>
+	</div>
+
+	<div class="modal fade" id="appConfirmModal" tabindex="-1" aria-labelledby="appConfirmModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="appConfirmModalLabel">Bestätigung</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body" id="appConfirmModalBody"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-warning ui-button" data-bs-dismiss="modal" id="appConfirmModalCancel">Abbrechen</button>
+					<button type="button" class="btn btn-outline-success ui-button" id="appConfirmModalConfirm">Bestätigen</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </body>

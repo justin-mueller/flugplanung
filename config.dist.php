@@ -7,6 +7,13 @@ return [
 
     'sites' => ['Neustadt-Glewe', 'Hörpel', 'Altenmedingen'],
 
+    'newsletterSecret' => 'define_a_secure_random_string_here',
+
+    'smtpDsn' => 'smtp://user:password@smtp.example.com:587',
+
+    'newsletterFrom' => 'Newsletter <newsletter.flugplanung@yourdomain.de>',
+    'flugplanungFrom' => 'Flugplanung <flugplanung@yourdomain.de>',
+
     'db' => [
         'servername' => $_SERVER['DATABASE_HOST'] ?? 'localhost',
         'username' => $_SERVER['DATABASE_USER'] ?? '',

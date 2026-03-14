@@ -49,7 +49,21 @@ if ($mitgliederData['dienste_admin']) {
         'label' => 'Flugtage',
         'content' => $twig->render('flugtage.twig.html')
     ];
+    
+    $clubId = Helper::$configuration['clubId'];
+    $clubName = Helper::$configuration['clubs'][$clubId]['name'] ?? 'Unbekannter Verein';
+    
+    $tabs['admin'] = [
+        'label' => 'Admin',
+        'content' => $twig->render('admin.twig.html', [
+            'newsletterSecret' => Helper::$configuration['newsletterSecret'],
+            'clubId' => $clubId,
+            'clubName' => $clubName,
+            'currentUserEmail' => $mitgliederData['email'] ?? ''
+        ])
+    ];
 }
+
 
 if ($mitgliederData['vereinId'] === Helper::$configuration['clubId']) {
     $tabs['dienste_uebersicht'] = [
@@ -67,7 +81,11 @@ if ($mitgliederData['vereinId'] === Helper::$configuration['clubId']) {
 $tabs['einstellungen'] = [
     'label' => 'Nutzerkonto',
     'content' => $twig->render('einstellungen.twig.html', [
-        'clubs' => Helper::$configuration['clubs']
+        'clubs' => Helper::$configuration['clubs'],
+        'User_Information' => $mitgliederData,
+        'config' => [
+            'ClubID' => Helper::$configuration['clubId']
+        ]
     ])
 ];
 

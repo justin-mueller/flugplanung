@@ -19,6 +19,7 @@ $sql = "SELECT
 m.pilot_id,
 m.firstname,
 m.lastname,
+m.windenfahrer,
 
 -- Count ALL dienste from startDate onwards
 (SELECT COUNT(d.pilot_id)

@@ -126,17 +126,34 @@ function updateCountdown() {
     const timeDifference = flugtag_deadline - now;
 
     // Check if the countdown has finished
-    if (timeDifference < 0) {
-        clearInterval(intervalId); // Clear the interval using the interval ID
-        document.getElementById('countdown').innerHTML = "Warten auf Entscheidung vom Startleiter...";
-    } else {
-        // Calculate remaining time components
-        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+    const countdownElement = document.getElementById('countdown');
+    if (countdownElement) {
+        if (timeDifference < 0) {
+            clearInterval(intervalId); // Clear the interval using the interval ID
+            countdownElement.innerHTML = "Warten auf Entscheidung vom Startleiter...";
+        } else {
+            // Calculate remaining time components
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
-        // Display the remaining time
-		document.getElementById('countdown').innerHTML = `Zeit bis Entscheidung (20 Uhr Vortrag): <strong>${days} Tage, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</strong>`;
+            // Display the remaining time
+            countdownElement.innerHTML = `Zeit bis Entscheidung (20 Uhr Vortrag): <strong>${days} Tage, ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</strong>`;
+        }
     }
+}
+
+function getCalendarWeek(date) {
+    // Copy date so don't modify original
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    // Set to nearest Thursday: current date + 4 - current day number
+    // Make Sunday's day number 7
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    // Get first day of year
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    // Calculate full weeks to nearest Thursday
+    const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    // Return array of year and week number
+    return weekNo;
 }

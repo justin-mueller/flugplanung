@@ -20,6 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'windenfahrer' => $_POST['windenfahrer'],
         'fluggeraet' => $_POST['fluggeraete_combined'],
         'avatar' => $_POST['avatar'],
+        'newsletter' => $_POST['newsletter'],
+        'duty_reminder' => $_POST['duty_reminder'],
+        'duty_reminder_days' => $_POST['duty_reminder_days'],
+        'wuensche_reminder' => $_POST['wuensche_reminder']
     ];
 
     $password = $_POST['password'];
@@ -47,7 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     windenfahrer = :windenfahrer , 
     fluggeraet = :fluggeraet , 
     verein = :verein ,
-    avatar = :avatar ' . $emailString . $passwordString . ' WHERE pilot_id = :pilotId';
+    avatar = :avatar , 
+    newsletter = :newsletter ,
+    duty_reminder = :duty_reminder ,
+    duty_reminder_days = :duty_reminder_days ,
+    wuensche_reminder = :wuensche_reminder ' . $emailString . $passwordString . ' WHERE pilot_id = :pilotId';
 
     $result = Database::execute($updateQuery, $params);
 
