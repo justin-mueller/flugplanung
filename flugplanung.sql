@@ -182,7 +182,7 @@ ALTER TABLE `mitglieder`
 --
 
 CREATE TABLE `reparaturen` (
-  `key` int(11) NOT NULL,
+  `key` int(11) NOT NULL DEFAULT 0,
   `fluggebiet` enum('HRP','NGL','AMD') NOT NULL,
   `text` longtext NOT NULL,
   `level` tinyint(1) NOT NULL DEFAULT 0,
