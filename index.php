@@ -70,6 +70,12 @@ if ($mitgliederData['vereinId'] === Helper::$configuration['clubId']) {
         'label' => 'Dienste',
         'content' => $twig->render('dienste_uebersicht.twig.html')
     ];
+
+    // Reparaturen Tab nur für Vereinsmitglieder
+    $tabs['reparaturen'] = [
+        'label' => 'Reparaturen',
+        'content' => $twig->render('reparaturen.twig.html')
+    ];
 }
 
 $tabs['einstellungen'] = [

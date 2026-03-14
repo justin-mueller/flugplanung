@@ -96,8 +96,8 @@ function getFlugtag() {
 					let new_record = (timestamp >= oneHourBack && timestamp <= now) ? '<span class="badge bg-info">Neu vor ' + time_ago + ' min</span>' : '';
 					let local_club_member = row.VereinId === localClubId;
 					let row_not_local_club_member = local_club_member ? '' : 'class="tr_no_hgdf"';
-					let ist_startleiter = row.Pilot_ID == startleiter_official ? '<span class="badge bg-success">SL Offiziell</span>' : '';
-					let windenfahrer_official_info = row.Pilot_ID == windenfahrer_official ? '<span class="badge bg-success">WF Offiziell</span>' : '';
+					let ist_startleiter = row.Pilot_ID == startleiter_official ? '<span class="badge bg-warning">SL Offiziell</span>' : '';
+					let windenfahrer_official_info = row.Pilot_ID == windenfahrer_official ? '<span class="badge bg-warning">WF Offiziell</span>' : '';
 					let windenfahrer_info = (row.ist_windenfahrer == 1 && row.Pilot_ID != windenfahrer_official) ? '<span class="badge bg-primary">WF</span>' : '';
 					var newRow = $('<tr ' + row_not_local_club_member + '>');
 					let fluggerateIMG = row.fluggeraet.includes('G') ? replaceValueWithImage('G') : ''
@@ -140,7 +140,7 @@ function getFlugtag() {
 
 
 				var legendRow = $('<tr>');
-				legendRow.append('<td colspan="6" style="font-size: small">Abstimmung = <img src="img/stern_fav.svg" class="table-image"></strong> Relevant für die Entscheidung des Haupt-Fluggebiets<br>Piloten maximal = <img src="img/stern_fav.svg" class="table-image"> + <img src="img/stern.svg" class="table-image"> wenn Betrieb nur in diesem Fluggebiet stattfindet<br><span class="badge bg-success">SL Offiziell</span> = Offizieller Startleiter für den Tag<br><span class="badge bg-success">WF Offiziell</span> = Offizieller Windenfahrer für den Tag<br><span class="badge bg-primary">WF</span> = Hat einen Windenfahrerschein</td>');
+				legendRow.append('<td colspan="6" style="font-size: small">Abstimmung = <img src="img/stern_fav.svg" class="table-image"></strong> Relevant für die Entscheidung des Haupt-Fluggebiets<br>Piloten maximal = <img src="img/stern_fav.svg" class="table-image"> + <img src="img/stern.svg" class="table-image"> wenn Betrieb nur in diesem Fluggebiet stattfindet<br><span class="badge bg-warning">SL Offiziell</span> = Offizieller Startleiter für den Tag<br><span class="badge bg-warning">WF Offiziell</span> = Offizieller Windenfahrer für den Tag<br><span class="badge bg-primary">WF</span> = Hat einen Windenfahrerschein</td>');
 				$('#tagesplanung tbody').append(legendRow);
 
 				User_Information.record_present = data.some(pilot => pilot.Pilot_ID === User_Information.pilot_id && (pilot.startleiter_official == "0" || pilot.startleiter_official == "") && (pilot.windenfahrer_official == "0" || pilot.windenfahrer_official == ""));
@@ -286,9 +286,10 @@ function getFlugtag() {
 			if (Active_User_Is_Windenfahrer) {
 				$('#btn_enter').addClass('d-none');
 			}
-
-
 			
+			// Load reparaturen counts after flugplanung data is loaded
+			loadReparaturenCounts();
+
 		}
 	});
 }
@@ -398,3 +399,183 @@ function replaceValueWithImage(value) {
 
 	return '<img src="img/' + value + '.png" class="table-image aircraft">';
 }
+
+// Reparaturen functionality
+let reparaturenData = {};
+
+function loadReparaturenCounts() {
+	$.ajax({
+		url: 'getReparaturenCounts.php',
+		type: 'GET',
+		success: function (data) {
+			reparaturenData = data;
+			updateReparaturenBadges();
+			// Update modal warnings if modal is open
+			if (document.getElementById('enterModal').classList.contains('show')) {
+				updateEnterModalReparaturenWarnings();
+			}
+		},
+		error: function (xhr) {
+			console.log('Reparaturen counts could not be loaded');
+			console.log(xhr);
+		}
+	});
+}
+
+function updateReparaturenBadges() {
+	const fluggebiete = ['ngl', 'hrp', 'amd'];
+	
+	fluggebiete.forEach(function(fluggebiet) {
+		const fluggebietUpper = fluggebiet.toUpperCase();
+		const elementId = 'reparaturen-' + fluggebiet;
+		const element = document.getElementById(elementId);
+		
+		if (element && reparaturenData[fluggebietUpper]) {
+			const level0Count = reparaturenData[fluggebietUpper].level0.count;
+			const level1Count = reparaturenData[fluggebietUpper].level1.count;
+			
+			let badgesHtml = '';
+			
+			if (level0Count > 0) {
+				badgesHtml += `<span class="badge bg-warning reparaturen-badge" 
+					data-fluggebiet="${fluggebietUpper}" 
+					data-level="0" 
+					style="cursor: pointer; margin-right: 2px;">${level0Count}</span>`;
+			}
+			
+			if (level1Count > 0) {
+				badgesHtml += `<span class="badge bg-danger reparaturen-badge" 
+					data-fluggebiet="${fluggebietUpper}" 
+					data-level="1" 
+					style="cursor: pointer;">${level1Count}</span>`;
+			}
+			
+			element.innerHTML = badgesHtml;
+		}
+	});
+}
+
+function showReparaturenModal(fluggebiet) {
+	if (!reparaturenData[fluggebiet]) return;
+	
+	const level0Data = reparaturenData[fluggebiet].level0;
+	const level1Data = reparaturenData[fluggebiet].level1;
+	
+	let modalContent = '';
+	
+	// Level 0 (Geringfügig)
+	if (level0Data.count > 0) {
+		modalContent += '<div class="mb-3">';
+		modalContent += '<h6><span class="badge bg-warning">Geringfügig</span> (' + level0Data.count + ' Problem' + (level0Data.count > 1 ? 'e' : '') + ')</h6>';
+		modalContent += '<ul class="list-group list-group-flush">';
+		level0Data.texts.forEach(function(text) {
+			modalContent += '<li class="list-group-item">' + text + '</li>';
+		});
+		modalContent += '</ul>';
+		modalContent += '</div>';
+	}
+	
+	// Level 1 (Flugbetrieb nicht möglich)
+	if (level1Data.count > 0) {
+		modalContent += '<div class="mb-3">';
+		modalContent += '<h6><span class="badge bg-danger">Flugbetrieb nicht möglich</span> (' + level1Data.count + ' Problem' + (level1Data.count > 1 ? 'e' : '') + ')</h6>';
+		modalContent += '<ul class="list-group list-group-flush">';
+		level1Data.texts.forEach(function(text) {
+			modalContent += '<li class="list-group-item">' + text + '</li>';
+		});
+		modalContent += '</ul>';
+		modalContent += '</div>';
+	}
+	
+	if (modalContent === '') {
+		modalContent = '<p class="text-muted">Keine offenen Reparaturen vorhanden.</p>';
+	}
+	
+	document.getElementById('modal-fluggebiet').textContent = fluggebiet;
+	document.getElementById('reparaturen-modal-content').innerHTML = modalContent;
+	
+	const modal = new bootstrap.Modal(document.getElementById('reparaturenModal'));
+	modal.show();
+}
+
+// Function to update reparaturen warnings in the enter modal
+function updateEnterModalReparaturenWarnings() {
+	const container = document.getElementById('reparaturen-warnings-container');
+	if (!container) return;
+	
+	let warningsHtml = '';
+	const fluggebiete = ['NGL', 'HRP', 'AMD'];
+	const fluggebietNames = {
+		'NGL': 'Neustadt-Glewe',
+		'HRP': 'Hörpel',
+		'AMD': 'Altenmedingen'
+	};
+	
+	// Check each Fluggebiet for open repairs
+	fluggebiete.forEach(function(fluggebiet) {
+		if (reparaturenData[fluggebiet]) {
+			const level0Count = reparaturenData[fluggebiet].level0.count;
+			const level1Count = reparaturenData[fluggebiet].level1.count;
+			const level0Texts = reparaturenData[fluggebiet].level0.texts;
+			const level1Texts = reparaturenData[fluggebiet].level1.texts;
+			
+			// Show critical (level 1) repairs in red
+			if (level1Count > 0) {
+				warningsHtml += `<div class="alert alert-danger d-flex align-items-start mb-2" role="alert">
+					<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+						<use xlink:href="img/warning.svg#warning-fill"/>
+					</svg>
+					<div class="w-100">
+						<strong>${fluggebietNames[fluggebiet]}: Flugbetrieb nicht möglich!</strong>
+						<ul class="mb-0 mt-1 small">`;
+				level1Texts.forEach(function(text) {
+					warningsHtml += `<li>${text}</li>`;
+				});
+				warningsHtml += `</ul>
+					</div>
+				</div>`;
+			}
+			
+			// Show minor (level 0) repairs in yellow
+			if (level0Count > 0) {
+				warningsHtml += `<div class="alert alert-warning d-flex align-items-start mb-2" role="alert">
+					<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:">
+						<use xlink:href="img/warning.svg#warning-fill"/>
+					</svg>
+					<div class="w-100">
+						<strong>${fluggebietNames[fluggebiet]}: Geringfügige Probleme</strong>
+						<ul class="mb-0 mt-1 small">`;
+				level0Texts.forEach(function(text) {
+					warningsHtml += `<li>${text}</li>`;
+				});
+				warningsHtml += `</ul>
+					</div>
+				</div>`;
+			}
+		}
+	});
+	
+	container.innerHTML = warningsHtml;
+}
+
+// Add event listeners for reparaturen badges
+document.addEventListener('DOMContentLoaded', function() {
+	// Load reparaturen counts when page loads
+	loadReparaturenCounts();
+	
+	// Add click event listeners for reparaturen badges
+	document.addEventListener('click', function(e) {
+		if (e.target.classList.contains('reparaturen-badge')) {
+			const fluggebiet = e.target.getAttribute('data-fluggebiet');
+			showReparaturenModal(fluggebiet);
+		}
+	});
+	
+	// Update reparaturen warnings when enter modal is shown
+	const enterModal = document.getElementById('enterModal');
+	if (enterModal) {
+		enterModal.addEventListener('show.bs.modal', function() {
+			updateEnterModalReparaturenWarnings();
+		});
+	}
+});
