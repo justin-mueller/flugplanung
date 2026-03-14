@@ -46,6 +46,10 @@
 			Eintragen
 		</button>
 
+		<button type="button" class="btn btn-success ui-button d-none" id="btn_open_flugtag" onclick="openFlugtag()">
+			Flugtag eröffnen
+		</button>
+
 		<button type="button" class="btn btn-warning mb-3 ui-button d-none" data-bs-toggle="modal"
 			data-bs-target="#enterModal" id="btn_update">
 			Eintrag Ändern
@@ -252,7 +256,7 @@
 				<div id="take_over_duty" class="d-none">
 					<p id="take_over_duty_text"></p>
 					<button type="button"  class="btn btn-outline-warning ui-button mb-4"
-						data-bs-toggle="modal" data-bs-target="#confirmTakeOverModal">Dienst übernehmen</button>
+						onclick="confirmTakeOverDienst()">Dienst übernehmen</button>
 				</div>
 
 				<div class="modal-footer">
@@ -263,28 +267,6 @@
 
 				</div>
 
-			</div>
-		</div>
-	</div>
-</div>
-
-
-<div class="modal fade" id="confirmTakeOverModal" tabindex="-1" aria-labelledby="confirmTakeOverModalLabel"
-	aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="confirmTakeOverModalLabel">Bestätigung</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<p id="confirmTakeOverModalText">Ja, ich möchte diesen Dienst übernehmen!</p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-outline-warning ui-button"
-					data-bs-dismiss="modal">Abbrechen</button>
-				<button type="button" class="btn btn-outline-success ui-button"
-					onclick="enterDienst(); $('#confirmTakeOverModal').modal('hide')" data-bs-dismiss="modal">Bestätigen</button>
 			</div>
 		</div>
 	</div>

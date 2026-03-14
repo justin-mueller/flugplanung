@@ -23,6 +23,7 @@ function getFlugtag() {
 
 	// Reset Buttons, Banners
 	$('#btn_enter').removeClass('d-none');
+	$('#btn_open_flugtag').addClass('d-none');
 	$('#btn_update').addClass('d-none');
 	$('#btn_delete').addClass('d-none');
 
@@ -198,13 +199,16 @@ function getFlugtag() {
 			no_official_flugtag
 			abgesagt
 			*/
+			const isLocalClubMember = User_Information.vereinId == localClubId;
+
 			if (isFlugtag) {
 
 				$('#no_official_flugtag').addClass('d-none');
 				$('#minpilotreached').removeClass('d-none');
+				$('#btn_open_flugtag').addClass('d-none');
 				
 
-				if( User_Information.vereinId == localClubId && (User_Information.pilot_id != startleiter_official || User_Information.pilot_id != windenfahrer_official )) {
+				if( isLocalClubMember && (User_Information.pilot_id != startleiter_official || User_Information.pilot_id != windenfahrer_official )) {
 					$('#take_over_duty').removeClass('d-none');
 					$('#take_over_duty_text').html("Ich möchte den Dienst als " +  (User_Information.windenfahrer == 0 ? "Startleiter" : "Windenfahrer") + 	" für diesen Tag übernehmen:");
 				}
@@ -240,6 +244,13 @@ function getFlugtag() {
 			} else {
 				$('#no_official_flugtag').removeClass('d-none');
 				$('#minpilotreached').addClass('d-none');
+				$('#btn_enter').addClass('d-none');
+				$('#btn_update').addClass('d-none');
+				$('#btn_delete').addClass('d-none');
+
+				if (isLocalClubMember) {
+					$('#btn_open_flugtag').removeClass('d-none');
+				}
 			}
 
 			updateCountdown();
@@ -278,6 +289,100 @@ function getFlugtag() {
 
 
 			
+		}
+	});
+}
+
+function openFlugtag() {
+	showConfirmationModal({
+		title: 'Bestätigung',
+		message: 'Bist Du sicher, dass Du diesen Flugtag eröffnen möchtest?',
+		confirmText: 'Bestätigen',
+		cancelText: 'Abbrechen',
+		confirmClass: 'btn-outline-success',
+		onConfirm: function () {
+			openFlugtagConfirmed();
+			return true;
+		}
+	});
+}
+
+function confirmTakeOverDienst() {
+	showConfirmationModal({
+		title: 'Bestätigung',
+		message: 'Ja, ich möchte diesen Dienst übernehmen!',
+		confirmText: 'Bestätigen',
+		cancelText: 'Abbrechen',
+		confirmClass: 'btn-outline-success',
+		onConfirm: function () {
+			enterDienst();
+			return true;
+		}
+	});
+}
+
+function openFlugtagConfirmed() {
+	if (!flugtag_formatted) {
+		showToast('Oops!', 'Etwas ist schiefgegangen!', 'Es wurde kein gültiges Datum ausgewählt!', 'error');
+		return;
+	}
+
+	if (User_Information.vereinId != localClubId) {
+		showToast('Oops!', 'Keine Berechtigung', 'Nur Vereinsmitglieder können einen Flugtag eröffnen!', 'error');
+		return;
+	}
+
+	$.ajax({
+		url: 'add_flugtag.php',
+		type: 'POST',
+		data: { datum: flugtag_formatted },
+		success: function (response) {
+			if (!response || response.success !== true) {
+				showToast('Oops!', 'Etwas ist schiefgegangen!', 'Der Flugtag konnte nicht eröffnet werden!', 'error');
+				return;
+			}
+
+			if (!FlugtageRaw.some(item => item.datum === flugtag_formatted)) {
+				FlugtageRaw.push({ datum: flugtag_formatted });
+			}
+
+			sendAutomaticFlugtagChatMessage();
+
+			showToast('Juhu!', 'Das hat geklappt', 'Der Flugtag wurde eröffnet!', 'success');
+			loadFlugtage(false);
+			getFlugtag();
+			betriebAbfragen();
+		},
+		error: function (xhr) {
+			let errorMessage = 'Der Flugtag konnte nicht eröffnet werden!';
+
+			if (xhr && xhr.responseJSON && xhr.responseJSON.error) {
+				errorMessage = xhr.responseJSON.error;
+			}
+
+			showToast('Oops!', 'Etwas ist schiefgegangen!', errorMessage, 'error');
+		}
+	});
+}
+
+function sendAutomaticFlugtagChatMessage() {
+	if (!flugtag_formatted) return;
+
+	const dateParts = flugtag_formatted.split('-');
+	if (dateParts.length !== 3) return;
+
+	const formattedDate = dateParts[2] + '.' + dateParts[1] + '.' + dateParts[0];
+	const text = '<i>[Automatische Nachricht]</i> Der ' + formattedDate + ' wurde von mir als Flugtag erstellt.';
+
+	$.ajax({
+		url: 'enterChatbox.php',
+		type: 'POST',
+		data: { text: text, pilot_id: User_Information.pilot_id },
+		success: function () {
+			loadChatbox(true);
+		},
+		error: function (error) {
+			console.error('Error inserting automatic Chatbox Message:', error.responseText);
 		}
 	});
 }

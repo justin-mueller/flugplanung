@@ -83,33 +83,6 @@
     </div>
 </div>
 
-<!-- Confirm Send Modal -->
-<div class="modal fade" id="confirmSendModal" tabindex="-1" aria-labelledby="confirmSendModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="confirmSendModalLabel">
-                    <i class="fa-solid fa-exclamation-triangle me-2"></i>Bestätigung erforderlich
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Schließen"></button>
-            </div>
-            <div class="modal-body">
-                <p>Du bist dabei, die E-Mail <strong id="confirm-mail-subject"></strong> an <strong>alle Newsletter-Abonnenten</strong> zu senden.</p>
-                <p class="mb-3">Gebe zur Bestätigung ein:</p>
-                <input type="text" id="confirm-phrase-input" class="form-control" 
-                    placeholder="ja ich bin mir sicher"
-                    autocomplete="off">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                <button type="button" class="btn btn-danger" id="confirm-send-btn">
-                    <i class="fa-solid fa-paper-plane me-1"></i>Senden
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Logs Modal -->
 <div class="modal fade" id="logsModal" tabindex="-1" aria-labelledby="logsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -257,10 +230,40 @@
     function showConfirmModal(filename, subject, wrapper) {
         pendingMailFilename = filename;
         pendingMailWrapper = wrapper;
-        document.getElementById('confirm-mail-subject').textContent = subject;
-        document.getElementById('confirm-phrase-input').value = '';
-        const modal = new bootstrap.Modal(document.getElementById('confirmSendModal'));
-        modal.show();
+        showConfirmationModal({
+            title: 'Bestätigung erforderlich',
+            bodyHtml:
+                '<p>Du bist dabei, die E-Mail <strong>' + escapeHtml(subject) + '</strong> an <strong>alle Newsletter-Abonnenten</strong> zu senden.</p>' +
+                '<p class="mb-3">Gebe zur Bestätigung ein:</p>' +
+                '<input type="text" id="confirm-phrase-input-dynamic" class="form-control" placeholder="ja ich bin mir sicher" autocomplete="off">',
+            confirmText: 'Senden',
+            cancelText: 'Abbrechen',
+            confirmClass: 'btn-danger',
+            onShown: function () {
+                const phraseInput = document.getElementById('confirm-phrase-input-dynamic');
+                if (phraseInput) {
+                    phraseInput.value = '';
+                    phraseInput.focus();
+                }
+            },
+            onConfirm: function () {
+                const phraseInput = document.getElementById('confirm-phrase-input-dynamic');
+                const phrase = phraseInput ? phraseInput.value : '';
+
+                if (phrase !== 'ja ich bin mir sicher') {
+                    alert('Bitte gebe "ja ich bin mir sicher" ein.');
+                    return false;
+                }
+
+                if (pendingMailFilename) {
+                    sendMail(pendingMailFilename, false, null, pendingMailWrapper);
+                    pendingMailFilename = null;
+                    pendingMailWrapper = null;
+                }
+
+                return true;
+            }
+        });
     }
 
     // Send mail
@@ -384,23 +387,6 @@
         if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
         return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
-
-    // Confirm send button handler
-    document.getElementById('confirm-send-btn').addEventListener('click', function() {
-        const phrase = document.getElementById('confirm-phrase-input').value;
-        
-        if (phrase !== 'ja ich bin mir sicher') {
-            alert('Bitte gebe "ja ich bin mir sicher" ein.');
-            return;
-        }
-
-        if (pendingMailFilename) {
-            sendMail(pendingMailFilename, false, null, pendingMailWrapper);
-            bootstrap.Modal.getInstance(document.getElementById('confirmSendModal')).hide();
-            pendingMailFilename = null;
-            pendingMailWrapper = null;
-        }
-    });
 
     // Escape HTML helper
     function escapeHtml(text) {
