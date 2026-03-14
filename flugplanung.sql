@@ -186,7 +186,7 @@ ALTER TABLE `mitglieder`
 --
 
 CREATE TABLE `reparaturen` (
-  `key` int(11) NOT NULL DEFAULT 0,
+  `key` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `fluggebiet` enum('HRP','NGL','AMD') NOT NULL,
   `text` longtext NOT NULL,
   `level` tinyint(1) NOT NULL DEFAULT 0,
@@ -201,8 +201,6 @@ CREATE TABLE `reparaturen` (
 --
 -- Indizes für die Tabelle `reparaturen`
 --
-ALTER TABLE `reparaturen`
-  ADD PRIMARY KEY (`key`);
 
 --
 -- AUTO_INCREMENT für Tabelle `reparaturen`
