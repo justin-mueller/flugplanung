@@ -18,7 +18,10 @@ $mailAttachments = [
     ],
     'newsletter.html' => [
         'hdgflogo.png' => 'hdgf@flugplanung',
-        'screenshot_flugtage.png' => 'screenshot_flugtage@flugplanung'
+        'screenshot_flugtage.png' => 'screenshot_flugtage@flugplanung',
+        'screenshot_reparaturen_1.png' => 'screenshot_reparaturen_1@flugplanung',
+        'screenshot_reparaturen_2.png' => 'screenshot_reparaturen_2@flugplanung',
+        'screenshot_dienst.png' => 'screenshot_dienst@flugplanung'
     ],
     // Add more mail files and their attachments here
     // 'another_mail.html' => [
