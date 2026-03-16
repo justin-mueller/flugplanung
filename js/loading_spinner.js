@@ -1,7 +1,7 @@
-function toggleSpinner(show) {
+function toggleSpinner(show, selector = '#spinner') {
 	if (show) {
-		$('#spinner').removeClass('d-none');
+		$(selector).removeClass('d-none');
 	} else {
-		$('#spinner').addClass('d-none');
+		$(selector).addClass('d-none');
 	}
 }
