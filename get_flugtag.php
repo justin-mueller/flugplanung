@@ -43,11 +43,12 @@ $sql = "SELECT
             '' as startleiter_official
         FROM tagesplanung t
         INNER JOIN mitglieder m ON t.pilot_id = m.pilot_id
-        WHERE flugtag = :flugtag";
+        WHERE flugtag = :flugtag
+        ORDER BY timestamp ASC";
 
 
 $result = Database::query($sql, ['flugtag' => $_GET['flugtag']]);
-if ($result !== false && $result !== []) {
+if ($result !== false && !empty($result)) {
     $data = [];
     foreach ($result as $row) {
         $row['VereinId'] = (int)$row['VereinId'];
