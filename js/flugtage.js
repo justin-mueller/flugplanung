@@ -123,6 +123,7 @@ function loadFlugtage(init, fullYear = false) {
 				calc_deadline(flugtag_unformatted);
 
 				$('#flugtag').val(getFormattedGermanDate(startFlugtag));
+				$('#flugtag').datepicker('update', startFlugtag); // force flatpickr to recognize the programmatic value change
 
 				getFlugtag();
 				betriebAbfragen();

@@ -1,0 +1,131 @@
+/* Custom Flatpickr styles to align with old legacy Bootstrap datepicker UI */
+
+/* Add specific classes that matching 'beforeShowDay' logic injects */
+.flatpickr-day.highlight-day {
+    background-color: #75ff9e;
+    border-color: #000000;
+    color: #0c5460;
+    font-weight: bold;
+}
+
+.flatpickr-day.non-highlight-day {
+    /* normal day styles inherit from flatpickr by default */
+}
+
+/* Make flatpickr look a bit more integrated in bootstrap input groups */
+.input-group .flatpickr-wrapper {
+    flex: 1 1 auto;
+    width: auto;
+    max-width: 100%;
+}
+
+.input-group.date {
+    display: flex;
+    align-items: stretch;
+    max-width: fit-content;
+}
+
+.input-group.date .form-control {
+    background-color: #fff;
+    flex-grow: 0;
+    width: auto;
+}
+
+/* Base Selected day + non-"Flugtag" (Dark Gray) */
+.flatpickr-calendar .flatpickr-day.selected,
+.flatpickr-calendar .flatpickr-day.selected:not(.highlight-day) {
+    background-color: #5a5a5a !important; /* Dark Gray */
+    border-color: #5a5a5a !important;
+    color: #fff !important;
+}
+
+/* Hover day + non-"Flugtag" (match selected Dark Gray) */
+.flatpickr-calendar .flatpickr-day:hover:not(.highlight-day):not(.selected) {
+    background-color: #5a5a5a !important; /* Dark Gray */
+    border-color: #5a5a5a !important;
+    color: #fff !important;
+}
+
+/* Selected day + "Flugtag" (Dark Green) */
+.flatpickr-calendar .flatpickr-day.selected.highlight-day {
+    background-color: #198754 !important; /* Dark Green */
+    border-color: #157347 !important;
+    color: #fff !important;
+}
+
+/* Hover day + "Flugtag" (match selected Dark Green) */
+.flatpickr-calendar .flatpickr-day:hover.highlight-day:not(.selected) {
+    background-color: #198754 !important; /* Dark Green */
+    border-color: #157347 !important;
+    color: #fff !important;
+}
+
+/* Fix for today vs selected styling conflict */
+.flatpickr-calendar .flatpickr-day.today {
+    border-color: #ff6600 !important;
+    border-width: 3px !important;
+}
+
+/* If the selected day is also today */
+.flatpickr-calendar .flatpickr-day.today.selected {
+    box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px #ff9800 !important; /* Double inner ring */
+}
+
+/* Ensure the calendar popup doesn't extend unnecessarily */
+.flatpickr-calendar {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* Hide the placeholder/dummy element that flatpickr creates */
+.flatpickr-input {
+    cursor: pointer;
+}
+:root {
+    --datepicker-gap: 4px; /* Change this value to adjust the gap */
+}
+
+.flatpickr-calendar .flatpickr-innerContainer {
+    overflow: hidden; /* Clear floating boundaries if necessary */
+}
+
+/* Use CSS Grid to ensure an accurate, consistent gap across all rows and columns */
+.flatpickr-calendar .dayContainer {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(2em, 1fr)) !important;
+    gap: var(--datepicker-gap) !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    justify-content: center;
+    padding: var(--datepicker-gap) !important;
+}
+
+/* Align weekday header correctly with the body grid */
+.flatpickr-calendar .flatpickr-weekdaycontainer {
+    display: grid !important;
+    grid-template-columns: repeat(7, minmax(2em, 1fr)) !important;
+    gap: var(--datepicker-gap) !important;
+    width: 100% !important;
+    padding: 0 var(--datepicker-gap) !important;
+}
+
+.flatpickr-calendar .flatpickr-weekday {
+    width: auto !important;
+    flex: none !important;
+}
+
+/* Ensure individual days stretch to fit their grid cell properly */
+.flatpickr-day {
+    width: 100% !important;
+    height: 38px !important; /* Force typical height */
+    display: flex !important; /* Use flexbox for robust centering */
+    align-items: center !important; /* Center vertically */
+    justify-content: center !important; /* Center horizontally */
+    box-sizing: border-box !important; /* Include border in height calculation so thickness doesn't affect layout */
+    max-width: 40px !important;
+    margin: 0 auto !important; /* Remove Flatpickr's default margins as Grid handles this */
+    line-height: normal !important; /* Reset line-height for flexbox container */
+}
+

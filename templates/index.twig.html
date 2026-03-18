@@ -12,7 +12,8 @@
 	<link rel="manifest" href="/manifest.php">
 
 	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/bootstrap.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/bootstrap-datepicker.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/flatpickr.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/custom-datepicker.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/fontawesome.min.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/solid.min.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% cache_busting 'css/style.css' %}">
@@ -28,8 +29,9 @@
 
 	<script src="{% cache_busting 'js_modules/jquery.js' %}"></script>
 	<script src="{% cache_busting 'js_modules/bootstrap.js' %}"></script>
-	<script src="{% cache_busting 'js_modules/bootstrap-datepicker.min.js' %}"></script>
-	<script src="{% cache_busting 'js_modules/bootstrap-datepicker.de.min.js' %}"></script>
+	<script src="{% cache_busting 'js_modules/flatpickr.min.js' %}"></script>
+	<script src="{% cache_busting 'js_modules/flatpickr.de.js' %}"></script>
+	<script src="{% cache_busting 'js/datePickerShim.js' %}"></script>
 	<script src="{% cache_busting 'js/date_functions.js' %}"></script>
 	<script src="{% cache_busting 'js/confirm_modal.js' %}"></script>
 	<script src="{% cache_busting 'js/globals.js' %}"></script>
