@@ -85,7 +85,7 @@ $response['mails'] = $mails;
 // Get all members for test recipient dropdown
 $sql = "SELECT pilot_id, firstname, lastname, email 
         FROM mitglieder 
-        ORDER BY lastname, firstname";
+        ORDER BY lastname";
 $members = Database::query($sql, []);
 $response['members'] = $members ?: [];
 

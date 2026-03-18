@@ -59,7 +59,8 @@ if ($mitgliederData['dienste_admin']) {
             'newsletterSecret' => Helper::$configuration['newsletterSecret'],
             'clubId' => $clubId,
             'clubName' => $clubName,
-            'currentUserEmail' => $mitgliederData['email'] ?? ''
+            'currentUserEmail' => $mitgliederData['email'] ?? '',
+            'clubs' => Helper::$configuration['clubs']
         ])
     ];
 }

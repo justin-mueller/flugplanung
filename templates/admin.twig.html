@@ -1,6 +1,118 @@
 <div class="card mt-3">
     <div class="card-header">
         <h5 class="card-title mb-0">
+            <i class="fa-solid fa-users me-2"></i>Mitglieder verwalten
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="admin-member-select" class="form-label fw-semibold">Mitglied auswählen</label>
+                <select id="admin-member-select" class="form-select">
+                    <option value="">Bitte auswählen...</option>
+                </select>
+                <small class="text-muted">Zeigt Name + Pilot-ID an</small>
+            </div>
+        </div>
+
+        <form id="admin-member-form" class="d-none">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="member-pilot-id" class="form-label">Pilot-ID</label>
+                    <input type="number" class="form-control" id="member-pilot-id" min="1" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="member-firstname" class="form-label">Vorname</label>
+                    <input type="text" class="form-control" id="member-firstname" maxlength="32" required>
+                </div>
+                <div class="col-md-5">
+                    <label for="member-lastname" class="form-label">Nachname</label>
+                    <input type="text" class="form-control" id="member-lastname" maxlength="32" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="member-email" class="form-label">E-Mail</label>
+                    <input type="email" class="form-control" id="member-email" maxlength="64" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="member-password" class="form-label">Passwort (Hash)</label>
+                    <input type="text" class="form-control" id="member-password">
+                </div>
+                <div class="col-md-4">
+                    <label for="member-verein" class="form-label">Verein</label>
+                    <select id="member-verein" class="form-select" required>
+                        {% for id, club in clubs %}
+                        <option value="{{ id }}">{{ club.name ?? club }} ({{ id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="member-fluggeraet" class="form-label">Fluggerät</label>
+                    <input type="text" class="form-control" id="member-fluggeraet" maxlength="5" required>
+                </div>
+                <div class="col-md-3">
+                    <label for="member-avatar" class="form-label">Avatar</label>
+                    <input type="number" class="form-control" id="member-avatar" min="1">
+                </div>
+                <div class="col-md-3">
+                    <label for="member-duty-reminder-days" class="form-label">Duty Reminder Tage</label>
+                    <input type="number" class="form-control" id="member-duty-reminder-days" min="0">
+                </div>
+                <div class="col-md-3">
+                    <label for="member-max-dienste-halbjahr" class="form-label">Max Dienste/Halbjahr</label>
+                    <input type="number" class="form-control" id="member-max-dienste-halbjahr" min="0">
+                </div>
+
+                <div class="col-12">
+                    <div class="row g-2">
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="member-windenfahrer">
+                                <label class="form-check-label" for="member-windenfahrer">Windenfahrer</label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="member-dienste-admin">
+                                <label class="form-check-label" for="member-dienste-admin">Dienste Admin</label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="member-newsletter">
+                                <label class="form-check-label" for="member-newsletter">Newsletter</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="member-duty-reminder">
+                                <label class="form-check-label" for="member-duty-reminder">Duty Reminder</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="member-wuensche-reminder">
+                                <label class="form-check-label" for="member-wuensche-reminder">Wünsche Reminder</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 d-flex gap-2 align-items-center">
+                <button type="button" class="btn btn-primary" id="admin-member-save-btn">
+                    <i class="fa-solid fa-floppy-disk me-1"></i>Mitglied speichern
+                </button>
+                <small class="text-muted" id="admin-member-status"></small>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
             <i class="fa-solid fa-envelope me-2"></i>Newsletter / E-Mails senden
         </h5>
     </div>
@@ -110,6 +222,8 @@
 (function() {
     const SECRET_KEY = '{{ newsletterSecret }}';
     let mailsData = [];
+    let membersData = [];
+    let selectedMemberOriginalPilotId = null;
     let pendingMailFilename = null;
     let pendingMailWrapper = null;
 
@@ -119,13 +233,253 @@
             .then(response => response.json())
             .then(data => {
                 mailsData = data.mails || [];
+                membersData = data.members || [];
+                renderMemberDropdown();
                 renderMailList();
             })
             .catch(error => {
                 console.error('Error loading admin data:', error);
                 document.getElementById('mail-list').innerHTML = 
                     '<div class="alert alert-danger">Fehler beim Laden der Daten</div>';
+                const memberSelect = document.getElementById('admin-member-select');
+                if (memberSelect) {
+                    memberSelect.innerHTML = '<option value="">Fehler beim Laden</option>';
+                }
             });
+    }
+
+    function renderMemberDropdown() {
+        const select = document.getElementById('admin-member-select');
+        if (!select) {
+            return;
+        }
+
+        const sortedMembers = [...membersData].sort((a, b) => {
+            const lastA = (a.lastname || '').toLowerCase();
+            const lastB = (b.lastname || '').toLowerCase();
+            if (lastA !== lastB) return lastA.localeCompare(lastB, 'de');
+            const firstA = (a.firstname || '').toLowerCase();
+            const firstB = (b.firstname || '').toLowerCase();
+            return firstA.localeCompare(firstB, 'de');
+        });
+
+        let html = '<option value="">Bitte auswählen...</option>';
+        sortedMembers.forEach(member => {
+            const fullName = `${member.firstname || ''} ${member.lastname || ''}`.trim();
+            const label = `${fullName} (ID: ${member.pilot_id})`;
+            html += `<option value="${String(member.pilot_id)}">${escapeHtml(label)}</option>`;
+        });
+
+        select.innerHTML = html;
+    }
+
+    function attachMemberEventListeners() {
+        const memberSelect = document.getElementById('admin-member-select');
+        const saveButton = document.getElementById('admin-member-save-btn');
+
+        if (memberSelect) {
+            memberSelect.addEventListener('change', function () {
+                const selectedId = parseInt(this.value, 10);
+                if (!selectedId) {
+                    hideMemberForm();
+                    return;
+                }
+                loadMemberDetails(selectedId);
+            });
+        }
+
+        if (saveButton) {
+            saveButton.addEventListener('click', function () {
+                const payload = collectMemberPayload();
+                if (!payload) {
+                    return;
+                }
+
+                showConfirmationModal({
+                    title: 'Mitglied speichern',
+                    message: 'Möchtest du die Änderungen an diesem Mitglied wirklich speichern?',
+                    confirmText: 'Speichern',
+                    cancelText: 'Abbrechen',
+                    confirmClass: 'btn-outline-success',
+                    onConfirm: async function () {
+                        return await saveMember(payload);
+                    }
+                });
+            });
+        }
+    }
+
+    function hideMemberForm() {
+        const form = document.getElementById('admin-member-form');
+        if (form) {
+            form.classList.add('d-none');
+        }
+        selectedMemberOriginalPilotId = null;
+        setMemberStatus('');
+    }
+
+    function setMemberStatus(message, isError = false) {
+        const status = document.getElementById('admin-member-status');
+        if (!status) {
+            return;
+        }
+
+        status.textContent = message;
+        status.classList.remove('text-danger', 'text-success', 'text-muted');
+
+        if (!message) {
+            status.classList.add('text-muted');
+        } else if (isError) {
+            status.classList.add('text-danger');
+        } else {
+            status.classList.add('text-success');
+        }
+    }
+
+    function loadMemberDetails(pilotId) {
+        setMemberStatus('Mitglied wird geladen...');
+
+        fetch('getMitgliedAdmin.php?pilot_id=' + encodeURIComponent(String(pilotId)))
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success || !data.member) {
+                    throw new Error(data.error || 'Mitglied konnte nicht geladen werden.');
+                }
+
+                populateMemberForm(data.member);
+                setMemberStatus('Mitglied geladen.');
+            })
+            .catch(error => {
+                console.error('Error loading member details:', error);
+                setMemberStatus('Fehler beim Laden des Mitglieds.', true);
+                showToast('Oops!', 'Fehler', 'Mitgliedsdaten konnten nicht geladen werden!', 'error');
+            });
+    }
+
+    function populateMemberForm(member) {
+        selectedMemberOriginalPilotId = Number(member.pilot_id);
+
+        const form = document.getElementById('admin-member-form');
+        if (form) {
+            form.classList.remove('d-none');
+        }
+
+        setValue('member-pilot-id', member.pilot_id);
+        setValue('member-firstname', member.firstname);
+        setValue('member-lastname', member.lastname);
+        setValue('member-email', member.email);
+        setValue('member-password', member.password);
+        setValue('member-verein', member.verein);
+        setValue('member-fluggeraet', member.fluggeraet);
+        setValue('member-avatar', member.avatar);
+        setValue('member-duty-reminder-days', member.duty_reminder_days);
+        setValue('member-max-dienste-halbjahr', member.max_dienste_halbjahr ?? '');
+
+        setChecked('member-windenfahrer', member.windenfahrer == 1);
+        setChecked('member-dienste-admin', member.dienste_admin == 1);
+        setChecked('member-newsletter', member.newsletter == 1);
+        setChecked('member-duty-reminder', member.duty_reminder == 1);
+        setChecked('member-wuensche-reminder', member.wuensche_reminder == 1);
+    }
+
+    function setValue(elementId, value) {
+        const input = document.getElementById(elementId);
+        if (input) {
+            input.value = value ?? '';
+        }
+    }
+
+    function setChecked(elementId, checked) {
+        const input = document.getElementById(elementId);
+        if (input) {
+            input.checked = !!checked;
+        }
+    }
+
+    function collectMemberPayload() {
+        if (!selectedMemberOriginalPilotId) {
+            showToast('Oops!', 'Fehler', 'Bitte zuerst ein Mitglied auswählen.', 'error');
+            return null;
+        }
+
+        const payload = {
+            original_pilot_id: String(selectedMemberOriginalPilotId),
+            pilot_id: (document.getElementById('member-pilot-id').value || '').trim(),
+            firstname: (document.getElementById('member-firstname').value || '').trim(),
+            lastname: (document.getElementById('member-lastname').value || '').trim(),
+            email: (document.getElementById('member-email').value || '').trim(),
+            password: (document.getElementById('member-password').value || '').trim(),
+            verein: document.getElementById('member-verein').value,
+            fluggeraet: (document.getElementById('member-fluggeraet').value || '').trim(),
+            avatar: (document.getElementById('member-avatar').value || '').trim(),
+            duty_reminder_days: (document.getElementById('member-duty-reminder-days').value || '').trim(),
+            max_dienste_halbjahr: (document.getElementById('member-max-dienste-halbjahr').value || '').trim(),
+            windenfahrer: document.getElementById('member-windenfahrer').checked ? '1' : '0',
+            dienste_admin: document.getElementById('member-dienste-admin').checked ? '1' : '0',
+            newsletter: document.getElementById('member-newsletter').checked ? '1' : '0',
+            duty_reminder: document.getElementById('member-duty-reminder').checked ? '1' : '0',
+            wuensche_reminder: document.getElementById('member-wuensche-reminder').checked ? '1' : '0'
+        };
+
+        if (!payload.pilot_id || !payload.firstname || !payload.lastname || !payload.email || !payload.fluggeraet) {
+            showToast('Oops!', 'Fehler', 'Bitte alle Pflichtfelder ausfüllen.', 'error');
+            return null;
+        }
+
+        return payload;
+    }
+
+    async function saveMember(payload) {
+        setMemberStatus('Speichern...');
+
+        const formData = new FormData();
+        Object.keys(payload).forEach(key => {
+            formData.append(key, payload[key]);
+        });
+
+        try {
+            const response = await fetch('updateMitgliedAdmin.php', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'Mitglied konnte nicht gespeichert werden.');
+            }
+
+            setMemberStatus('Mitglied erfolgreich gespeichert.');
+            showToast('Juhu!', 'Gespeichert', 'Mitglied wurde aktualisiert!', 'success');
+
+            const updatedMember = data.member || {
+                pilot_id: payload.pilot_id,
+                firstname: payload.firstname,
+                lastname: payload.lastname,
+                email: payload.email
+            };
+
+            const oldPilotId = Number(payload.original_pilot_id);
+            const existingIndex = membersData.findIndex(member => Number(member.pilot_id) === oldPilotId);
+            if (existingIndex >= 0) {
+                membersData[existingIndex] = {
+                    ...membersData[existingIndex],
+                    ...updatedMember
+                };
+            } else {
+                membersData.push(updatedMember);
+            }
+
+            renderMemberDropdown();
+            document.getElementById('admin-member-select').value = String(updatedMember.pilot_id);
+            populateMemberForm(updatedMember);
+
+            return true;
+        } catch (error) {
+            console.error('Error saving member:', error);
+            setMemberStatus('Fehler beim Speichern.', true);
+            showToast('Oops!', 'Fehler', error.message || 'Mitglied konnte nicht gespeichert werden!', 'error');
+            return false;
+        }
     }
 
     // Render mail list
@@ -396,6 +750,7 @@
     }
 
     // Initialize
+    attachMemberEventListeners();
     loadAdminData();
 })();
 </script>
