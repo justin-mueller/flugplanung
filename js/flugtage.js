@@ -195,17 +195,30 @@ function deleteFlugtage(datum) {
 		datum = dateToSQLFormat(datum);
 	}
 
-	$.ajax({
-		url: 'delete_flugtage.php',
-		type: 'POST',
-		data: { datum: datum },
-		success: function (response) {
-			showToast('Juhu!', 'Das hat geklappt', 'Der Flugtag wurde gelöscht!', 'success');
-			loadFlugtage();
-		},
-		error: function (error) {
-			showToast('Oops!', 'Etwas ist schiefgegangen!', 'Der Flugtag konnte nicht gelöscht werden!', 'error');
-			console.error('Error deleting entry:', error.responseText);
+	showConfirmationModal({
+		title: 'Flugtag löschen',
+		message: 'Möchten Sie diesen Flugtag wirklich löschen?',
+		confirmText: 'Löschen',
+		cancelText: 'Abbrechen',
+		confirmClass: 'btn-outline-danger',
+		onConfirm: async function () {
+			return new Promise((resolve) => {
+				$.ajax({
+					url: 'delete_flugtage.php',
+					type: 'POST',
+					data: { datum: datum },
+					success: function (response) {
+						showToast('Juhu!', 'Das hat geklappt', 'Der Flugtag wurde gelöscht!', 'success');
+						loadFlugtage();
+						resolve(true);
+					},
+					error: function (error) {
+						showToast('Oops!', 'Etwas ist schiefgegangen!', 'Der Flugtag konnte nicht gelöscht werden!', 'error');
+						console.error('Error deleting entry:', error.responseText);
+						resolve(false);
+					}
+				});
+			});
 		}
 	});
 }
