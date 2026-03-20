@@ -15,6 +15,11 @@ $(document).ready(function () {
     betriebAbfragen();
   });
 
+  // Ensure clicking the calendar icon opens the datepicker (same behavior as clicking the input field)
+  $("#datepicker .input-group-text").on("click", function () {
+    $("#flugtag").focus();
+  });
+
   if (typeof initHistoryRange === "function") {
     initHistoryRange();
   }
