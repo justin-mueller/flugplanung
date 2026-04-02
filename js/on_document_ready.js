@@ -13,6 +13,7 @@ $(document).ready(function () {
     calc_deadline(flugtag_unformatted);
     getFlugtag();
     betriebAbfragen();
+    fetchParaglideable();
   });
 
   // Ensure clicking the calendar icon opens the datepicker (same behavior as clicking the input field)
@@ -32,6 +33,7 @@ $(document).ready(function () {
   }
   getDashboardData();
   getDienste();
+  fetchParaglideable();
 
   $("[id^=list_fist_choice]").on("click", function (e) {
     if (!$(this).hasClass("active"))

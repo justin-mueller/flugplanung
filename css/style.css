@@ -535,3 +535,7 @@ img.table-image.vote {
 #tagesplanung th {
     position: relative;
 }
+
+#paraglideable-forecast a {
+	color: var(--bs-link-color);
+}
