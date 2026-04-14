@@ -42,9 +42,9 @@
                     </td>
                     <td class="py-4">
                         <select class="form-select form-select bg-light" id="rep-fluggebiet" style="background-color: #f8fff8 !important;">
-                            <option value="HRP">HRP</option>
-                            <option value="NGL">NGL</option>
-                            <option value="AMD">AMD</option>
+                            {% for site in sites %}
+                            <option value="{{ loop.index0 }}">{{ site.short }}</option>
+                            {% endfor %}
                         </select>
                     </td>
                     <td class="py-4">

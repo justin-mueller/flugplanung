@@ -25,11 +25,13 @@ $twig->addExtension(
     )
 );
 
+$sites = Helper::$configuration['sites'];
+
 // populate tabs
 $tabs = [
     'flugplanung' => [
         'label' => 'Flugplanung',
-        'content' => $twig->render('flugplanung.twig.html')
+        'content' => $twig->render('flugplanung.twig.html', ['sites' => $sites])
     ]
 ];
 
@@ -75,7 +77,7 @@ if ($mitgliederData['vereinId'] === Helper::$configuration['clubId']) {
     // Reparaturen Tab nur für Vereinsmitglieder
     $tabs['reparaturen'] = [
         'label' => 'Reparaturen',
-        'content' => $twig->render('reparaturen.twig.html')
+        'content' => $twig->render('reparaturen.twig.html', ['sites' => $sites])
     ];
 }
 

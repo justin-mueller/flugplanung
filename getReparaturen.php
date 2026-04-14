@@ -9,7 +9,7 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$sql = 'SELECT r.`key`, r.`fluggebiet`, r.`text`, r.`level`, r.`closed`, r.`solvedText`, 
+$sql = 'SELECT r.`key`, r.`site_index`, r.`text`, r.`level`, r.`closed`, r.`solvedText`,
         r.`created_by`, r.`created_at`, r.`closed_by`, r.`closed_at`,
         CONCAT(c.firstname, " ", c.lastname) as created_by_name,
         CONCAT(cl.firstname, " ", cl.lastname) as closed_by_name
@@ -19,7 +19,14 @@ $sql = 'SELECT r.`key`, r.`fluggebiet`, r.`text`, r.`level`, r.`closed`, r.`solv
         ORDER BY r.`created_at` ASC';
 $result = Database::query($sql, []);
 
+$shorthands = Helper::getSiteShorthands();
+$data = [];
+if (is_array($result)) {
+    foreach ($result as $row) {
+        $row['fluggebiet'] = $shorthands[(int)$row['site_index']] ?? '?';
+        $data[] = $row;
+    }
+}
+
 header('Content-Type: application/json');
-echo json_encode($result ?: [], JSON_THROW_ON_ERROR);
-
-
+echo json_encode($data, JSON_THROW_ON_ERROR);

@@ -9,12 +9,29 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$query = 'SELECT * FROM flugtage WHERE datum = :flugtag';
-$result = Database::query($query, ['flugtag' => $_GET['flugtag']]);
+$siteCount = Helper::getSiteCount();
+
+$flugtag = Database::query(
+    'SELECT abgesagt, aufbau FROM flugtage WHERE datum = :flugtag',
+    ['flugtag' => $_GET['flugtag']]
+);
+
+$betriebRows = Database::query(
+    'SELECT site_index, betrieb FROM flugtage_betrieb WHERE datum = :flugtag',
+    ['flugtag' => $_GET['flugtag']]
+);
 
 header('Content-Type: application/json');
-if ($result !== false && $result !== []) {
-    echo json_encode(current($result), JSON_THROW_ON_ERROR);
+if ($flugtag !== false && $flugtag !== []) {
+    $row = current($flugtag);
+    $betrieb = array_fill(0, $siteCount, '0');
+    if (is_array($betriebRows)) {
+        foreach ($betriebRows as $b) {
+            $betrieb[(int)$b['site_index']] = $b['betrieb'];
+        }
+    }
+    $row['betrieb'] = $betrieb;
+    echo json_encode($row, JSON_THROW_ON_ERROR);
 } else {
-    echo json_encode(['error' => 'No entries found in the "mitglieder" table'], JSON_THROW_ON_ERROR);
+    echo json_encode(['error' => 'No entry found for this date'], JSON_THROW_ON_ERROR);
 }

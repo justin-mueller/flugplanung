@@ -9,9 +9,10 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$sql = 'DELETE FROM tagesplanung WHERE Pilot_ID = :pilotid AND flugtag = :flugtag';
+$params = ['pilotid' => $_POST['pilotid_delete'], 'flugtag' => $_POST['flugtag']];
 
-$result = Database::execute($sql, ['pilotid' => $_POST['pilotid_delete'], 'flugtag' => $_POST['flugtag']]);
+Database::execute('DELETE FROM tagesplanung_sites WHERE pilot_id = :pilotid AND flugtag = :flugtag', $params);
+$result = Database::execute('DELETE FROM tagesplanung WHERE Pilot_ID = :pilotid AND flugtag = :flugtag', $params);
 
 header('Content-Type: application/json');
 echo json_encode($result, JSON_THROW_ON_ERROR);

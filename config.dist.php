@@ -5,7 +5,11 @@ return [
 
     'clubId' => 198,
 
-    'sites' => ['Neustadt-Glewe', 'Hörpel', 'Altenmedingen'],
+    'sites' => [
+        0 => ['short' => 'NGL', 'name' => 'Neustadt-Glewe'],
+        1 => ['short' => 'HRP', 'name' => 'Hörpel'],
+        2 => ['short' => 'AMD', 'name' => 'Altenmedingen'],
+    ],
 
     'newsletterSecret' => 'define_a_secure_random_string_here',
 

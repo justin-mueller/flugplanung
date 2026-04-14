@@ -1,6 +1,10 @@
 function renameAlternativeButtons(firstChoice) {
 	firstChoice = parseInt(firstChoice);
-	let alternatives = [0, 1, 2].filter(function (item) { return item !== firstChoice })
-	$('#list_alternative_1')[0].innerHTML = Fluggebiete[alternatives[0]];
-	$('#list_alternative_2')[0].innerHTML = Fluggebiete[alternatives[1]];
+	let alternatives = [];
+	for (let i = 0; i < SiteCount; i++) {
+		if (i !== firstChoice) alternatives.push(i);
+	}
+	for (let i = 0; i < alternatives.length; i++) {
+		$(`#list_alternative_${i + 1}`)[0].innerHTML = Fluggebiete[alternatives[i]];
+	}
 }

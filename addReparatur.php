@@ -9,20 +9,20 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$fluggebiet = $_POST['fluggebiet'] ?? '';
+$siteIndex = $_POST['site_index'] ?? '';
 $text = $_POST['text'] ?? '';
 $level = $_POST['level'] ?? 0;
 
-if ($fluggebiet === '' || $text === '') {
+if ($siteIndex === '' || $text === '' || (int)$siteIndex < 0 || (int)$siteIndex >= Helper::getSiteCount()) {
     http_response_code(400);
-    echo 'Missing parameters';
+    echo 'Missing or invalid parameters';
     exit;
 }
 
-$sql = 'INSERT INTO reparaturen (`fluggebiet`, `text`, `level`, `closed`, `created_by`) VALUES (:fluggebiet, :text, :level, 0, :created_by)';
+$sql = 'INSERT INTO reparaturen (`site_index`, `text`, `level`, `closed`, `created_by`) VALUES (:site_index, :text, :level, 0, :created_by)';
 $result = Database::execute($sql, [
-    'fluggebiet' => $fluggebiet, 
-    'text' => $text, 
+    'site_index' => (int)$siteIndex,
+    'text' => $text,
     'level' => $level,
     'created_by' => $_SESSION['mitgliederData']['pilot_id']
 ]);

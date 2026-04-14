@@ -15,7 +15,7 @@ $defaultStartDate = $currentYear . '-01-01';
 
 $startDate = $_GET['startDate'] ?? $defaultStartDate;
 
-$sql = "SELECT
+$sql = 'SELECT
 m.pilot_id,
 m.firstname,
 m.lastname,
@@ -34,7 +34,7 @@ m.windenfahrer,
  INNER JOIN flugtage mf ON mf.datum = d.flugtag
  WHERE d.pilot_id = m.pilot_id
    AND d.flugtag >= :startDate
-   AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
+   AND EXISTS (SELECT 1 FROM flugtage_betrieb fb WHERE fb.datum = mf.datum AND fb.betrieb = 1)
 ) AS active_duties_count,
 
 -- Active Flying Days (pilot flew on days with active betrieb from startDate onwards)
@@ -43,14 +43,14 @@ m.windenfahrer,
  INNER JOIN flugtage mf ON mf.datum = tp.flugtag
  WHERE tp.pilot_id = m.pilot_id
    AND tp.flugtag >= :startDate
-   AND (mf.betrieb_ngl = 1 OR mf.betrieb_hrp = 1 OR mf.betrieb_amd = 1)
+   AND EXISTS (SELECT 1 FROM flugtage_betrieb fb WHERE fb.datum = mf.datum AND fb.betrieb = 1)
 ) AS active_flying_days
 
 FROM
 mitglieder m
 WHERE 
     m.verein = :clubId;
-";
+';
 
 $params = [
     'startDate' => $startDate,
