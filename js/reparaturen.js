@@ -60,7 +60,7 @@ function addReparatur() {
     $.ajax({
         url: 'addReparatur.php',
         type: 'POST',
-        data: { fluggebiet: fluggebiet, text: text, level: level },
+        data: { site_index: fluggebiet, text: text, level: level },
         success: function () {
             document.getElementById('rep-text').value = '';
             loadReparaturen();

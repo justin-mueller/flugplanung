@@ -1,7 +1,12 @@
 function getSelectedButtons() {
 
-  const firstChoiceButtons = document.querySelectorAll('#list_fist_choice_1, #list_fist_choice_2, #list_fist_choice_3');
-  const alternativeButtons = document.querySelectorAll('#list_alternative_1, #list_alternative_2');
+  // With only 1 site, auto-select it as first choice
+  if (SiteCount === 1) {
+    return [0];
+  }
+
+  const firstChoiceButtons = document.querySelectorAll('[id^="list_fist_choice_"]');
+  const alternativeButtons = document.querySelectorAll('[id^="list_alternative_"]');
   const alternativeTitles = [];
   let firstChoiceTitle = '';
 
@@ -12,32 +17,21 @@ function getSelectedButtons() {
     }
   }
 
-
   for (let i = 0; i < alternativeButtons.length; i++) {
     if (alternativeButtons[i].classList.contains('active')) {
       alternativeTitles.push(alternativeButtons[i].innerText);
     }
   }
 
-  let NGL = 0, HRP = 0, AMD = 0;
+  let result = new Array(SiteCount).fill(2); // default: not chosen
 
-  if (alternativeTitles.includes('Neustadt-Glewe')) {
-    NGL = 1;
-  } else if (!firstChoiceTitle.includes('Neustadt-Glewe')) {
-    NGL = 2;
+  for (let i = 0; i < SiteCount; i++) {
+    if (firstChoiceTitle.includes(Fluggebiete[i])) {
+      result[i] = 0;
+    } else if (alternativeTitles.includes(Fluggebiete[i])) {
+      result[i] = 1;
+    }
   }
 
-  if (alternativeTitles.includes('Hörpel')) {
-    HRP = 1;
-  } else if (!firstChoiceTitle.includes('Hörpel')) {
-    HRP = 2;
-  }
-
-  if (alternativeTitles.includes('Altenmedingen')) {
-    AMD = 1;
-  } else if (!firstChoiceTitle.includes('Altenmedingen')) {
-    AMD = 2;
-  }
-
-  return [NGL, HRP, AMD];
+  return result;
 }

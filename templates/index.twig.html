@@ -24,7 +24,9 @@
 	<script>
 		var User_Information = {{ mitgliederData|json_encode|raw }};
 		const localClubId = {{ clubId }};
-		const Fluggebiete = {{ sites|json_encode|raw }};
+		const SiteCount = {{ sites|length }};
+		const Fluggebiete = {{ sites|column('name')|json_encode|raw }};
+		const FluggebieteShort = {{ sites|column('short')|json_encode|raw }};
 	</script>
 
 	<script src="{% cache_busting 'js_modules/jquery.js' %}"></script>
@@ -74,21 +76,21 @@
 
 		<nav>
 			<div class="nav nav-tabs" id="nav-tab" role="tablist">
-                {% for id, tab in tabs %}
+				{% for id, tab in tabs %}
 				<button class="nav-link {% if loop.index == 1 %}active{% endif %} ui-button" id="nav-{{ id }}-tab" data-bs-toggle="tab"
 					data-bs-target="#nav-{{ id }}" type="button" role="tab" aria-controls="nav-{{ id }}"
 					aria-selected="true">{{ tab.label }}</button>
-                {% endfor %}
+				{% endfor %}
 			</div>
 		</nav>
 
 		<div class="tab-content" id="nav-tabContent">
-            {% for id, tab in tabs %}
+			{% for id, tab in tabs %}
 			<div class="tab-pane fade show {% if loop.index == 1     %}active{% endif %}" id="nav-{{ id }}" role="tabpanel"
 				aria-labelledby="nav-{{ id }}-tab">
 				{{ tab.content|raw }}
 			</div>
-            {% endfor %}
+			{% endfor %}
 		</div>
 	</div>
 

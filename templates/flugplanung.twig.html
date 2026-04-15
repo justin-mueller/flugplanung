@@ -23,9 +23,9 @@
 					<tr style="vertical-align: top;">
 						<th>Pilot</th>
 						<th>Verein</th>
-						<th>NGL<br><span id="reparaturen-ngl" class="reparaturen-badges"></span></th>
-						<th>HRP<br><span id="reparaturen-hrp" class="reparaturen-badges"></span></th>
-						<th>AMD<br><span id="reparaturen-amd" class="reparaturen-badges"></span></th>
+						{% for site in sites %}
+						<th>{{ site.short }}<br><span id="reparaturen-{{ site.short|lower }}" class="reparaturen-badges"></span></th>
+						{% endfor %}
 						<th>Kommentar</th>
 					</tr>
 				</thead>
@@ -65,15 +65,11 @@
 <div class="row  d-none" id="flugbetriebAusrufen">
 	<div class="col">
 		<p>Betrieb ausrufen:</p>
-		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb0" onclick="betriebAusrufen(0)">
-			NGL
+		{% for site in sites %}
+		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb{{ loop.index0 }}" onclick="betriebAusrufen({{ loop.index0 }})">
+			{{ site.short }}
 		</button>
-		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb1" onclick="betriebAusrufen(1)">
-			HRP
-		</button>
-		<button type="button" class="btn btn-secondary ui-button mb-2" id="btn_betrieb2" onclick="betriebAusrufen(2)">
-			AMD
-		</button>
+		{% endfor %}
 	</div>
 
 	<div class="col">
@@ -95,29 +91,15 @@
 <div class="row">
 	<div class="col-12 mb-3">
 
-		<div id="banner_flugbetrieb_0" class="alert alert-success d-flex align-items-center mt-3 mb-3 d-none"
+		{% for site in sites %}
+		<div id="banner_flugbetrieb_{{ loop.index0 }}" class="alert alert-success d-flex align-items-center mt-3 mb-3 d-none"
 			role="alert">
 			<img src="img/flugbetrieb.svg" width="24" height="24" style="margin-right: 0.5rem" alt="Custom SVG">
 			<div>
-				Flugbetrieb in Neustadt-Glewe
+				Flugbetrieb in {{ site.name }}
 			</div>
 		</div>
-
-		<div id="banner_flugbetrieb_1" class="alert alert-success d-flex align-items-center mt-3 mb-3 d-none"
-			role="alert">
-			<img src="img/flugbetrieb.svg" width="24" height="24" style="margin-right: 0.5rem" alt="Custom SVG">
-			<div>
-				Flugbetrieb in Hörpel
-			</div>
-		</div>
-
-		<div id="banner_flugbetrieb_2" class="alert alert-success d-flex align-items-center mt-3 mb-3 d-none"
-			role="alert">
-			<img src="img/flugbetrieb.svg" width="24" height="24" style="margin-right: 0.5rem" alt="Custom SVG">
-			<div>
-				Flugbetrieb in Altenmedingen
-			</div>
-		</div>
+		{% endfor %}
 
 		<div id="banner_aufbau" class="alert alert-warning d-flex align-items-center mt-3 mb-3 d-none" role="alert">
 			<img src="img/clock.svg" width="24" height="24" style="margin-right: 0.5rem" alt="Custom SVG">
@@ -190,7 +172,7 @@
 								<li>Tage, die nicht offiziell als Flugtage eingetragen wurden, werden als solche gekennzeichnet</li>
 								<li>Das Passwort kann jetzt vom User selbst zurückgesetzt werden</li>
 							</ul>
-							
+
 							<br>
 							Wenn du Fragen zur neuen Planung hast, wende Dich bitte an Justin.
 						</div>
@@ -218,15 +200,14 @@
 
 					<div class="row">
 
-						<div class="col border-end mb-4">
+					{% if sites|length > 1 %}
+					<div class="col border-end mb-4">
 							<h4 class="mb-4 pb-3 border-bottom">Erste Wahl</h4>
 							<div class="btn-group-vertical btn-block w-100">
+								{% for site in sites %}
 								<button type="button" class="btn btn-outline-primary btn-block ui-button"
-									id="list_fist_choice_1">Neustadt-Glewe</button>
-								<button type="button" class="btn btn-outline-primary btn-block ui-button"
-									id="list_fist_choice_2">Hörpel</button>
-								<button type="button" class="btn btn-outline-primary btn-block ui-button"
-									id="list_fist_choice_3">Altenmedingen</button>
+									id="list_fist_choice_{{ loop.index }}">{{ site.name }}</button>
+								{% endfor %}
 							</div>
 
 						</div>
@@ -235,13 +216,14 @@
 							<h4 class="mb-4 pb-3 border-bottom">Alternative</h4>
 
 							<div class="btn-group-vertical w-100">
+								{% for i in 1..(sites|length - 1) %}
 								<button type="button" class="btn btn-outline-primary ui-button"
-									id="list_alternative_1">Hörpel</button>
-								<button type="button" class="btn btn-outline-primary ui-button"
-									id="list_alternative_2">Altenmedingen</button>
+									id="list_alternative_{{ i }}">{{ sites[i].name }}</button>
+								{% endfor %}
 							</div>
 
 						</div>
+					{% endif %}
 
 					</div>
 
@@ -277,20 +259,21 @@
 
 <!-- Modal for Reparaturen Details -->
 <div class="modal fade" id="reparaturenModal" tabindex="-1" aria-labelledby="reparaturenModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="reparaturenModalLabel">Reparaturen - <span id="modal-fluggebiet"></span></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="reparaturen-modal-content">
-          <!-- Content will be populated by JavaScript -->
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
-      </div>
-    </div>
-  </div>
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="reparaturenModalLabel">Reparaturen - <span id="modal-fluggebiet"></span>
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div id="reparaturen-modal-content">
+					<!-- Content will be populated by JavaScript -->
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+			</div>
+		</div>
+	</div>
 </div>

@@ -22,7 +22,7 @@ function loadFlugtage(init, fullYear = false) {
 	let startDate = fullYear ? saisonJahr + '-01-01' : formatDateString(saisonStartDate);
 	let endDate = fullYear ? saisonJahr + '-12-31' : formatDateString(saisonEndDate);
 
-	$.ajax({	
+	$.ajax({
 		url: 'fetch_flugtage.php',
 		type: 'GET',
 		data: { startDate: startDate, endDate: endDate },
@@ -53,7 +53,7 @@ function loadFlugtage(init, fullYear = false) {
 					if (highlightedDates.has(date.toDateString())) {
 
 						return { classes: 'highlight-day', tooltip: 'Highlighted date' };
-					
+
 					} else {
 						return { classes: 'non-highlight-day', tooltip: 'Regular date' };
 					}
@@ -67,15 +67,15 @@ function loadFlugtage(init, fullYear = false) {
 				daysOfWeekHighlighted: [0, 6],
 				todayHighlight: true,
 				format: {
-				  toDisplay: function (date, format, language) {
-					return getFormattedGermanDate(date);
-				  },
-				  toValue: function (date, format, language) {
-					return date;
-				  },
+					toDisplay: function (date, format, language) {
+						return getFormattedGermanDate(date);
+					},
+					toValue: function (date, format, language) {
+						return date;
+					},
 				},
-			  });
-			  
+			});
+
 			renderFlugtageList(Flugtage);
 
 			if (init) {
@@ -148,7 +148,7 @@ function renderFlugtageList(data) {
 		let currentWeek = null;
 
 		$.each(displayData, function (index, entry) {
-			
+
 			let dateObj = new Date(entry.datum);
 			let week = getCalendarWeek(dateObj);
 			let year = dateObj.getFullYear();
@@ -163,7 +163,7 @@ function renderFlugtageList(data) {
 			let day = dateObj.getDate();
 			let monthShort = dateObj.toLocaleDateString('de-DE', { month: 'short' }).toUpperCase().replace('.', '');
 			// Ensure we strip possible dot "Okt."
-			
+
 			let fullDate = getFormattedGermanDate(entry.datum);
 
 			const card = `

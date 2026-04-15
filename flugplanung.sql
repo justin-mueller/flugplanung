@@ -92,10 +92,20 @@ CREATE TABLE `mitglieder` (
 CREATE TABLE `flugtage` (
   `datum` date NOT NULL,
   `aufbau` time NOT NULL DEFAULT '10:00:00',
-  `betrieb_ngl` tinyint(1) DEFAULT 0,
-  `betrieb_hrp` tinyint(1) NOT NULL DEFAULT 0,
-  `betrieb_amd` tinyint(1) NOT NULL DEFAULT 0,
   `abgesagt` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `flugtage_betrieb`
+--
+
+CREATE TABLE `flugtage_betrieb` (
+  `datum` date NOT NULL,
+  `site_index` tinyint NOT NULL,
+  `betrieb` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`datum`, `site_index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -107,11 +117,22 @@ CREATE TABLE `flugtage` (
 CREATE TABLE `tagesplanung` (
   `pilot_id` int(11) NOT NULL,
   `Kommentar` varchar(128) NOT NULL,
-  `NGL` int(11) NOT NULL,
-  `HRP` int(11) NOT NULL,
-  `AMD` int(11) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `flugtag` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tagesplanung_sites`
+--
+
+CREATE TABLE `tagesplanung_sites` (
+  `pilot_id` int(11) NOT NULL,
+  `flugtag` date NOT NULL,
+  `site_index` tinyint NOT NULL,
+  `priority` int(11) NOT NULL,
+  PRIMARY KEY (`pilot_id`, `flugtag`, `site_index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -178,7 +199,7 @@ ALTER TABLE `tagesplanung`
 --
 ALTER TABLE `mitglieder`
   MODIFY `pilot_id` int(11) NOT NULL AUTO_INCREMENT;
- 
+
 -- --------------------------------------------------------
 
 --
@@ -187,7 +208,7 @@ ALTER TABLE `mitglieder`
 
 CREATE TABLE `reparaturen` (
   `key` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `fluggebiet` enum('HRP','NGL','AMD') NOT NULL,
+  `site_index` tinyint NOT NULL,
   `text` longtext NOT NULL,
   `level` tinyint(1) NOT NULL DEFAULT 0,
   `closed` tinyint(1) NOT NULL DEFAULT 0,

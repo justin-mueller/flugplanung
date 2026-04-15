@@ -16,17 +16,19 @@ function betriebAusrufen(Fluggebiet) {
 
 	const aufbau = $('#aufbau').val();
 
+	let postData = {
+		flugtag: flugtag_formatted,
+		abgesagt: FlugbetriebAbgesagt ? '1' : '0',
+		aufbau: aufbau
+	};
+	for (let i = 0; i < SiteCount; i++) {
+		postData['betrieb[' + i + ']'] = Flugbetrieb[i] ? '1' : '0';
+	}
+
 	$.ajax({
 		url: 'betriebAusrufen.php',
 		type: 'POST',
-		data: {
-			flugtag: flugtag_formatted,
-			flugbetrieb_ngl: Flugbetrieb[0] ? '1' : '0',
-			flugbetrieb_hrp: Flugbetrieb[1] ? '1' : '0',
-			flugbetrieb_amd: Flugbetrieb[2] ? '1' : '0',
-			abgesagt: FlugbetriebAbgesagt ? '1' : '0',
-			aufbau: aufbau
-		},
+		data: postData,
 		success: function (data) {
 			betriebAbfragen();
 			showToast('Juhu!', 'Das hat geklappt', 'Die Änderung in dem Betrieb wurde gespeichert!', 'success');
@@ -54,42 +56,22 @@ function betriebAbfragen() {
 		data: { flugtag: flugtag_formatted },
 		success: function (data) {
 
-			Flugbetrieb[0] = data.betrieb_ngl == '1' ? true : false;
-			Flugbetrieb[1] = data.betrieb_hrp == '1' ? true : false;
-			Flugbetrieb[2] = data.betrieb_amd == '1' ? true : false;
-			FlugbetriebAbgesagt = data.abgesagt == '1' ? true : false;
+			for (let i = 0; i < SiteCount; i++) {
+				Flugbetrieb[i] = data.betrieb[i] == '1';
+			}
+			FlugbetriebAbgesagt = data.abgesagt == '1';
 
 			$('#abgesagt').addClass('d-none');
 
-
-			if (Flugbetrieb[0]) {
-				$('#banner_flugbetrieb_0').removeClass('d-none');
-				$('#btn_betrieb0').removeClass('btn-secondary');
-				$('#btn_betrieb0').addClass('btn-success');
-				
-			} else {
-				$('#banner_flugbetrieb_0').addClass('d-none');
-				$('#btn_betrieb0').addClass('btn-secondary');
-				$('#btn_betrieb0').removeClass('btn-success');
-			}
-			if (Flugbetrieb[1]) {
-				$('#banner_flugbetrieb_1').removeClass('d-none');
-				$('#btn_betrieb1').removeClass('btn-secondary');
-				$('#btn_betrieb1').addClass('btn-success');
-			} else {
-				$('#banner_flugbetrieb_1').addClass('d-none');
-				$('#btn_betrieb1').addClass('btn-secondary');
-				$('#btn_betrieb1').removeClass('btn-success');
-			}
-			if (Flugbetrieb[2]) {
-				$('#banner_flugbetrieb_2').removeClass('d-none');
-				$('#btn_betrieb2').removeClass('btn-secondary');
-				$('#btn_betrieb2').addClass('btn-success');
-			} else {
-				$('#banner_flugbetrieb_2').addClass('d-none');
-					$('#btn_betrieb2').addClass('btn-secondary');
-					$('#btn_betrieb2').removeClass('btn-success');
+			for (let i = 0; i < SiteCount; i++) {
+				if (Flugbetrieb[i]) {
+					$(`#banner_flugbetrieb_${i}`).removeClass('d-none');
+					$(`#btn_betrieb${i}`).removeClass('btn-secondary').addClass('btn-success');
+				} else {
+					$(`#banner_flugbetrieb_${i}`).addClass('d-none');
+					$(`#btn_betrieb${i}`).addClass('btn-secondary').removeClass('btn-success');
 				}
+			}
 
 				const Flugbetrieb_any = Flugbetrieb.some(value => value === true);
 

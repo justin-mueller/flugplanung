@@ -9,8 +9,11 @@ Helper::loadConfiguration();
 Helper::checkLogin();
 Database::connect();
 
-$sql = 'DELETE FROM flugtage WHERE datum = :datum';
-$result = Database::execute($sql, ['datum' => $_POST['datum']]);
+$result = Database::execute('DELETE FROM flugtage_betrieb WHERE datum = :datum', ['datum' => $_POST['datum']]);
+
+if ($result['success'] === true) {
+    $result = Database::execute('DELETE FROM flugtage WHERE datum = :datum', ['datum' => $_POST['datum']]);
+}
 
 header('Content-Type: application/json');
 echo json_encode($result, JSON_THROW_ON_ERROR);

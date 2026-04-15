@@ -19,13 +19,22 @@ class Helper
             $config = include __DIR__ . '/../config.php';
             self::$configuration = array_merge(self::$configuration, $config);
         }
-        
+
         // Ensure configuration was loaded
         if (empty(self::$configuration)) {
             throw new \Exception('No configuration file found. Please ensure config.php exists.');
         }
     }
 
+    public static function getSiteShorthands(): array
+    {
+        return array_column(self::$configuration['sites'], 'short');
+    }
+
+    public static function getSiteCount(): int
+    {
+        return count(self::$configuration['sites']);
+    }
 
     public static function checkLogin(): void
     {
