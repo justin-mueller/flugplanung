@@ -110,6 +110,32 @@ if (empty($recipients)) {
     die("No recipients found!");
 }
 
+$customRecipientFilterDescription = null;
+$customExcludedRecipients = [];
+$recipientPersonalizations = [];
+if (isset($mailRecipientFilter) && is_callable($mailRecipientFilter)) {
+    $filterResult = $mailRecipientFilter($recipients);
+    if (is_array($filterResult) && isset($filterResult['recipients']) && is_array($filterResult['recipients'])) {
+        $recipients = $filterResult['recipients'];
+        $recipientPersonalizations = isset($filterResult['personalizations']) && is_array($filterResult['personalizations'])
+            ? $filterResult['personalizations']
+            : [];
+        $customExcludedRecipients = isset($filterResult['excluded']) && is_array($filterResult['excluded'])
+            ? $filterResult['excluded']
+            : [];
+        $customRecipientFilterDescription = isset($filterResult['description'])
+            ? (string)$filterResult['description']
+            : null;
+    }
+}
+
+if (empty($recipients)) {
+    if ($customRecipientFilterDescription !== null) {
+        die("No recipients found after filter: " . htmlspecialchars($customRecipientFilterDescription));
+    }
+    die("No recipients found!");
+}
+
 // Load mail file from mails folder
 $emailFile = __DIR__ . '/mails/' . $mailFile;
 if (!file_exists($emailFile)) {
@@ -161,6 +187,8 @@ $logData = [
     'club_id' => $configClubId,
     'total_recipients' => $total,
     'excluded_by_preference' => $excludedByPreference,
+    'custom_filter_description' => $customRecipientFilterDescription,
+    'excluded_by_custom_filter' => $customExcludedRecipients,
     'recipients' => []
 ];
 
@@ -174,6 +202,14 @@ foreach ($recipients as $recipient) {
         [$recipient['firstname'], $recipient['lastname']],
         $body
     );
+    $pilotPersonalizations = $recipientPersonalizations[(int)$recipient['pilot_id']] ?? [];
+    if (!empty($pilotPersonalizations)) {
+        $personalizedBody = str_replace(
+            array_keys($pilotPersonalizations),
+            array_values($pilotPersonalizations),
+            $personalizedBody
+        );
+    }
 
     $email = (new Email())
         ->from($senderEmail)
@@ -461,6 +497,7 @@ function generateHtmlLog($logData) {
             ' . ($logData['is_test'] && $logData['test_recipient_email'] ? '<p><strong>Test-Empfänger:</strong> ' . htmlspecialchars($logData['test_recipient_email']) . '</p>' : '') . '
             <p><strong>User-ID Bereich:</strong> ' . htmlspecialchars($logData['user_id_from']) . ' - ' . htmlspecialchars($logData['user_id_to']) . '</p>
             <p><strong>Nur interne Mitglieder:</strong> ' . ($logData['internal_only'] ? 'Ja (Verein ID: ' . htmlspecialchars($logData['club_id']) . ')' : 'Nein') . '</p>
+            ' . ($logData['custom_filter_description'] ? '<p><strong>Zusatzfilter:</strong> ' . htmlspecialchars($logData['custom_filter_description']) . '</p>' : '') . '
             <p><strong>Gesamt Empfänger:</strong> ' . htmlspecialchars($logData['total_recipients']) . '</p>
         </div>
         
@@ -477,6 +514,11 @@ function generateHtmlLog($logData) {
                 <h3>⊗ Ausgeschlossen</h3>
                 <div class="count">' . count($logData['excluded_by_preference']) . '</div>
                 <p style="margin: 10px 0 0 0; font-size: 12px;">Preferenz deaktiviert</p>
+            </div>' : '') . '
+            ' . (count($logData['excluded_by_custom_filter']) > 0 ? '<div class="summary-box excluded-box">
+                <h3>⊗ Ausgeschlossen</h3>
+                <div class="count">' . count($logData['excluded_by_custom_filter']) . '</div>
+                <p style="margin: 10px 0 0 0; font-size: 12px;">Zusatzfilter</p>
             </div>' : '') . '
         </div>
         
@@ -542,6 +584,37 @@ function generateHtmlLog($logData) {
                     <td>' . htmlspecialchars($excluded['email']) . '</td>
                     <td>' . htmlspecialchars($excluded['verein'] ?? '-') . '</td>
                     <td><span class="status-badge status-excluded">⊗ Preferenz deaktiviert</span></td>
+                </tr>';
+        }
+    }
+
+    if (count($logData['excluded_by_custom_filter']) > 0) {
+        $html .= '</tbody>
+        </table>
+
+        <h2 style="margin-top: 40px; color: #856404;">⊗ Ausgeschlossene Empfänger (Zusatzfilter)</h2>
+        <p style="color: #666; font-size: 14px;">Diese Benutzer erfüllen die allgemeinen Filterkriterien, wurden aber durch den Zusatzfilter ausgeschlossen: ' . htmlspecialchars($logData['custom_filter_description'] ?? '-') . '</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User-ID</th>
+                    <th>Name</th>
+                    <th>E-Mail</th>
+                    <th>Verein</th>
+                    <th>Grund für Ausschluss</th>
+                </tr>
+            </thead>
+            <tbody>';
+
+        foreach ($logData['excluded_by_custom_filter'] as $excluded) {
+            $html .= '<tr style="background: #fffbea;">
+                    <td>' . $index++ . '</td>
+                    <td>' . htmlspecialchars($excluded['pilot_id']) . '</td>
+                    <td>' . htmlspecialchars($excluded['lastname'] . ', ' . $excluded['firstname']) . '</td>
+                    <td>' . htmlspecialchars($excluded['email']) . '</td>
+                    <td>' . htmlspecialchars($excluded['verein'] ?? '-') . '</td>
+                    <td><span class="status-badge status-excluded">⊗ Zusatzfilter</span></td>
                 </tr>';
         }
     }

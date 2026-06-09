@@ -53,6 +53,10 @@ if (is_dir($mailsDir)) {
                 $mailType = 'Wünsche-Erinnerung';
                 $wrapper = 'sendWuenscheReminder.php';
                 $sender = Helper::$configuration['flugplanungFrom'];
+            } elseif (strpos($file, 'dienste_halbjahr') !== false) {
+                $mailType = 'Dienste Halbjahr';
+                $wrapper = 'sendDiensteHalbjahrInfo.php';
+                $sender = Helper::$configuration['flugplanungFrom'];
             } elseif (strpos($file, 'duty') !== false || strpos($file, 'dienst') !== false) {
                 $mailType = 'Dienst-Erinnerung';
                 $wrapper = 'sendDutyReminder.php';
