@@ -21,7 +21,14 @@ $flugtageResult = Database::query(
 
 // Step 2: Get all members for this club
 $membersResult = Database::query(
-    "SELECT pilot_id, firstname, lastname, windenfahrer, max_dienste_halbjahr FROM mitglieder WHERE verein = :clubId",
+    "SELECT pilot_id, firstname, lastname, windenfahrer, max_dienste_halbjahr
+     FROM mitglieder m
+     WHERE m.verein = :clubId
+       AND NOT EXISTS (
+           SELECT 1
+           FROM dienstfreistellung df
+           WHERE df.pilot_id = m.pilot_id
+       )",
     ['clubId' => $clubId]
 );
 
@@ -39,7 +46,13 @@ $diensteResult = Database::query(
     "SELECT d.flugtag, d.pilot_id, d.windenfahrer, d.startleiter 
      FROM dienste d
      INNER JOIN mitglieder m ON d.pilot_id = m.pilot_id
-     WHERE d.flugtag BETWEEN :startDate AND :endDate AND m.verein = :clubId",
+     WHERE d.flugtag BETWEEN :startDate AND :endDate
+       AND m.verein = :clubId
+       AND NOT EXISTS (
+           SELECT 1
+           FROM dienstfreistellung df
+           WHERE df.pilot_id = d.pilot_id
+       )",
     ['startDate' => $startDate, 'endDate' => $endDate, 'clubId' => $clubId]
 );
 

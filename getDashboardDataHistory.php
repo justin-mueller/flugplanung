@@ -49,7 +49,12 @@ m.windenfahrer,
 FROM
 mitglieder m
 WHERE 
-    m.verein = :clubId;
+    m.verein = :clubId
+    AND NOT EXISTS (
+        SELECT 1
+        FROM dienstfreistellung df
+        WHERE df.pilot_id = m.pilot_id
+    );
 ";
 
 $params = [

@@ -103,6 +103,7 @@ function getDashboardData() {
         populateDashboardTable();
         //populatePilotTable();
         populateDashboardHistory();
+        loadDienstfreistellungen();
         
         // Sort pilot cards according to history table order
         sortPilotCards();
@@ -115,6 +116,65 @@ function getDashboardData() {
         console.error('Dashboard Daten konnten nicht geladen werden:', status, error);
     });
 }
+
+function loadDienstfreistellungen() {
+    const table = document.getElementById('dienstfreistellungTable');
+
+    if (!table) {
+        return;
+    }
+
+    $.ajax({
+        url: 'getDienstfreistellung.php',
+        type: 'GET',
+        dataType: 'json'
+    })
+    .done(function(data) {
+        dienstfreistellungen = data || [];
+        populateDienstfreistellungList();
+    })
+    .fail(function(xhr, status, error) {
+        console.error('Dienstfreistellungen konnten nicht geladen werden:', status, error);
+    });
+}
+
+function populateDienstfreistellungList() {
+    const tbody = document.querySelector('#dienstfreistellungTable tbody');
+
+    if (!tbody) {
+        return;
+    }
+
+    tbody.innerHTML = '';
+
+    if (!dienstfreistellungen.length) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 2;
+        cell.classList.add('text-muted');
+        cell.textContent = 'Keine Dienstfreistellungen eingetragen.';
+        row.appendChild(cell);
+        tbody.appendChild(row);
+        return;
+    }
+
+    dienstfreistellungen.forEach(entry => {
+        const row = document.createElement('tr');
+        const nameCell = document.createElement('td');
+        const grundCell = document.createElement('td');
+        const fullName = `${entry.firstname || ''} ${entry.lastname || ''}`.trim();
+
+        nameCell.classList.add('dienstfreistellung-name');
+        nameCell.textContent = fullName || `Pilot ${entry.pilot_id}`;
+        nameCell.title = nameCell.textContent;
+        grundCell.textContent = entry.grund || '';
+
+        row.appendChild(nameCell);
+        row.appendChild(grundCell);
+        tbody.appendChild(row);
+    });
+}
+
 function refreshDashboardHistory() {
     const historyStartDate = getHistoryStartDateValue();
     

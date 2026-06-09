@@ -25,6 +25,14 @@ class Database
 
     private static function setupSchema(): void
     {
+        self::$conn->exec(
+            'CREATE TABLE IF NOT EXISTS dienstfreistellung (
+                pilot_id int(11) NOT NULL,
+                grund text NOT NULL,
+                PRIMARY KEY (pilot_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;'
+        );
+
         // rename moegliche_flugtage -> flugtage (#16)
         $result =  self::query(
             'SELECT COUNT(*) AS exists FROM information_schema.tables WHERE table_schema = database() AND table_name = :tableName',

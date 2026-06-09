@@ -61,6 +61,17 @@ CREATE TABLE `dienste_wuensche` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur fuer Tabelle `dienstfreistellung`
+--
+
+CREATE TABLE `dienstfreistellung` (
+  `pilot_id` int(11) NOT NULL,
+  `grund` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `mitglieder`
 --
 
@@ -150,6 +161,12 @@ ALTER TABLE `dienste`
 --
 ALTER TABLE `dienste_wuensche`
   ADD PRIMARY KEY (`pilot_id`,`datum`);
+
+--
+-- Indizes fuer die Tabelle `dienstfreistellung`
+--
+ALTER TABLE `dienstfreistellung`
+  ADD PRIMARY KEY (`pilot_id`);
 
 --
 -- Indizes für die Tabelle `mitglieder`

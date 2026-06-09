@@ -12,6 +12,7 @@ var Active_Pilot_Choices = [null, null, null]
 var enteredDienste = [];
 var dashboardData = [];
 var dashboardDataHistory = [];
+var dienstfreistellungen = [];
 const thisYear = new Date().getFullYear();
 var Saison = 1;
 var saisonJahr = thisYear;
