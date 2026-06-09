@@ -54,6 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ->subject('Passwort zurücksetzen')
                 ->text("Bitte klicke auf folgenden Link, um Dein Passwort zurückzusetzen:\n\n" . $resetLink);
 
+            if (!empty(Helper::$configuration['email']['envelopeFrom'])) {
+                $emailMessage->sender(Helper::$configuration['email']['envelopeFrom']);
+            }
+
             $mailer->send($emailMessage);
         }
     }

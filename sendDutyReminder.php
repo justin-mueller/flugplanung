@@ -120,7 +120,8 @@ foreach ($duties as $duty) {
 }
 
 // Get sender email from configuration
-$senderEmail = Helper::$configuration['mailFrom'] ?? Helper::$configuration['flugplanungFrom'] ?? 'noreply@example.com';
+$senderEmail = Helper::$configuration['email']['from'] ?? Helper::$configuration['mailFrom'] ?? Helper::$configuration['flugplanungFrom'] ?? 'no-reply@example.com';
+$envelopeSenderEmail = Helper::$configuration['email']['envelopeFrom'] ?? null;
 
 foreach ($dutiesByPilot as $pilotId => $data) {
     $pilot = $data['pilot'];
@@ -161,6 +162,10 @@ foreach ($dutiesByPilot as $pilotId => $data) {
         ->to($to)
         ->subject($personalizedSubject)
         ->html($personalizedBody);
+
+    if ($envelopeSenderEmail) {
+        $email->sender($envelopeSenderEmail);
+    }
     
     try {
         $mailer->send($email);

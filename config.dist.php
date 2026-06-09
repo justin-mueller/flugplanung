@@ -11,8 +11,8 @@ return [
 
     'smtpDsn' => 'smtp://user:password@smtp.example.com:587',
 
-    'newsletterFrom' => 'Newsletter <newsletter.flugplanung@yourdomain.de>',
-    'flugplanungFrom' => 'Flugplanung <flugplanung@yourdomain.de>',
+    'newsletterFrom' => 'Newsletter <no-reply@yourdomain.de>',
+    'flugplanungFrom' => 'Flugplanung <no-reply@yourdomain.de>',
 
     'db' => [
         'servername' => $_SERVER['DATABASE_HOST'] ?? 'localhost',
@@ -24,7 +24,8 @@ return [
 
     'email' => [
         'dsn' => $_SERVER['EMAIL_DSN'] ?? 'smtp://user:password@smtp.example.com:587',
-        'from' => $_SERVER['EMAIL_FROM'] ?? 'no-reply@nothing.invalid'
+        'from' => $_SERVER['EMAIL_FROM'] ?? 'no-reply@yourdomain.de',
+        'envelopeFrom' => $_SERVER['EMAIL_ENVELOPE_FROM'] ?? 'user@yourdomain.de'
     ],
 
     'clubs' => [

@@ -25,7 +25,7 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret) {
 }
 
 // Set sender email address for Flugplanung emails
-$_POST['sender_email'] = Helper::$configuration['flugplanungFrom'];
+$_POST['sender_email'] = Helper::$configuration['flugplanungFrom'] ?? Helper::$configuration['email']['from'];
 
 // Set preference filter - only send to users who have wuensche_reminder enabled
 $_POST['preference_filter'] = 'wuensche_reminder';

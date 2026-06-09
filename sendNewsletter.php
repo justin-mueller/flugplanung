@@ -25,7 +25,7 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret) {
 }
 
 // Set sender email address for newsletter emails
-$_POST['sender_email'] = Helper::$configuration['newsletterFrom'];
+$_POST['sender_email'] = Helper::$configuration['newsletterFrom'] ?? Helper::$configuration['email']['from'];
 
 // Set preference filter - only send to users who have newsletter enabled
 $_POST['preference_filter'] = 'newsletter';

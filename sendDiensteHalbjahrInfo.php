@@ -21,7 +21,7 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret) {
     exit("Forbidden: Invalid or missing key");
 }
 
-$_POST['sender_email'] = Helper::$configuration['flugplanungFrom'];
+$_POST['sender_email'] = Helper::$configuration['flugplanungFrom'] ?? Helper::$configuration['email']['from'];
 $_POST['mail_file'] = 'dienste_halbjahr.html';
 $_POST['user_id_from'] = isset($_POST['user_id_from'])
     ? intval($_POST['user_id_from'])

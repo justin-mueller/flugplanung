@@ -172,7 +172,8 @@ $total = count($recipients);
 $current = 0;
 
 // Get sender email from configuration or POST parameter (set by wrapper scripts)
-$senderEmail = $_POST['sender_email'] ?? Helper::$configuration['mailFrom'] ?? Helper::$configuration['newsletterFrom'] ?? 'noreply@example.com';
+$senderEmail = $_POST['sender_email'] ?? Helper::$configuration['email']['from'] ?? Helper::$configuration['mailFrom'] ?? Helper::$configuration['newsletterFrom'] ?? 'no-reply@example.com';
+$envelopeSenderEmail = Helper::$configuration['email']['envelopeFrom'] ?? null;
 
 // Initialize log data
 $logData = [
@@ -216,6 +217,10 @@ foreach ($recipients as $recipient) {
         ->to($to)
         ->subject($subject)
         ->html($personalizedBody);
+
+    if ($envelopeSenderEmail) {
+        $email->sender($envelopeSenderEmail);
+    }
 
     // Attach images if configured
     $attachmentConfig = require __DIR__ . '/mailAttachments.php';
