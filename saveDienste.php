@@ -42,7 +42,7 @@ try {
     echo json_encode(['success' => true], JSON_THROW_ON_ERROR);
 
 } catch (Exception $e) {
-    Database::rollback();
+    //Database::rollback();
     echo json_encode([
         'success' => false,
         'error'   => $e->getMessage(),
