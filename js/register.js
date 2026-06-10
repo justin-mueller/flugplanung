@@ -40,11 +40,21 @@ $(document).ready(function () {
 
 });
 
-function openRegisterForm() {
-	$('#registration-form').removeClass('d-none');
+function openLoginForm() {
+	$('#login-container').removeClass('d-none');
+	$('#registration-form').addClass('d-none');
+	$('#forgot-password-container').addClass('d-none');
 }
 
-function forgotPassword() {
-	$('#forgot-password-form').removeClass('d-none');
+function openRegisterForm() {
+	$('#login-container').addClass('d-none');
+	$('#registration-form').removeClass('d-none');
+	$('#forgot-password-container').addClass('d-none');
+}
+
+function openForgotPasswordForm() {
+	$('#login-container').addClass('d-none');
+	$('#registration-form').addClass('d-none');
+	$('#forgot-password-container').removeClass('d-none');
 }
 

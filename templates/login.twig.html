@@ -70,48 +70,62 @@
                   zu finden!
                 </p>
 
-                <form method="post" action="login.php">
-                  <div class="form-outline mb-4">
-                    <input
-                      type="email"
-                      name="email"
-                      id="typeEmailX-2"
-                      value="{{ email }}"
-                      class="form-control form-control-lg"
-                      required
-                      placeholder="E-Mail"
-                      aria-label="E-Mail"
-                    />
-                  </div>
+                <hr class="my-4" />
 
-                  <div class="form-outline mb-4">
-                    <input
-                      type="password"
-                      name="password"
-                      id="typePasswordX-2"
-                      class="form-control form-control-lg"
-                      required
-                      placeholder="Passwort"
-                      aria-label="Passwort"
-                    />
-                  </div>
+                <div id="login-container">
+                  <form method="post" action="login.php">
+                    <h4>Login</h4>
+                    <div class="form-outline mb-4">
+                      <input
+                        type="email"
+                        name="email"
+                        id="typeEmailX-2"
+                        value="{{ email }}"
+                        class="form-control form-control-lg"
+                        required
+                        placeholder="E-Mail"
+                        aria-label="E-Mail"
+                      />
+                    </div>
 
-                  <button
-                    class="btn btn-primary btn-lg btn-block mb-4 ui-button"
-                    type="submit"
-                  >
-                    Login
-                  </button>
+                    <div class="form-outline mb-4">
+                      <input
+                        type="password"
+                        name="password"
+                        id="typePasswordX-2"
+                        class="form-control form-control-lg"
+                        required
+                        placeholder="Passwort"
+                        aria-label="Passwort"
+                      />
+                    </div>
 
-                  {% if error %}
-                  <div class="alert alert-danger" role="alert">{{ error }}</div>
-                  {% endif %}
-                </form>
+                    <button
+                      class="btn btn-primary btn-lg btn-block mb-4 ui-button"
+                      type="submit"
+                    >
+                      Login
+                    </button>
+                    <br />
+                    <a class="text-muted" href="#" onclick="openForgotPasswordForm()">Passwort vergessen?</a>
 
-                <div class="small mb-5 pb-lg-2">
-                    <a class="text-muted" href="#" onclick="forgotPassword()">Passwort vergessen?</a>
+                    {% if error %}
+                    <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endif %}
+                  </form>
+                  <hr class="my-4" />
 
-                    <form action="send_password_reset_mail.php" method="post" class="d-none" id="forgot-password-form">
+                  <p class="text-muted">
+                    Noch keinen Account?<br><br>
+                    <button type="button" class="btn btn-danger btn-md ui-button" onclick="openRegisterForm()">
+                      Hier registrieren!
+                    </button>
+                  </p>
+                </div>
+
+                <div class="small mb-5 pb-lg-2 d-none" id="forgot-password-container">
+                    <form action="send_password_reset_mail.php" method="post">
+                      <h4>Passwort vergessen</h4>
                       <div class="form-outline mb-4">
                         <input class="form-control form-control-lg" type="email" id="email" name="email" required placeholder="E-Mail" aria-label="E-Mail">
                       </div>
@@ -119,23 +133,13 @@
                       <button type="submit" class="btn btn-primary btn-md btn-block mb-4 ui-button">
                         Reset-Link senden
                       </button>
+                      <br/>
+                      <a class="text-muted" href="#" onclick="openLoginForm()">zurück zum Login</a>
                     </form>
                 </div>
 
-                <hr class="my-4" />
-
-                <p class="small pb-lg-2">
-                  Noch keinen Account?<br>
-                  <button
-                    type="button"
-                    class="btn btn-danger btn-md ui-button"
-                    onclick="openRegisterForm()"
-                  >
-                  Hier registrieren!
-                  </button>
-                </p>
-
                 <form method="post" id="registration-form" class="d-none">
+                  <h4>Account anlegen</h4>
                   <div class="card mb-4">
                     <div class="card-header">
                       <h5 class="card-title">Allgemeine Daten</h5>
@@ -285,11 +289,10 @@
                   >
                       Registrieren
                   </button>
-                    <div
-                            id="register-error"
-                            class="alert alert-danger d-none"
-                            role="alert"
-                    ></div>
+                  <br/>
+                  <a class="text-muted" href="#" onclick="openLoginForm()">zurück zum Login</a>
+
+                  <div id="register-error" class="alert alert-danger d-none" role="alert"></div>
                 </form>
 
                   <hr class="my-4" />
