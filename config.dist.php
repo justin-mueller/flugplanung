@@ -28,6 +28,8 @@ return [
         'envelopeFrom' => $_SERVER['EMAIL_ENVELOPE_FROM'] ?? 'user@yourdomain.de'
     ],
 
+    'paraglideableApiKey' => $_SERVER['PARAGLIDEABLE_API_KEY'] ?? '',
+
     'clubs' => [
         0 => ['name' => 'Kein Verein', 'shortName' => ''],
         1 => ['name' => '08/15 Parajumpers e.V.', 'shortName' => ''],
